@@ -27,12 +27,13 @@ namespace RoslynMonoFamix
             string path = Assembly.GetAssembly(typeof(MainClass)).Location;
             Console.WriteLine("--->>>" + path);
             path = path.Replace("RoslynMonoFamix.exe", "");
-            string solutionPath = args[0];
+            
 
             var metamodel = FamixModel.Metamodel();
 
             var msWorkspace = MSBuildWorkspace.Create();
 
+            string solutionPath = args[0];
             var solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
             Uri uri = null;
             try
