@@ -26,5 +26,3 @@ build:
 after_build:
   - cmd: md output
   - cmd: RoslynMonoFamix\bin\Debug\RoslynMonoFamix.exe SampleCode\SampleCode.sln output\Output.mse
-  - cmd:  type Output.mse
-  - appveyor PushArtifact local-file.zip -FileName remote-file-%appveyor_build_version%.zip 
