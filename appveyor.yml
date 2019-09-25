@@ -13,11 +13,9 @@ before_build:
 build:
   parallel: true                  # enable MSBuild parallel builds
   project: RoslynMonoFamix.sln    # path to Visual Studio solution or projec
-  include_nuget_references: true  # add -IncludeReferencedProjects option while packaging NuGet artifacts
-
+  include_nuget_references: true  # add -IncludeReferencedProjects option while packaging NuGet artifact
   # MSBuild verbosity level
   verbosity: normal
-after_build: 
+after_build:
   - cmd: ./RoslynMonoFamix/bin/Debug/RoslynMonoFamix.exe SampleCode/SampleCode.sln Output.mse
-  - cmd: type Output.mse
-	
+  - cmd:  type Output.mse
