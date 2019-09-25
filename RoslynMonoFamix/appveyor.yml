@@ -13,9 +13,11 @@ before_build:
   - cmd: dotnet --version
   # Display minimal restore text
   - cmd: dotnet restore RoslynMonoFamix.sln --verbosity m
+build:
+    project: RoslynMonoFamix.sln
 build_script:
   # output will be in ./src/bin/debug/netcoreapp1.1/publish
-  - cmd: dotnet build RoslynMonoFamix.sln
+  - cmd: msbuild build RoslynMonoFamix.sln
 after_build:
   # For once the build has completed
 artifacts:
