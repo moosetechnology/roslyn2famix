@@ -8,6 +8,8 @@ init:
   - cmd: git config --global core.autocrlf true
 platform: Any CPU
 configuration: Debug
+before_build:
+  - cmd: dotnet restore RoslynMonoFamix.sln --verbosity m 
 build:
   parallel: true                  # enable MSBuild parallel builds
   project: RoslynMonoFamix.sln    # path to Visual Studio solution or projec
