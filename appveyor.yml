@@ -8,6 +8,13 @@ init:
   - cmd: git config --global core.autocrlf true
 platform: Any CPU
 configuration: Debug
+
+artifacts:
+  - path: output\Output.mse
+    name: output
+    type: zip
+
+
 before_build:
   - cmd: nuget restore RoslynMonoFamix.sln -verbosity detailed
 build:
@@ -17,6 +24,7 @@ build:
   # MSBuild verbosity level
   verbosity: normal
 after_build:
-  - cmd: RoslynMonoFamix\bin\Debug\RoslynMonoFamix.exe SampleCode\SampleCode.sln Output.mse
+  - cmd: md output
+  - cmd: RoslynMonoFamix\bin\Debug\RoslynMonoFamix.exe SampleCode\SampleCode.sln output\Output.mse
   - cmd:  type Output.mse
   - appveyor PushArtifact local-file.zip -FileName remote-file-%appveyor_build_version%.zip 
