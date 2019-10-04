@@ -433,6 +433,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="appveyor.yml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fame\Fame.csproj">

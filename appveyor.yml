@@ -1,0 +1,31 @@
+﻿version: '1.0.{build}'
+image: Visual Studio 2019
+branches:
+  only:
+  - master
+init:
+  # Good practise, because Windows line endings are different from Unix/Linux ones
+  - cmd: git config --global core.autocrlf true
+platform: Any CPU
+configuration: Debug
+
+artifacts:
+  - path: output\Output.mse
+    name: output
+    type: zip
+
+
+before_build:
+  - cmd: nuget restore RoslynMonoFamix.sln -verbosity detailed
+build:
+  parallel: true                  # enable MSBuild parallel builds
+  project: RoslynMonoFamix.sln    # path to Visual Studio solution or projec
+  include_nuget_references: true  # add -IncludeReferencedProjects option while packaging NuGet artifact
+  # MSBuild verbosity level
+  verbosity: normal
+after_build:
+  - cmd: md output
+  - cmd: RoslynMonoFamix\bin\Debug\RoslynMonoFamix.exe SampleCode\SampleCode.sln output\Output.mse
+  - cmd: dir
+  - appveyor PushArtifact output\Output.mse -FileName remote-file-%appveyor_build_version%.mse 
+  
