@@ -25,7 +25,8 @@ build:
   verbosity: normal
 after_build:
   - cmd: md output
-  - cmd: RoslynMonoFamix\bin\Debug\RoslynMonoFamix.exe SampleCode\SampleCode.sln output\Output.mse
+  - cmd: RoslynMonoFamix\bin\Debug\RoslynMonoFamix.exe SampleCode\SampleCode.sln output\SampleCode.mse
+  - cmd: RoslynMonoFamix\bin\Debug\RoslynMonoFamix.exe VBLanLibrary\VBLanLibrary.sln output\VBLanLibrary.mse
   - cmd: dir
-  - appveyor PushArtifact output\Output.mse -FileName remote-file-%appveyor_build_version%.mse 
-  
+  - appveyor PushArtifact output\SampleCode.mse -FileName remote-file-%appveyor_build_version%-SampleCode.mse 
+  - appveyor PushArtifact output\VBLanLibrary.mse -FileName remote-file-%appveyor_build_version%-VBLanLibrary.mse   
