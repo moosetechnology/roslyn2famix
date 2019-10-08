@@ -324,9 +324,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AST2XMLPrinter.cs" />
+    <Compile Include="VBASTVisitor.cs" />
     <Compile Include="InCSharp\InCSharpImporter.cs" />
     <Compile Include="InCSharp\NamedEntityAccumulator.cs" />
-    <Compile Include="ASTVisitor.cs" />
+    <Compile Include="CSharpASTVisitor.cs" />
     <Compile Include="Model\CSharp\CSharpEvent.cs" />
     <Compile Include="Model\CSharp\CSharpProperty.cs" />
     <Compile Include="Model\CSharp\CSharpPropertyAccessor.cs" />

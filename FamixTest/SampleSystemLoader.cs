@@ -45,7 +45,7 @@ namespace FamixTest
 						var syntaxTree = document.GetSyntaxTreeAsync().Result;
 						var compilationAsync = project.GetCompilationAsync().Result;
 						var semanticModel = compilationAsync.GetSemanticModel(syntaxTree);
-                        var visitor = new ASTVisitor(semanticModel, importer);
+                        var visitor = new CSharpASTVisitor(semanticModel, importer);
 						visitor.Visit(syntaxTree.GetRoot());
                         fileWasFound = true;
 					}
