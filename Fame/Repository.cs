@@ -13,7 +13,7 @@ namespace Fame
 
 		private IList elements;
 
-		private MetaRepository metamodel;
+		public MetaRepository metamodel;
 
 		public IList GetElements()
 		{
@@ -31,7 +31,7 @@ namespace Fame
 
 		}
 
-		/**Creates a empty layer with the given meta-layer.
+        /**Creates a empty layer with the given meta-layer.
 
 		* <p>
 		* If the specified parameter is <code>null</code>, creates a
@@ -40,10 +40,12 @@ namespace Fame
 		* @param metamodel
 		*/
 
-		public Repository(MetaRepository metamodel)
+
+
+        public Repository(MetaRepository metamodel)
 		{
 			// allow null in order to boot-strap self-described meta-models
-			this.metamodel = metamodel ?? (MetaRepository)this;
+			this.metamodel = metamodel;
 			this.elements = new List<object>();
 		}
 
@@ -70,35 +72,36 @@ namespace Fame
 
 		public virtual void Add(object element)
 		{
-			if (elements.Add(element) > 0)
-			{
-				MetaDescription meta = metamodel.GetDescription(element.GetType());
+            MetaDescription meta = metamodel.GetDescription(element.GetType());
 
-				foreach (PropertyDescription property in meta.AllAttributes())
+            elements.Add(element);
+			
+
+			foreach (PropertyDescription property in meta.AllAttributes())
+			{
+				if (!property.IsPrimitive())
 				{
-					if (!property.IsPrimitive())
+					Boolean isRoot = property.Type.IsRoot();
+					foreach (object value in property.ReadAll(element))
 					{
-						Boolean isRoot = property.Type.IsRoot();
-						foreach (object value in property.ReadAll(element))
+						if (!(isRoot &&
+								(value is String ||
+								value is Boolean ||
+								Number.IsNumber(value))))
 						{
-							if (!(isRoot &&
-									(value is String ||
-									value is Boolean ||
-									Number.IsNumber(value))))
+							try
 							{
-								try
-								{
-									this.Add(value);
-								}
-								catch (ClassNotMetadescribedException e)
-								{
-									throw new ElementInPropertyNotMetadescribed(property);
-								}
+								this.Add(value);
+							}
+							catch (ClassNotMetadescribedException e)
+							{
+								throw new ElementInPropertyNotMetadescribed(property);
 							}
 						}
 					}
 				}
 			}
+			
 		}
 
 		public void AddAll(IList<object> all)

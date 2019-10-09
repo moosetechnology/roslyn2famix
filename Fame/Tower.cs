@@ -14,11 +14,17 @@ namespace Fame
 		private Tower(MetaRepository m3, MetaRepository m2, Repository m1)
 		{
 			this.metaMetamodel = m3;
-			this.metamodel = m2 ?? new MetaRepository(metaMetamodel);
-			this.model = m1 ?? new Repository(metamodel);
+			this.metamodel = m2;
+			this.model = m1;
 		}
+        private Tower(MetaRepository m3)
+        {
+            this.metaMetamodel = m3;
+            this.metamodel = new MetaRepository(metaMetamodel);
+            this.model =  new Repository(metamodel);
+        }
 
-		public Tower() : this (MetaRepository.CreateFM3(), null, null)
+        public Tower() : this (MetaRepository.CreateFM3())
 		{
 
 		}

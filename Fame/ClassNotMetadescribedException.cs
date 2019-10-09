@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Fame
 {
 	[Serializable]
-	internal class ClassNotMetadescribedException : Exception
+	public class ClassNotMetadescribedException : Exception
 	{
 		public ClassNotMetadescribedException()
 		{

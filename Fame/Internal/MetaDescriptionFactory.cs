@@ -61,7 +61,7 @@ namespace Fame.Internal
         {
             if (type.BaseType != null)
             {
-                repository.With(type.BaseType);
+                repository.RegisterType(type.BaseType);
                 MetaDescription superclass = repository.GetDescription(type.BaseType);
                 if (superclass != null)
                     instance.SuperClass = superclass;

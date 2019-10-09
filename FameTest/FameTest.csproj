@@ -51,7 +51,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="WithTest.cs" />
+    <Compile Include="FameRepositoryTest.cs" />
+    <Compile Include="DragonTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

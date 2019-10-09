@@ -24,10 +24,17 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
         currentTypeStack = new System.Collections.Stack();
     }
 
+
+    /************************************************************************************************
+     *  Class Entities management   
+     *    - In this following Visit methods we deal with the class and inside class elements    
+     ************************************************************************************************/
+
+
     public override void VisitClassBlock(ClassBlockSyntax node)
     {
-        var typeSymbol = semanticModel.GetDeclaredSymbol(node);
-       
+        var typeSymbol = semanticModel.GetDeclaredSymbol(node.ClassStatement);
+
         FAMIX.Type type = type = importer.EnsureType(typeSymbol);
         var superType = typeSymbol.BaseType;
 
@@ -49,6 +56,7 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
         AddSuperInterfaces(typeSymbol, type);
         AddAnnotations(typeSymbol, type);
         AddParameterTypes(typeSymbol, type);
+
         currentTypeStack.Push(type);
         importer.CreateSourceAnchor(type, node);
         type.isStub = false;
@@ -59,25 +67,6 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
         currentTypeStack.Pop();
     }
 
-
-    private void ComputeFanout(FAMIX.Type currentType)
-    {
-        //  currentType.Methods.ForEach(method=>method.OutgoingInvocations.ForEach())
-
-        var types = currentType.Methods.SelectMany(
-            method => method.OutgoingInvocations.SelectMany(
-                invocation => invocation.Candidates.SelectMany(called=> new FAMIX.Type[] {(called as Method).parentType}))).Distinct<FAMIX.Type>();
-        var fanout = types.Sum<FAMIX.Type>(type => type == currentType? 0 : 1);
-        currentType.fanOut = fanout;
-    }
-
-    private void AddParameterTypes(INamedTypeSymbol typeSymbol, FAMIX.Type type)
-    {
-        foreach (var typeParameter in typeSymbol.TypeParameters)
-        {
-            (type as ParameterizableClass).Parameters.Add(importer.EnsureType(typeParameter) as FAMIX.ParameterType);
-        }
-    }
 
     public override void VisitStructureBlock(StructureBlockSyntax node)
     {
@@ -114,56 +103,6 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
             anEnumValue.parentEnum = currentTypeStack.Peek() as FAMIX.Enum;
             anEnumValue.parentEnum.AddValue(anEnumValue);
             anEnumValue.isStub = false;
-        }
-      
-    }
-
-    //TODO add AnnotationInstanceAttribute link to AnnotationAttribute is not implemented
-    //because in C# there are AnnotationAttributes that are initilized via constructors
-    private void AddAnnotations(INamedTypeSymbol typeSymbol, FAMIX.NamedEntity type)
-    {
-        var attributes = typeSymbol.GetAttributes();
-        foreach (var attr in attributes)
-        {
-            try
-            {
-                FAMIX.AnnotationInstance annotationInstance = importer.New<FAMIX.AnnotationInstance>();
-
-                FAMIX.AnnotationType annonType = (FAMIX.AnnotationType)importer.EnsureType(attr.AttributeClass);
-                annotationInstance.annotatedEntity = type;
-                annotationInstance.annotationType = annonType;
-
-                foreach (var constrArgument in attr.ConstructorArguments)
-                {
-                    AnnotationInstanceAttribute annotationInstanceAttribute = importer.New<FAMIX.AnnotationInstanceAttribute>();
-                    annotationInstanceAttribute.value = constrArgument.Value.ToString();
-                    annotationInstance.AddAttribute(annotationInstanceAttribute);
-                }
-                foreach (var namedArgument in attr.NamedArguments)
-                {
-                    AnnotationInstanceAttribute annotationInstanceAttribute = importer.New<FAMIX.AnnotationInstanceAttribute>();
-                    annotationInstanceAttribute.value = namedArgument.Value.ToString();
-                    annotationInstance.AddAttribute(annotationInstanceAttribute);
-                }
-            }
-            catch (InvalidCastException c)
-            {
-                Console.WriteLine(c.Message);
-            }
-        }
-    }
-
-    private void AddSuperInterfaces(INamedTypeSymbol typeSymbol, FAMIX.Type type)
-    {
-        foreach (var inter in typeSymbol.Interfaces)
-        {
-            FAMIX.Type fInterface = (FAMIX.Type)importer.EnsureType(inter);
-            if (fInterface is FAMIX.Class) (fInterface as FAMIX.Class).isInterface = true;
-            Inheritance inheritance = importer.CreateNewAssociation<Inheritance>("FAMIX.Inheritance");
-            inheritance.subclass = type;
-            inheritance.superclass = fInterface;
-            fInterface.AddSubInheritance(inheritance);
-            type.AddSuperInheritance(inheritance);
         }
     }
 
@@ -248,37 +187,12 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
     }
 
 
-    /*
-      This two methods AddMethod reveals the flaws of designing based on method overload instead of using polymorphism.  
-    */
-   private Method AddMethod(SubNewStatementSyntax node, string name) {
-        return AddMethod(semanticModel.GetDeclaredSymbol(node), node, name);
-   }
-    private Method AddMethod(MethodStatementSyntax node, string name)
-    {
-      return AddMethod(semanticModel.GetDeclaredSymbol(node), node, name);
-    } 
-    
 
-    private Method AddMethod(IMethodSymbol methodSymbol,  SyntaxNode node, string name)
-    {
-        if (currentTypeStack.Count > 0)
-        {
-          
 
-            Method aMethod = importer.EnsureMethod(methodSymbol);
-            aMethod.name = name;
-            aMethod.parentType = importer.EnsureType(methodSymbol.ContainingType);
-            aMethod.parentType.AddMethod(aMethod);
-            currentMethod = aMethod;
 
-            var returnType = importer.EnsureType(methodSymbol.ReturnType);
-            currentMethod.declaredType = returnType;
-            importer.CreateSourceAnchor(aMethod, node);
-            currentMethod.isStub = false;
-        }
-        return currentMethod;
-    }
+
+
+
 
     public override void VisitPropertyBlock (PropertyBlockSyntax node)
     {
@@ -334,34 +248,12 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
         base.VisitFieldDeclaration(node);
     }
 
-    private void AddField(FieldDeclarationSyntax node)
-    {
-        foreach (var variableDeclarator in node.Declarators)
-        {
-            foreach (var attributeName in variableDeclarator.Names) {
-                var returnTypeSymbol = semanticModel.GetDeclaredSymbol(variableDeclarator.AsClause.Type());
-                var symbol = semanticModel.GetDeclaredSymbol(variableDeclarator);
-
-                if (symbol is IFieldSymbol || symbol is IEventSymbol)
-                {
-                    if (currentTypeStack.Count > 0)
-                    {
-                        FAMIX.Attribute anAttribute = importer.EnsureAttribute(symbol) as FAMIX.Attribute;
-                        anAttribute.parentType = importer.EnsureType(symbol.ContainingType);
-                        anAttribute.parentType.AddAttribute(anAttribute);
-                        importer.CreateSourceAnchor(anAttribute, node);
-                        anAttribute.isStub = false;
-                    }
-                }
-            }
-        }
-    }
 
     public override void VisitCatchBlock(CatchBlockSyntax node)
     {
-      
+
         ISymbol typeSymbol = semanticModel.GetTypeInfo(node.CatchStatement.AsClause.Type).Type;
-        var exceptionClass = (FAMIX.Class) importer.EnsureType(typeSymbol);
+        var exceptionClass = (FAMIX.Class)importer.EnsureType(typeSymbol);
         FAMIX.CaughtException caughtException = importer.New<FAMIX.CaughtException>();
         caughtException.definingMethod = currentMethod;
         caughtException.exceptionClass = exceptionClass;
@@ -373,7 +265,7 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
         if (node.Expression != null)
         {
             var symbolInfo = semanticModel.GetTypeInfo(node.Expression).Type;
-        
+
             var exceptionClass = (FAMIX.Class)importer.EnsureType(symbolInfo);
             FAMIX.ThrownException thrownException = importer.New<FAMIX.ThrownException>();
             thrownException.definingMethod = currentMethod;
@@ -382,18 +274,6 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
         base.VisitThrowStatement(node);
     }
 
-    private T GetSymbol<T>(SyntaxNode node)
-    {
-        var symbolInfo = semanticModel.GetSymbolInfo(node).Symbol;
-        if (symbolInfo is T methodSymbol)
-            return methodSymbol;
-        return default(T);
-    }
-
-    /**
-     * Visit an identifier, it can be anything, a method reference, a field, a local variable, etc.
-     * We need to find out what it is and if it is located in a method and then make the appropriate connection.
-     */
     public override void VisitIdentifierName(IdentifierNameSyntax node)
     {
         try
@@ -412,7 +292,8 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
     }
 
     public override void VisitInvocationExpression(InvocationExpressionSyntax node)
-    {   try
+    {
+        try
         {
             if (currentMethod != null)
             {
@@ -447,44 +328,10 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
         base.VisitObjectCreationExpression(node);
     }
 
-    private void AddAttributeAccess(SyntaxNode node, Method clientMethod, FAMIX.Attribute attribute)
-    {
-        Access access = importer.CreateNewAssociation<Access>("FAMIX.Access");
-        access.accessor = currentMethod;
-        access.variable = attribute;
-        clientMethod.AddAccesse(access);
-        attribute.AddIncomingAccesse(access);
-        importer.CreateSourceAnchor(access, node);
-    }
-
-    private void AddMethodCall(SyntaxNode node, Method clientMethod, Method referencedEntity)
-    {
-            Invocation invocation = importer.CreateNewAssociation<Invocation>("FAMIX.Invocation");
-            invocation.sender = clientMethod;
-            invocation.AddCandidate(referencedEntity);
-            invocation.signature = node.Span.ToString();
-            //invocation.receiver = referencedEntity;
-            clientMethod.AddOutgoingInvocation(invocation);
-            referencedEntity.AddIncomingInvocation(invocation);
-            importer.CreateSourceAnchor(invocation, node);
-    }
-
-    private NamedEntity FindReferencedEntity(ExpressionSyntax node)
-    {
-        var symbol = semanticModel.GetSymbolInfo(node).Symbol;
-        if (symbol is IMethodSymbol || symbol is IEventSymbol)
-            return importer.EnsureMethod(symbol);
-        if (symbol is IFieldSymbol)
-            return importer.EnsureAttribute(symbol);
-        if (symbol is IPropertySymbol)
-            return importer.EnsureAttribute(symbol);
-        return null;
-    }
-
     public override void VisitAssignmentStatement(AssignmentStatementSyntax node)
     {
         var isEvent = semanticModel.GetSymbolInfo(node.Left).Symbol;
-        if (isEvent!=null && isEvent.Kind == SymbolKind.Event)
+        if (isEvent != null && isEvent.Kind == SymbolKind.Event)
         {
             var isMethod = semanticModel.GetSymbolInfo(node.Right).Symbol;
             if (isMethod != null && isMethod.Kind == SymbolKind.Method)
@@ -530,4 +377,190 @@ public class VBASTVisitor : VisualBasicSyntaxWalker
         if (currentMethod != null) currentMethod.cyclomaticComplexity++;
         base.VisitReturnStatement(node);
     }
+
+
+
+
+    /*********************************************************************************************************
+     * Auxiliary functions
+     *********************************************************************************************************/
+
+
+
+
+    private void ComputeFanout(FAMIX.Type currentType)
+    {
+        //  currentType.Methods.ForEach(method=>method.OutgoingInvocations.ForEach())
+
+        var types = currentType.Methods.SelectMany(
+            method => method.OutgoingInvocations.SelectMany(
+                invocation => invocation.Candidates.SelectMany(called => new FAMIX.Type[] { (called as Method).parentType }))).Distinct<FAMIX.Type>();
+        var fanout = types.Sum<FAMIX.Type>(type => type == currentType ? 0 : 1);
+        currentType.fanOut = fanout;
+    }
+
+    private void AddParameterTypes(INamedTypeSymbol typeSymbol, FAMIX.Type type)
+    {
+        foreach (var typeParameter in typeSymbol.TypeParameters)
+        {
+            (type as ParameterizableClass).Parameters.Add(importer.EnsureType(typeParameter) as FAMIX.ParameterType);
+        }
+    }
+    //TODO add AnnotationInstanceAttribute link to AnnotationAttribute is not implemented
+    //because in C# there are AnnotationAttributes that are initilized via constructors
+    private void AddAnnotations(INamedTypeSymbol typeSymbol, FAMIX.NamedEntity type)
+    {   
+
+
+        var attributes = typeSymbol.GetAttributes();
+        foreach (var attr in attributes)
+        {
+            try
+            {
+                FAMIX.AnnotationInstance annotationInstance = importer.New<FAMIX.AnnotationInstance>();
+
+                FAMIX.AnnotationType annonType = (FAMIX.AnnotationType)importer.EnsureType(attr.AttributeClass);
+                annotationInstance.annotatedEntity = type;
+                annotationInstance.annotationType = annonType;
+
+                foreach (var constrArgument in attr.ConstructorArguments)
+                {
+                    AnnotationInstanceAttribute annotationInstanceAttribute = importer.New<FAMIX.AnnotationInstanceAttribute>();
+                    annotationInstanceAttribute.value = constrArgument.Value.ToString();
+                    annotationInstance.AddAttribute(annotationInstanceAttribute);
+                }
+                foreach (var namedArgument in attr.NamedArguments)
+                {
+                    AnnotationInstanceAttribute annotationInstanceAttribute = importer.New<FAMIX.AnnotationInstanceAttribute>();
+                    annotationInstanceAttribute.value = namedArgument.Value.ToString();
+                    annotationInstance.AddAttribute(annotationInstanceAttribute);
+                }
+            }
+            catch (InvalidCastException c)
+            {
+                Console.WriteLine(c.Message);
+            }
+        }
+    }
+
+    private void AddSuperInterfaces(INamedTypeSymbol typeSymbol, FAMIX.Type type)
+    {
+        foreach (var inter in typeSymbol.Interfaces)
+        {
+            FAMIX.Type fInterface = (FAMIX.Type)importer.EnsureType(inter);
+            if (fInterface is FAMIX.Class) (fInterface as FAMIX.Class).isInterface = true;
+            Inheritance inheritance = importer.CreateNewAssociation<Inheritance>("FAMIX.Inheritance");
+            inheritance.subclass = type;
+            inheritance.superclass = fInterface;
+            fInterface.AddSubInheritance(inheritance);
+            type.AddSuperInheritance(inheritance);
+        }
+    }
+    /*
+      This two methods AddMethod reveals the flaws of designing based on method overload instead of using polymorphism.  
+    */
+
+
+    private Method AddMethod(SubNewStatementSyntax node, string name)
+    {
+        return AddMethod(semanticModel.GetDeclaredSymbol(node), node, name);
+    }
+    private Method AddMethod(MethodStatementSyntax node, string name)
+    {
+        return AddMethod(semanticModel.GetDeclaredSymbol(node), node, name);
+    }
+
+
+    private Method AddMethod(IMethodSymbol methodSymbol, SyntaxNode node, string name)
+    {
+        if (currentTypeStack.Count > 0)
+        {
+            Method aMethod = importer.EnsureMethod(methodSymbol);
+            aMethod.name = name;
+            aMethod.parentType = importer.EnsureType(methodSymbol.ContainingType);
+            aMethod.parentType.AddMethod(aMethod);
+            currentMethod = aMethod;
+
+            var returnType = importer.EnsureType(methodSymbol.ReturnType);
+            currentMethod.declaredType = returnType;
+            importer.CreateSourceAnchor(aMethod, node);
+            currentMethod.isStub = false;
+        }
+        return currentMethod;
+    }
+
+
+    private void AddField(FieldDeclarationSyntax node)
+    {
+        foreach (var variableDeclarator in node.Declarators)
+        {
+            foreach (var attributeName in variableDeclarator.Names) {
+                var returnTypeSymbol = semanticModel.GetDeclaredSymbol(variableDeclarator.AsClause.Type());
+                var symbol = semanticModel.GetDeclaredSymbol(variableDeclarator);
+
+                if (symbol is IFieldSymbol || symbol is IEventSymbol)
+                {
+                    if (currentTypeStack.Count > 0)
+                    {
+                        FAMIX.Attribute anAttribute = importer.EnsureAttribute(symbol) as FAMIX.Attribute;
+                        anAttribute.parentType = importer.EnsureType(symbol.ContainingType);
+                        anAttribute.parentType.AddAttribute(anAttribute);
+                        importer.CreateSourceAnchor(anAttribute, node);
+                        anAttribute.isStub = false;
+                    }
+                }
+            }
+        }
+    }
+
+  
+
+    private T GetSymbol<T>(SyntaxNode node)
+    {
+        var symbolInfo = semanticModel.GetSymbolInfo(node).Symbol;
+        if (symbolInfo is T methodSymbol)
+            return methodSymbol;
+        return default(T);
+    }
+
+    /**
+     * Visit an identifier, it can be anything, a method reference, a field, a local variable, etc.
+     * We need to find out what it is and if it is located in a method and then make the appropriate connection.
+     */
+  
+
+    private void AddAttributeAccess(SyntaxNode node, Method clientMethod, FAMIX.Attribute attribute)
+    {
+        Access access = importer.CreateNewAssociation<Access>("FAMIX.Access");
+        access.accessor = currentMethod;
+        access.variable = attribute;
+        clientMethod.AddAccesse(access);
+        attribute.AddIncomingAccesse(access);
+        importer.CreateSourceAnchor(access, node);
+    }
+
+    private void AddMethodCall(SyntaxNode node, Method clientMethod, Method referencedEntity)
+    {
+            Invocation invocation = importer.CreateNewAssociation<Invocation>("FAMIX.Invocation");
+            invocation.sender = clientMethod;
+            invocation.AddCandidate(referencedEntity);
+            invocation.signature = node.Span.ToString();
+            //invocation.receiver = referencedEntity;
+            clientMethod.AddOutgoingInvocation(invocation);
+            referencedEntity.AddIncomingInvocation(invocation);
+            importer.CreateSourceAnchor(invocation, node);
+    }
+
+    private NamedEntity FindReferencedEntity(ExpressionSyntax node)
+    {
+        var symbol = semanticModel.GetSymbolInfo(node).Symbol;
+        if (symbol is IMethodSymbol || symbol is IEventSymbol)
+            return importer.EnsureMethod(symbol);
+        if (symbol is IFieldSymbol)
+            return importer.EnsureAttribute(symbol);
+        if (symbol is IPropertySymbol)
+            return importer.EnsureAttribute(symbol);
+        return null;
+    }
+
 }

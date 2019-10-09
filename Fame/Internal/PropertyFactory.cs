@@ -42,7 +42,7 @@ namespace Fame.Internal
 
 		private void InitializeType()
 		{
-			repository.With(access.GetElementType());
+			repository.RegisterType(access.GetElementType());
 			MetaDescription type = repository.GetDescription(access.GetElementType());
 			instance.Type = type;
 		}

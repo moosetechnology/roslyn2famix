@@ -20,10 +20,10 @@ namespace Fame
 		internal static MetaRepository CreateFM3()
 		{
 			MetaRepository mse =  new MetaRepository(null);
-			mse.With(typeof(MetaDescription));
-			mse.With(typeof(Element));
-			mse.With(typeof(PackageDescription));
-			mse.With(typeof(PropertyDescription));
+			mse.RegisterType(typeof(MetaDescription));
+			mse.RegisterType(typeof(Element));
+			mse.RegisterType(typeof(PackageDescription));
+			mse.RegisterType(typeof(PropertyDescription));
 			mse.AddAll(mse.bindings.Values.ToList<object>());
 			return mse;
 		}
@@ -33,7 +33,7 @@ namespace Fame
             throw new System.NotImplementedException();
         }
 
-		public void With(Type type)
+		public void RegisterType(Type type)
 		{
 			if (!classes.ContainsKey(type))
 			{
@@ -64,6 +64,8 @@ namespace Fame
 		internal MetaDescription GetDescription(Type type)
 		{
 			classes.TryGetValue(type, out MetaDescription value);
+            if (value == null) 
+                   throw new ClassNotMetadescribedException("The type " + type.ToString() + " is not a valid type in this MetaRepository ");
 			return value;
 		}
 

@@ -12,7 +12,7 @@ namespace RoslynMonoFamix.InCSharp
     public class InCSharpImporter
     {
         private Repository repository;
-        private string ignoreFolder;
+        private string projectBaseFolder;
        
         private Dictionary<string, System.Type> typeNameMap = new Dictionary<string, System.Type>()
             {
@@ -24,14 +24,14 @@ namespace RoslynMonoFamix.InCSharp
                 { "Enum", typeof(FAMIX.Enum) },
             };
 
-        public InCSharpImporter(Repository repository, string ignoreFolder)
+        public InCSharpImporter(Repository repository, string projectBaseFolder)
         {
             this.repository = repository;
             this.Methods = new NamedEntityAccumulator<Method>();
             this.Types = new NamedEntityAccumulator<FAMIX.Type>();
             this.Namespaces = new NamedEntityAccumulator<Namespace>();
             this.Attributes = new NamedEntityAccumulator<FAMIX.StructuralEntity>();
-            this.ignoreFolder = ignoreFolder;
+            this.projectBaseFolder = projectBaseFolder;
         }
         public NamedEntityAccumulator<FAMIX.Namespace> Namespaces { get; set; }
         public NamedEntityAccumulator<FAMIX.Type> Types { get; set; }
@@ -294,7 +294,7 @@ namespace RoslynMonoFamix.InCSharp
         {
             
             var lineSpan = node.SyntaxTree.GetLineSpan(node.Span);
-            var relativePath = node.SyntaxTree.FilePath.Substring(ignoreFolder.Length+1);
+            var relativePath = node.SyntaxTree.FilePath.Substring(projectBaseFolder.Length+1);
             FileAnchor fileAnchor = CreateNewFileAnchor(node, ref lineSpan);
             var loc = lineSpan.EndLinePosition.Line - lineSpan.StartLinePosition.Line;
             if (sourcedEntity is BehaviouralEntity) (sourcedEntity as BehaviouralEntity).numberOfLinesOfCode = loc;
@@ -327,7 +327,7 @@ namespace RoslynMonoFamix.InCSharp
 
         private FileAnchor CreateNewFileAnchor(SyntaxNode node, ref FileLinePositionSpan lineSpan)
         {
-            var relativePath = node.SyntaxTree.FilePath.Substring(ignoreFolder.Length + 1);
+            var relativePath = node.SyntaxTree.FilePath.Substring(projectBaseFolder.Length + 1);
             FileAnchor fileAnchor = new FileAnchor
             {
                 startLine = lineSpan.StartLinePosition.Line + 1,

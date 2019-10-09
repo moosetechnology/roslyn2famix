@@ -282,27 +282,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1Test.cs" />
-    <Compile Include="MyPartialClass1Test.cs" />
+    <Compile Include="SampleProjectBasedTests\Class1Test.cs" />
+    <Compile Include="SampleProjectBasedTests\MyPartialClass1Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SampleSystemLoader.cs" />
-    <Compile Include="CallsTest.cs" />
-    <Compile Include="AttributeTest.cs" />
-    <Compile Include="SubClassTest.cs" />
-    <Compile Include="ISimpleInterfaceTest.cs" />
-    <Compile Include="ImplementorTest.cs" />
-    <Compile Include="AnnotationAttributeTest.cs" />
-    <Compile Include="ExceptionsTest.cs" />
-    <Compile Include="DelegateEventTest.cs" />
-    <Compile Include="SimpleStructTest.cs" />
-    <Compile Include="GenericsTest.cs" />
-    <Compile Include="ReturnTypeTest.cs" />
-    <Compile Include="EnumTest.cs" />
-    <Compile Include="BinarySuperclassesTest.cs" />
-    <Compile Include="PropertiesTest.cs" />
-    <Compile Include="FanoutTest.cs" />
-    <Compile Include="ExpressionBodyTest.cs" />
-    <Compile Include="EventDelegateClassTest.cs" />
+    <Compile Include="SampleProjectBasedTests\SampleSystemLoader.cs" />
+    <Compile Include="SampleProjectBasedTests\CallsTest.cs" />
+    <Compile Include="SampleProjectBasedTests\AttributeTest.cs" />
+    <Compile Include="SampleProjectBasedTests\SubClassTest.cs" />
+    <Compile Include="SampleProjectBasedTests\ISimpleInterfaceTest.cs" />
+    <Compile Include="SampleProjectBasedTests\ImplementorTest.cs" />
+    <Compile Include="SampleProjectBasedTests\AnnotationAttributeTest.cs" />
+    <Compile Include="SampleProjectBasedTests\ExceptionsTest.cs" />
+    <Compile Include="SampleProjectBasedTests\DelegateEventTest.cs" />
+    <Compile Include="SampleProjectBasedTests\SimpleStructTest.cs" />
+    <Compile Include="SampleProjectBasedTests\GenericsTest.cs" />
+    <Compile Include="SampleProjectBasedTests\ReturnTypeTest.cs" />
+    <Compile Include="SampleProjectBasedTests\EnumTest.cs" />
+    <Compile Include="SampleProjectBasedTests\BinarySuperclassesTest.cs" />
+    <Compile Include="SampleProjectBasedTests\PropertiesTest.cs" />
+    <Compile Include="SampleProjectBasedTests\FanoutTest.cs" />
+    <Compile Include="SampleProjectBasedTests\ExpressionBodyTest.cs" />
+    <Compile Include="SampleProjectBasedTests\EventDelegateClassTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
