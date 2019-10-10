@@ -109,7 +109,7 @@ namespace Fame
 			foreach (object o in all) Add(o);
 		}
 
-		public void Accept(IParseClient visitor)
+		public void Accept(MSEPrinter visitor)
 		{
 			RepositoryVisitor rv = new RepositoryVisitor(this, visitor);
 			rv.Run();

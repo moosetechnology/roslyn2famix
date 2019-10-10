@@ -1,5 +1,4 @@
-﻿namespace Fame
-{
+﻿namespace Fame {
     using System;
 
     /// <summary>
@@ -9,8 +8,7 @@
     /// @author akuhn
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, Inherited = false)]
-    public class FamePropertyAttribute : Attribute
-    {
+    public class FamePropertyAttribute : Attribute {
         public bool Container { get; set; } = false;
         public bool Derived { get; } = false;
         public string Name { get; set; } = "*";

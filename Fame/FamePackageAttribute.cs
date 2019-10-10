@@ -1,5 +1,4 @@
-﻿namespace Fame
-{
+﻿namespace Fame {
     using System;
 
     /// <summary>
@@ -21,14 +20,11 @@
     /// @author Adrian Kuhn, 2008
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Field, Inherited = false)]
-    public class FamePackageAttribute : Attribute
-    {
-        public FamePackageAttribute()
-        {
+    public class FamePackageAttribute : Attribute {
+        public FamePackageAttribute() {
         }
 
-        public FamePackageAttribute(string value)
-        {
+        public FamePackageAttribute(string value) {
             Value = value;
         }
 

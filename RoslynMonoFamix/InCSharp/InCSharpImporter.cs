@@ -7,13 +7,11 @@ using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharp;
 
-namespace RoslynMonoFamix.InCSharp
-{
-    public class InCSharpImporter
-    {
+namespace RoslynMonoFamix.InCSharp {
+    public class InCSharpImporter {
         private Repository repository;
         private string projectBaseFolder;
-       
+
         private Dictionary<string, System.Type> typeNameMap = new Dictionary<string, System.Type>()
             {
                 { "Struct", typeof(CSharp.CSharpStruct) },
@@ -24,8 +22,7 @@ namespace RoslynMonoFamix.InCSharp
                 { "Enum", typeof(FAMIX.Enum) },
             };
 
-        public InCSharpImporter(Repository repository, string projectBaseFolder)
-        {
+        public InCSharpImporter(Repository repository, string projectBaseFolder) {
             this.repository = repository;
             this.Methods = new NamedEntityAccumulator<Method>();
             this.Types = new NamedEntityAccumulator<FAMIX.Type>();
@@ -36,8 +33,7 @@ namespace RoslynMonoFamix.InCSharp
         public NamedEntityAccumulator<FAMIX.Namespace> Namespaces { get; set; }
         public NamedEntityAccumulator<FAMIX.Type> Types { get; set; }
 
-        internal FAMIX.Type EnsureBinaryType(INamedTypeSymbol superType)
-        {
+        internal FAMIX.Type EnsureBinaryType(INamedTypeSymbol superType) {
 
             string fullName = FullTypeName(superType.OriginalDefinition);
 
@@ -46,40 +42,34 @@ namespace RoslynMonoFamix.InCSharp
 
             FAMIX.Type binaryType = EnsureType(superType.OriginalDefinition);
             var members = superType.GetMembers();
-            foreach (var member in members)
-            {
-                if (member is IFieldSymbol || member is IPropertySymbol)
-                {
+            foreach (var member in members) {
+                if (member is IFieldSymbol || member is IPropertySymbol) {
                     var attr = EnsureAttribute(member) as FAMIX.Attribute;
                     binaryType.AddAttribute(attr);
                     attr.parentType = binaryType;
                 }
-                if (member is IMethodSymbol)
-                {
+                if (member is IMethodSymbol) {
                     var methd = EnsureMethod(member as IMethodSymbol) as FAMIX.Method;
                     binaryType.AddMethod(methd);
                     methd.parentType = binaryType;
                 }
             }
 
-            if (superType.BaseType != null)
-            {
+            if (superType.BaseType != null) {
                 var superDuper = EnsureBinaryType(superType.BaseType.OriginalDefinition);
                 LinkWithInheritance(binaryType, superDuper);
             }
-               
-            foreach (var inter in superType.AllInterfaces)
-            {
-                 var superDuper = EnsureBinaryType(inter.OriginalDefinition);
-                 LinkWithInheritance(binaryType, superDuper);
+
+            foreach (var inter in superType.AllInterfaces) {
+                var superDuper = EnsureBinaryType(inter.OriginalDefinition);
+                LinkWithInheritance(binaryType, superDuper);
             }
 
             return binaryType;
-               
+
         }
 
-        private void LinkWithInheritance(FAMIX.Type subClass, FAMIX.Type superClass)
-        {
+        private void LinkWithInheritance(FAMIX.Type subClass, FAMIX.Type superClass) {
             Inheritance inheritance = CreateNewAssociation<Inheritance>(typeof(FAMIX.Inheritance).FullName);
             inheritance.subclass = subClass;
             inheritance.superclass = superClass;
@@ -87,11 +77,9 @@ namespace RoslynMonoFamix.InCSharp
             subClass.AddSuperInheritance(inheritance);
         }
 
-        private Tuple<String,String> FullMethodName(ISymbol method)
-        {
+        private Tuple<String, String> FullMethodName(ISymbol method) {
             var parameters = "";
-            if (method is IMethodSymbol)
-            {
+            if (method is IMethodSymbol) {
                 parameters += "(";
                 foreach (var par in (method as IMethodSymbol).Parameters)
                     parameters += par.Type.Name + ",";
@@ -100,8 +88,7 @@ namespace RoslynMonoFamix.InCSharp
                 parameters += ")";
             }
             var fullClassName = "";
-            if (method.ContainingType != null)
-            {
+            if (method.ContainingType != null) {
                 fullClassName = FullTypeName(method.ContainingType);
             }
 
@@ -111,8 +98,7 @@ namespace RoslynMonoFamix.InCSharp
         public NamedEntityAccumulator<Method> Methods { get; set; }
         public NamedEntityAccumulator<FAMIX.StructuralEntity> Attributes { get; set; }
 
-        public Method EnsureMethod(ISymbol aMethod)
-        {
+        public Method EnsureMethod(ISymbol aMethod) {
             var methodFullName = FullMethodName(aMethod);
             if (Methods.has(methodFullName.Item1))
                 return Methods.Named(methodFullName.Item1);
@@ -120,11 +106,11 @@ namespace RoslynMonoFamix.InCSharp
             Method method = null;
             if (aMethod is IMethodSymbol && ((aMethod as IMethodSymbol).MethodKind == MethodKind.PropertyGet || (aMethod as IMethodSymbol).MethodKind == MethodKind.PropertySet))
                 method = repository.New<CSharp.CSharpPropertyAccessor>(typeof(CSharp.CSharpPropertyAccessor).FullName);
-            else 
+            else
                 if (aMethod is IEventSymbol)
-                    method = repository.New<CSharp.CSharpEvent>(typeof(CSharp.CSharpEvent).FullName);
-                else
-                    method = repository.New<Method>(typeof(FAMIX.Method).FullName);
+                method = repository.New<CSharp.CSharpEvent>(typeof(CSharp.CSharpEvent).FullName);
+            else
+                method = repository.New<Method>(typeof(FAMIX.Method).FullName);
 
             method.isStub = true;
             method.name = aMethod.Name;
@@ -133,27 +119,23 @@ namespace RoslynMonoFamix.InCSharp
             return method;
         }
 
-        private String FullTypeName(ISymbol aType)
-        {
-            var symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,  genericsOptions :SymbolDisplayGenericsOptions.IncludeTypeParameters);
+        private String FullTypeName(ISymbol aType) {
+            var symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
             string fullyQualifiedName = aType.ToDisplayString(symbolDisplayFormat);
-            if (aType is INamedTypeSymbol)
-            {
+            if (aType is INamedTypeSymbol) {
                 if ((aType as INamedTypeSymbol).IsGenericType && (aType as INamedTypeSymbol).IsDefinition)
                     fullyQualifiedName = "DefinitionOf" + fullyQualifiedName;
             }
             return fullyQualifiedName;
         }
 
-        private String TypeName(ISymbol aType)
-        {
+        private String TypeName(ISymbol aType) {
             var symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly, genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
             string fullyQualifiedName = aType.ToDisplayString(symbolDisplayFormat);
             return fullyQualifiedName;
         }
 
-        private FAMIX.Namespace EnsureNamespace(INamespaceSymbol ns)
-        {
+        private FAMIX.Namespace EnsureNamespace(INamespaceSymbol ns) {
             if (Namespaces.has(ns.Name))
                 return Namespaces.Named(ns.Name);
             FAMIX.Namespace newNs = repository.New<FAMIX.Namespace>(typeof(FAMIX.Namespace).FullName);
@@ -163,8 +145,7 @@ namespace RoslynMonoFamix.InCSharp
             return newNs;
         }
 
-        public FAMIX.Type EnsureType(ISymbol aType)
-        {
+        public FAMIX.Type EnsureType(ISymbol aType) {
 
             string fullName = FullTypeName(aType);
 
@@ -175,24 +156,20 @@ namespace RoslynMonoFamix.InCSharp
 
             FAMIX.Type type = repository.New<FAMIX.Type>(typeKind);
             type.isStub = true;
-            
+
             Types.Add(fullName, type);
 
-            if (typeKind.Equals(typeof(FAMIX.ParameterizedType).FullName))
-            {
+            if (typeKind.Equals(typeof(FAMIX.ParameterizedType).FullName)) {
                 var parameterizedClass = EnsureType(aType.OriginalDefinition);
                 (type as FAMIX.ParameterizedType).parameterizableClass = parameterizedClass as FAMIX.ParameterizableClass;
             }
 
             type.name = TypeName(aType);
-            if (aType.ContainingType != null)
-            {
+            if (aType.ContainingType != null) {
                 var containingType = EnsureType(aType.ContainingType);
                 type.container = containingType;
-            }
-            else
-            if (aType.ContainingNamespace != null)
-            {
+            } else
+            if (aType.ContainingNamespace != null) {
                 var ns = EnsureNamespace(aType.ContainingNamespace);
                 type.container = ns;
             }
@@ -200,22 +177,18 @@ namespace RoslynMonoFamix.InCSharp
             return type;
         }
 
-        private System.Type ResolveFAMIXTypeName(ISymbol aType)
-        {
+        private System.Type ResolveFAMIXTypeName(ISymbol aType) {
             System.Type result = typeof(FAMIX.Class);
             if (aType is ITypeSymbol) typeNameMap.TryGetValue(((ITypeSymbol)aType).TypeKind.ToString(), out result);
-            if (aType is INamedTypeSymbol)
-            {
+            if (aType is INamedTypeSymbol) {
                 var superType = (aType as INamedTypeSymbol).BaseType;
-                while (superType != null)
-                {
+                while (superType != null) {
                     if (superType.Name.Equals("Attribute") && superType.ContainingNamespace.Name.Equals("System"))
                         return typeof(FAMIX.AnnotationType);
                     superType = superType.BaseType;
                 }
-                   
-                if ((aType as INamedTypeSymbol).IsGenericType)
-                {
+
+                if ((aType as INamedTypeSymbol).IsGenericType) {
                     if ((aType as INamedTypeSymbol).IsDefinition)
                         result = typeof(FAMIX.ParameterizableClass);
                     else
@@ -226,8 +199,7 @@ namespace RoslynMonoFamix.InCSharp
                 return ResolveFAMIXTypeName((aType as IArrayTypeSymbol).ElementType);
             if (aType is IPointerTypeSymbol)
                 return ResolveFAMIXTypeName((aType as IPointerTypeSymbol).PointedAtType);
-            if (result == null)
-            {
+            if (result == null) {
                 Console.WriteLine("Could not resolve type for  " + aType);
                 if (aType.ContainingAssembly != null) Console.WriteLine("Containing Assembly " + aType.ContainingAssembly);
                 result = typeof(FAMIX.Class);
@@ -235,8 +207,7 @@ namespace RoslynMonoFamix.InCSharp
             return result;
         }
 
-        public FAMIX.NamedEntity EnsureAttribute (ISymbol field) 
-        {
+        public FAMIX.NamedEntity EnsureAttribute(ISymbol field) {
             String attributeFullName = FullFieldName(field);
             if (Attributes.has(attributeFullName))
                 return Attributes.Named(attributeFullName);
@@ -253,12 +224,11 @@ namespace RoslynMonoFamix.InCSharp
             return attribute;
         }
 
-        private string ResolveAttritbuteTypeName(ISymbol field)
-        {
+        private string ResolveAttritbuteTypeName(ISymbol field) {
             if (field.ContainingType != null) {
                 if (ResolveFAMIXTypeName(field.ContainingType).Equals(typeof(FAMIX.Enum)))
                     return typeof(FAMIX.EnumValue).FullName;
-               if ( ResolveFAMIXTypeName(field.ContainingType).Equals(typeof(FAMIX.AnnotationType)))
+                if (ResolveFAMIXTypeName(field.ContainingType).Equals(typeof(FAMIX.AnnotationType)))
                     return typeof(FAMIX.AnnotationTypeAttribute).FullName;
             }
             if (field is IEventSymbol)
@@ -268,11 +238,9 @@ namespace RoslynMonoFamix.InCSharp
             return typeof(FAMIX.Attribute).FullName;
         }
 
-        private String FullFieldName(ISymbol field)
-        {
+        private String FullFieldName(ISymbol field) {
             var fullClassName = "";
-            if (field.ContainingType != null)
-            {
+            if (field.ContainingType != null) {
                 fullClassName = FullTypeName(field.ContainingType);
             }
             return fullClassName + "." + field.Name;
@@ -280,53 +248,45 @@ namespace RoslynMonoFamix.InCSharp
 
         public T CreateNewAssociation<T>(String typeName) => repository.New<T>(typeName);
 
-        internal T New<T>()
-        {
+        internal T New<T>() {
             return repository.New<T>(typeof(T).FullName);
         }
 
-        public IEnumerable<T> AllElementsOfType<T>()
-        {
+        public IEnumerable<T> AllElementsOfType<T>() {
             return repository.GetElements().OfType<T>();
         }
 
-        public void CreateSourceAnchor(SourcedEntity sourcedEntity, SyntaxNode node)
-        {
-            
+        public void CreateSourceAnchor(SourcedEntity sourcedEntity, SyntaxNode node) {
+
             var lineSpan = node.SyntaxTree.GetLineSpan(node.Span);
-            var relativePath = node.SyntaxTree.FilePath.Substring(projectBaseFolder.Length+1);
+            var relativePath = node.SyntaxTree.FilePath.Substring(projectBaseFolder.Length + 1);
             FileAnchor fileAnchor = CreateNewFileAnchor(node, ref lineSpan);
             var loc = lineSpan.EndLinePosition.Line - lineSpan.StartLinePosition.Line;
             if (sourcedEntity is BehaviouralEntity) (sourcedEntity as BehaviouralEntity).numberOfLinesOfCode = loc;
-            
+
 
             sourcedEntity.sourceAnchor = fileAnchor;
             repository.Add(fileAnchor);
         }
-        public void CreateSourceAnchor(FAMIX.Type sourcedEntity, ClassDeclarationSyntax node)
-        {
+        public void CreateSourceAnchor(FAMIX.Type sourcedEntity, ClassDeclarationSyntax node) {
             var lineSpan = node.SyntaxTree.GetLineSpan(node.Span);
             FileAnchor fileAnchor = CreateNewFileAnchor(node, ref lineSpan);
             var loc = lineSpan.EndLinePosition.Line - lineSpan.StartLinePosition.Line;
 
-            if (node.Modifiers.ToFullString().Contains("partial"))
-            {
-                if (sourcedEntity.sourceAnchor == null)
-                {
+            if (node.Modifiers.ToFullString().Contains("partial")) {
+                if (sourcedEntity.sourceAnchor == null) {
                     sourcedEntity.sourceAnchor = new MultipleFileAnchor();
                     repository.Add(sourcedEntity.sourceAnchor);
                 }
                 (sourcedEntity.sourceAnchor as MultipleFileAnchor).AddAllFile(fileAnchor);
-            }
-            else
+            } else
                 sourcedEntity.sourceAnchor = fileAnchor;
             (sourcedEntity as FAMIX.Type).numberOfLinesOfCode += loc;
 
             repository.Add(fileAnchor);
         }
 
-        private FileAnchor CreateNewFileAnchor(SyntaxNode node, ref FileLinePositionSpan lineSpan)
-        {
+        private FileAnchor CreateNewFileAnchor(SyntaxNode node, ref FileLinePositionSpan lineSpan) {
             var relativePath = node.SyntaxTree.FilePath.Substring(projectBaseFolder.Length + 1);
             FileAnchor fileAnchor = new FileAnchor
             {

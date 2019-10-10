@@ -4,38 +4,32 @@ using System.Collections.Generic;
 
 using Fame;
 
-namespace FameTest
-{
-	[TestClass]
-	public class DragonTest
-	{
+namespace FameTest {
+    [TestClass]
+    public class DragonTest {
 
-		[FamePackage("RPG")]
-		[FameDescription("Dragon")]
-		class Dragon
-		{
+        [FamePackage("RPG")]
+        [FameDescription("Dragon")]
+        class Dragon {
 
 
-			private List<Treasure> hoard = new List<Treasure>();
+            private List<Treasure> hoard = new List<Treasure>();
 
-			[FameProperty(Name = "hoard")]
-			public List<Treasure> Hoard
-			{
-				get { return hoard; }
-				set { hoard = value; }
-			}
+            [FameProperty(Name = "hoard")]
+            public List<Treasure> Hoard {
+                get { return hoard; }
+                set { hoard = value; }
+            }
 
-			public void AddHoard(Treasure t)
-			{
-				hoard.Add(t);
-			}
-		}
+            public void AddHoard(Treasure t) {
+                hoard.Add(t);
+            }
+        }
 
-		[FamePackage("RPG")]
-		[FameDescription("Treasure")]
-		class Treasure
-		{
-		}
+        [FamePackage("RPG")]
+        [FameDescription("Treasure")]
+        class Treasure {
+        }
         MetaRepository metaRepo;
         Tower t;
         [TestInitialize]
@@ -57,8 +51,7 @@ namespace FameTest
             Assert.IsNotNull(deltaHoard);
             Assert.IsTrue(t.model.GetElements().Count == 2);
         }
-        public void TestMseFileCreatedWithTwoInstances()
-        {
+        public void TestMseFileCreatedWithTwoInstances() {
             Dragon leDragon = t.model.New<Dragon>("RPG.Dragon");
             Treasure deltaHoard = t.model.New<Treasure>("RPG.Treasure");
             t.model.ExportMSEFile("out.mse");
@@ -67,9 +60,9 @@ namespace FameTest
 
 
         [TestMethod]
-		public void TestMetaRepoContainsBothDefinedClasses() { 
-			Assert.IsNotNull(metaRepo.Get("RPG.Dragon"));
-			Assert.IsNotNull(metaRepo.Get("RPG.Treasure"));
-		}
-	}
+        public void TestMetaRepoContainsBothDefinedClasses() {
+            Assert.IsNotNull(metaRepo.Get("RPG.Dragon"));
+            Assert.IsNotNull(metaRepo.Get("RPG.Treasure"));
+        }
+    }
 }

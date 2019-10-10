@@ -1,5 +1,4 @@
-﻿namespace Fame
-{
+﻿namespace Fame {
     using System;
 
     /// <summary>
@@ -8,14 +7,11 @@
     /// @author Adrian Kuhn, 2007-2008
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class FameDescriptionAttribute : Attribute
-    {
-        public FameDescriptionAttribute()
-        {
+    public class FameDescriptionAttribute : Attribute {
+        public FameDescriptionAttribute() {
         }
 
-        public FameDescriptionAttribute(string value)
-        {
+        public FameDescriptionAttribute(string value) {
             Value = value;
         }
 
