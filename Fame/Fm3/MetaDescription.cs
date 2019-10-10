@@ -73,13 +73,10 @@ namespace Fame.Fm3 {
             }
         }
         public Type BaseClass { get; set; }
-
         [FameProperty]
         public bool IsAbstract { get; set; }
-
         private PackageDescription _nestingPackage;
         private Func<string> toString;
-
         [FameProperty(Opposite = "classes", Container = true)]
         public PackageDescription Package {
             get { return _nestingPackage; }
@@ -88,7 +85,6 @@ namespace Fame.Fm3 {
                 value.AddElement(this);
             }
         }
-
         [FameProperty]
         public MetaDescription SuperClass { get; set; }
 
@@ -100,15 +96,13 @@ namespace Fame.Fm3 {
         }
         [FamePropertyWithDerived]
         public bool IsPrimitive() {
-            return this == STRING || this == BOOLEAN || this == NUMBER || this == DATE || this.Name.Equals("Int32");
+            return this == STRING || this == BOOLEAN || this == NUMBER || this == DATE || this.Name.Equals("Int32") ;
         }
 
         [FamePropertyWithDerived]
         public bool IsRoot() {
             return this == OBJECT;
         }
-
-
 
         public MetaDescription() : this(string.Empty) {
         }

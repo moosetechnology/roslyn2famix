@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Fame.Internal {
-    static class Number {
+    public static class Number {
         public static bool IsNumber(object value) {
             return value is sbyte
                     || value is byte

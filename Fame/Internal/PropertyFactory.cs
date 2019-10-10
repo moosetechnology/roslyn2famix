@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Fame.Internal {
-    class PropertyFactory {
+   public class PropertyFactory {
         private Access access;
         private PropertyDescription instance;
         private MetaRepository repository;

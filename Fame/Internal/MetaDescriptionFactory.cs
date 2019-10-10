@@ -7,7 +7,7 @@ using Fame;
 using System.Collections;
 
 namespace Fame.Internal {
-    class MetaDescriptionFactory {
+   public  class MetaDescriptionFactory {
         private Type type;
         private MetaDescription instance;
         private MetaRepository repository;

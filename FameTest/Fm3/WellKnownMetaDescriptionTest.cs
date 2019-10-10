@@ -5,14 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FameTest {
     [TestClass]
-    public class MetaDescriptionTest {
-
-
-        [TestInitialize]
-        public void SetUp() { 
-
-            
-        }
+    public class WellKnownMetaDescriptionTest {
 
 
         [TestMethod]
@@ -49,5 +42,28 @@ namespace FameTest {
         public void TestPrimitiveUnexistantTypeGetsException() {
             MetaDescription.PrimitiveNamed("Unexistant");
         }
+
+        [TestMethod]
+        public void TestObjectIsNotPrimitive() {
+            Assert.IsFalse(MetaDescription.OBJECT.IsPrimitive());
+        }
+        [TestMethod]
+        public void TestStringIsPrimitive() {
+            Assert.IsTrue(MetaDescription.STRING.IsPrimitive());
+        }
+        [TestMethod]
+        public void TestBooleanIsPrimitive() {
+            Assert.IsTrue(MetaDescription.BOOLEAN.IsPrimitive());
+        }
+        [TestMethod]
+        public void TestNumberIsPrimitive() {
+            Assert.IsTrue(MetaDescription.NUMBER.IsPrimitive());
+        }
+        [TestMethod]
+        public void TestDateIsPrimitive() {
+            Assert.IsTrue(MetaDescription.DATE.IsPrimitive());
+        }
+
+      
     }
 }

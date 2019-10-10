@@ -2,7 +2,7 @@
 using Fame.Fm3;
 
 namespace Fame.Internal {
-    internal class UnknownElementError : Exception {
+    public class UnknownElementError : Exception {
         private Element description;
         private object element;
         public Element Description() {

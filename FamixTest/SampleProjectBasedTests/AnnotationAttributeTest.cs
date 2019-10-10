@@ -14,7 +14,6 @@ namespace FamixTest {
 
             Assert.IsTrue(annotation is FAMIX.AnnotationType);
         }
-
         [TestMethod]
         public void AnotationTypeHasAttributes() {
             Assert.AreEqual(3, importer.Types.Named("SampleProject.Basic.AnnotationAttribute").Attributes.Count);
