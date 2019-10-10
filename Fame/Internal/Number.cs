@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Fame.Internal {
     static class Number {
-        public static bool IsNumber(this object value) {
+        public static bool IsNumber(object value) {
             return value is sbyte
                     || value is byte
                     || value is short
