@@ -9,7 +9,7 @@ namespace Fame.Parser {
 
         protected int indentation;
         protected StringBuilder stream = new StringBuilder();
-        public static object UNLIMITED = new Object();
+        public static readonly object UNLIMITED = new Object();
         private bool newLineHasBeenWritten;
         private string filepath;
 
@@ -47,63 +47,77 @@ namespace Fame.Parser {
         }
 
         public void BeginDocument() {
-            // indentation++;
             AppendCharacter('(');
         }
-
-
         public void BeginElement(String name) {
             indentation++;
             IndentLine();
             AppendCharacter('(');
             AppendString(name);
         }
-
-
         public void EndAttribute(String name) {
             AppendCharacter(')');
             indentation--;
         }
-
         public void EndDocument() {
             AppendCharacter(')');
             Close();
         }
-
         private void Close() {
             string s = stream.ToString();
             if (filepath != null)
                 System.IO.File.WriteAllText(filepath, stream.ToString());
         }
-
         public string GetMSE() {
             return stream.ToString();
         }
-
         public void EndElement(String name) {
             AppendCharacter(')');
             indentation--;
         }
 
+
+
+      
+
         public void Primitive(Object value) {
             AppendCharacter(' ');
             if (value == UNLIMITED) {
-                AppendCharacter('*');
-            } else if (value.GetType() == typeof(string)) {
-                string str = (string)value;
-                AppendCharacter('\'');
-                foreach (char ch in (string)value) {
-                    if (ch == '\'') AppendCharacter('\'');
-                    AppendCharacter(ch);
-                }
-                AppendCharacter('\'');
-            } else if (value is bool) {
-                AppendString(value.ToString().ToLower());
-            } else if (Number.IsNumber(value)) {
-                AppendString(value.ToString());
+                PrivateDealWithUnlimitedType();
+                return; 
             }
+            if (value.GetType() == typeof(string)) {
+                PrivateDealWithStringType((string)value);
+                return;
+            } 
+            if (value is bool) {
+                PrivateDealWithBooleanType((bool)value);
+                return;
+            } 
+            if (Number.IsNumber(value)) {
+                PrivateDealWithNumber(value);
+                return;
+            }
+            throw new Exception("Unexpected primitive object type");
+        }
+        private void PrivateDealWithUnlimitedType() {
+            AppendCharacter('*');
         }
 
+        private void PrivateDealWithStringType(string str) {
+            AppendCharacter('\'');
+            foreach (char ch in str) {
+                if (ch == '\'') AppendCharacter('\'');
+                AppendCharacter(ch);
+            }
+            AppendCharacter('\'');
+        }
+        private void PrivateDealWithBooleanType(bool value) {
+            AppendString(value.ToString().ToLower());
+        }
+        private void PrivateDealWithNumber(object value) {
+            AppendString(value.ToString());
+        }
         public void Reference(int index) {
             stream.Append(" (ref: "); // must prepend space!
             stream.Append(index);
