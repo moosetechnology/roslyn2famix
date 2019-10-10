@@ -6,21 +6,11 @@ namespace Fame {
     [Serializable]
     internal class ElementInPropertyNotMetadescribed : Exception {
         private PropertyDescription property;
-
-        public ElementInPropertyNotMetadescribed() {
+        public PropertyDescription Property () {
+            return property;
         }
-
         public ElementInPropertyNotMetadescribed(PropertyDescription property) {
             this.property = property;
-        }
-
-        public ElementInPropertyNotMetadescribed(string message) : base(message) {
-        }
-
-        public ElementInPropertyNotMetadescribed(string message, Exception innerException) : base(message, innerException) {
-        }
-
-        protected ElementInPropertyNotMetadescribed(SerializationInfo info, StreamingContext context) : base(info, context) {
         }
     }
 }
