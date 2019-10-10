@@ -1,41 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Fame;
 using Fame.Common;
 using Fame.Fm3;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-
-namespace FameTest.Fm3 {
-    internal class TestableElement : Element {
-        public Element owner;
-        public TestableElement (String str, Element owner) : base(str) {
-            this.owner = owner; 
-        }
-        public override void CheckContraints(Warnings warnings) {
-            // Nothing to do
-        }
-        [FamePropertyWithDerived]
-        public override Element GetOwner() {
-            return owner; 
-        }
-    }
-
+namespace FameTest {
     [TestClass]
-    class TestElement {
-        Element unownedElement;
-        Element ownedElement;
-        [TestInitialize]
-        public void SetUp () {
-            unownedElement = new TestableElement("Parent-Element", null);
-            ownedElement = new TestableElement("SubElement", unownedElement);
+    public class TestElement {
+
+
+        public class TestableElement : Element {
+            public Element owner;
+            public TestableElement(String str, Element owner) : base(str) {
+                this.owner = owner;
+            }
+            public override void CheckContraints(Warnings warnings) {
+                // Nothing to do
+            }
+            [FamePropertyWithDerived]
+            public override Element GetOwner() {
+                return owner;
+            }
         }
+
+        public Element unOwnedElement;
+        public Element ownedElement;
+
+        [TestInitialize]
+        public void SetUp() {
+            unOwnedElement = new TestableElement("Parent-Element", null);
+            ownedElement = new TestableElement("SubElement", unOwnedElement);
+        }
+
         [TestMethod]
-        public void TestUnownedElementNameIsTheConstructedName () {
-            Assert.AreEqual("Parent-Element", unownedElement.Name);
+        public void TestUnownedElementNameIsTheConstructedName() {
+            Assert.AreEqual("Parent-Element", unOwnedElement.Name);
         }
         [TestMethod]
         public void TestOwnedElementNameIsTheConstructedName() {
@@ -43,12 +41,11 @@ namespace FameTest.Fm3 {
         }
         [TestMethod]
         public void TestUnownedElementFullNameIsTheName() {
-            Assert.AreEqual(unownedElement.Name, unownedElement.Fullname);
+            Assert.AreEqual(unOwnedElement.Name, unOwnedElement.Fullname);
         }
         [TestMethod]
         public void TestOwnedElementFullNameIsTheParentNamePlusName() {
-            Assert.AreEqual(unownedElement.Name + '.' + ownedElement.Name, ownedElement.Fullname);
+            Assert.AreEqual(unOwnedElement.Name + '.' + ownedElement.Name, ownedElement.Fullname);
         }
-   
     }
 }

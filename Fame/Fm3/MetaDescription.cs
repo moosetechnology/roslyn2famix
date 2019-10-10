@@ -108,6 +108,19 @@ namespace Fame.Fm3 {
             return this == OBJECT;
         }
 
+
+
+        public MetaDescription() : this(string.Empty) {
+        }
+
+        public MetaDescription(string name) : base(name) {
+            _attributes = new Dictionary<string, PropertyDescription>();
+        }
+
+        public MetaDescription(Func<string> toString) : this() {
+            this.toString = toString;
+        }
+
         private void CollectAllAttributes(Dictionary<string, PropertyDescription> all) {
             // superclass first, to ensure correct shadowing
             if (SuperClass != null)
@@ -129,7 +142,7 @@ namespace Fame.Fm3 {
             return PrimitiveNamed(name) != null;
         }
 
-        public static MetaDescription PrimitiveNamed(string name) {
+        public static MetaDescription PrimitiveNamed (string name) {
             if ("Boolean".Equals(name))
                 return BOOLEAN;
             if ("Number".Equals(name))
@@ -140,19 +153,9 @@ namespace Fame.Fm3 {
                 return DATE;
             if ("Object".Equals(name))
                 return OBJECT;
-            return null;
+            throw new ClassNotMetadescribedException(" Not available meta description for primitive type named " + name);
         }
 
-        public MetaDescription() : this(string.Empty) {
-        }
-
-        public MetaDescription(string name) : base(name) {
-            _attributes = new Dictionary<string, PropertyDescription>();
-        }
-
-        public MetaDescription(Func<string> toString) : this() {
-            this.toString = toString;
-        }
 
         public override Element GetOwner() {
             return Package;

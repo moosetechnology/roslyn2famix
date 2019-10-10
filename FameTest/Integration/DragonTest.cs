@@ -51,11 +51,11 @@ namespace FameTest {
             Assert.IsNotNull(deltaHoard);
             Assert.IsTrue(t.model.GetElements().Count == 2);
         }
+        [TestMethod]
         public void TestMseFileCreatedWithTwoInstances() {
             Dragon leDragon = t.model.New<Dragon>("RPG.Dragon");
             Treasure deltaHoard = t.model.New<Treasure>("RPG.Treasure");
             t.model.ExportMSEFile("out.mse");
-
         }
 
 

@@ -51,10 +51,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fm3\TestElement.cs" />
     <Compile Include="Metamodel\FameRepositoryTest.cs" />
     <Compile Include="Integration\DragonTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Fm3\TestElement.cs" />
+    <Compile Include="Fm3\MetaDescriptionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fame\Fame.csproj">
