@@ -76,10 +76,6 @@ namespace Fame.Parser {
             indentation--;
         }
 
-
-
-      
-
         public void Primitive(Object value) {
             AppendCharacter(' ');
             if (value == UNLIMITED) {
