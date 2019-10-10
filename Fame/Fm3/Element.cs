@@ -38,7 +38,7 @@
         }
         [FamePropertyWithDerived]
         public abstract Element GetOwner();
-   
+        
         public Element(string name) {
             Name = name;
         }
@@ -46,11 +46,6 @@
             return Fullname;
         }
         public abstract void CheckContraints(Common.Warnings warnings);
-        public static T GetAttributeFrom<T>(Type type, string propertyName) where T : Attribute {
-            var attrType = typeof(T);
-            var property = type.GetTypeInfo().GetDeclaredProperty(propertyName);
-            return (T)property.GetCustomAttributes(attrType, false).GetEnumerator().Current;
-        }
 
     }
 }
