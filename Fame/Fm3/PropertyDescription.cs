@@ -11,14 +11,22 @@
     [FamePackage("FM3")]
     [FameDescription("Property")]
     public class PropertyDescription : Element {
-        public PropertyDescription() {
-        }
-
-        public PropertyDescription(string name) : base(name) {
-            Name = name;
-        }
 
         private MetaDescription _declaringClass;
+        [FameProperty(Name = "package", Opposite = "extensions")]
+        public PackageDescription ExtendingPackage { get; set; }
+        [FameProperty]
+        public bool IsContainer { get; set; }
+        [FameProperty]
+        public bool IsDerived { get; set; }
+        [FameProperty]
+        public bool IsMultivalued { get; set; }
+        [FameProperty(Opposite = "opposite")]
+        public PropertyDescription Opposite { get; set; }
+        [FameProperty]
+        public MetaDescription Type { get; set; }
+        public Access Access { private get; set; }
+        public new string Name { get; set; }
         [FameProperty(Name = "class", Opposite = "attributes", Container = true)]
         public MetaDescription OwningMetaDescription {
             get {
@@ -29,54 +37,29 @@
                 value.AddOwnedAttribute(this);
             }
         }
-
-        [FameProperty(Name = "package", Opposite = "extensions")]
-        public PackageDescription ExtendingPackage { get; set; }
-
-        [FameProperty]
-        public bool IsContainer { get; set; }
-
-        [FameProperty]
-        public bool IsDerived { get; set; }
-
-        [FameProperty]
-        public bool IsMultivalued { get; set; }
-
-        [FameProperty(Opposite = "opposite")]
-        public PropertyDescription Opposite { get; set; }
-
-
-        [FameProperty]
-        public MetaDescription Type { get; set; }
-
-        public Access Access { private get; set; }
-
-
-        public new string Name { get; set; }
-
+        public PropertyDescription() {
+        }
+        public PropertyDescription(string name) : base(name) {
+            Name = name;
+        }
         public bool HasOpposite() {
             return Opposite != null;
         }
-
         internal void SetOwningMetaDescription(MetaDescription owner) {
             _declaringClass = owner;
             _declaringClass.AddOwnedAttribute(this);
         }
-
         [FamePropertyWithDerived]
         public bool IsComposite() {
             return HasOpposite() && Opposite.IsContainer;
         }
-
         public override Element GetOwner() {
             return OwningMetaDescription;
         }
-
         public bool IsPrimitive() {
             Debug.Assert(Type != null, Fullname);
             return Type.IsPrimitive();
         }
-
         public override void CheckContraints(Warnings warnings) {
             // TODO
             //if (isContainer)
@@ -102,19 +85,17 @@
             //if (declaringClass == null)
             //    warnings.add("Must have an owning class", this);
         }
-
         public void SetComposite(bool composite) {
             Debug.Assert(Opposite != null);
             Opposite.IsContainer = composite;
         }
-
         public object Read(object element) {
             Debug.Assert(Access != null);
             return Access.Read(element);
         }
 
         public ICollection<object> ReadAll(object element) {
-            if (Access == null) throw new NoAccessorException();
+            if (Access == null) throw new Exception(" There is not available accessor for reading the element ");
             Debug.Assert(element != null, "Trying to read property (" + this + ") from null");
 
             try {
@@ -145,11 +126,9 @@
                 }
                 return result;
             }
-
             Debug.Assert(!all.Contains(null), "Multivalued property contains null" + this);
             return all;
         }
-
         public void WriteAll<T>(object element, ICollection<T> values) {
             Debug.Assert(Access != null, Fullname);
             try {
@@ -189,31 +168,4 @@
         }
     }
 
-    public class ReadingPropertyFailed : AssertionError {
-        private static readonly long serialVersionUID = 6381545746042993261L;
-        public PropertyDescription Property;
-        public object Object;
-
-        public ReadingPropertyFailed(Exception e, PropertyDescription property, object @object) : base(e) {
-            Property = property;
-            Object = @object;
-        }
-    }
-
-    public class AssertionError {
-        protected AssertionError(Exception e) {
-            // TODO
-            throw new NotImplementedException();
-        }
-    }
-
-    public class NoAccessorException : Exception {
-        private static readonly long serialVersionUID = -2828241533257508153L;
-
-        public PropertyDescription Outer() {
-            // TODO
-            //return PropertyDescription.this;
-            throw new NotImplementedException();
-        }
-    }
 }

@@ -27,6 +27,11 @@
     [FameDescription("Package")]
     public class PackageDescription : Element {
         public static readonly string NAME = "FM3.Package";
+        [FameProperty(Opposite = "package")]
+        public ISet<MetaDescription> Elements { get; }
+
+        [FameProperty(Opposite = "package")]
+        public ISet<PropertyDescription> Extensions { get; set; }
 
         public PackageDescription() : this(string.Empty) {
         }
@@ -47,11 +52,7 @@
                 warnings.Add("Name must be alphanumeric", this);
         }
 
-        [FameProperty(Opposite = "package")]
-        public ISet<MetaDescription> Elements { get; }
-
-        [FameProperty(Opposite = "package")]
-        public ISet<PropertyDescription> Extensions { get; set; }
+        
 
         public void SetClasses(ISet<MetaDescription> classes) {
             foreach (var c in classes) {

@@ -5,19 +5,15 @@ namespace Fame.Internal {
     internal class UnknownElementError : Exception {
         private Element description;
         private object element;
-
-        public UnknownElementError() {
+        public Element Description() {
+            return description;
         }
-
-        public UnknownElementError(string message) : base(message) {
+        public object Element() {
+            return description;
         }
-
         public UnknownElementError(Element description, object element) {
             this.description = description;
             this.element = element;
-        }
-
-        public UnknownElementError(string message, Exception innerException) : base(message, innerException) {
         }
     }
 }

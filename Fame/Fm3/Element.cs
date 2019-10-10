@@ -27,13 +27,8 @@
     [FamePackage("FM3")]
     [FameDescription("Element")]
     public abstract class Element {
-        public Element() {
-        }
-
-        public Element(string name) {
-            Name = name;
-        }
-
+        [FameProperty]
+        public string Name { get; set; } = string.Empty;
         [FamePropertyWithDerived]
         public string Fullname {
             get {
@@ -41,20 +36,17 @@
                 return parent == null ? Name : parent.Fullname + "." + Name;
             }
         }
-
-        [FameProperty]
-        public string Name { get; set; } = string.Empty;
-
         [FamePropertyWithDerived]
         public abstract Element GetOwner();
-
-
+        public Element() {
+        }
+        public Element(string name) {
+            Name = name;
+        }
         public override string ToString() {
             return Fullname;
         }
-
         public abstract void CheckContraints(Common.Warnings warnings);
-
         public static T GetAttributeFrom<T>(Type type, string propertyName) where T : Attribute {
             var attrType = typeof(T);
             var property = type.GetTypeInfo().GetDeclaredProperty(propertyName);

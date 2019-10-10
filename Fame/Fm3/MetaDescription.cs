@@ -72,31 +72,6 @@ namespace Fame.Fm3 {
                 }
             }
         }
-
-        [FamePropertyWithDerived(Name = "allAttributes")]
-        public List<PropertyDescription> AllAttributes() {
-            var all = new Dictionary<string, PropertyDescription>();
-            CollectAllAttributes(all);
-            return all.Values.ToList<PropertyDescription>();
-        }
-
-        private void CollectAllAttributes(Dictionary<string, PropertyDescription> all) {
-            // superclass first, to ensure correct shadowing
-            if (SuperClass != null)
-                SuperClass.CollectAllAttributes(all);
-            foreach (var attribute in _attributes) {
-                all[attribute.Key] = attribute.Value;
-            }
-        }
-
-        public PropertyDescription AttributeNamed(string name) {
-            var property = _attributes[name];
-            if (property == null && SuperClass != null)
-                property = SuperClass.AttributeNamed(name);
-
-            return property;
-        }
-
         public Type BaseClass { get; set; }
 
         [FameProperty]
@@ -116,6 +91,39 @@ namespace Fame.Fm3 {
 
         [FameProperty]
         public MetaDescription SuperClass { get; set; }
+
+        [FamePropertyWithDerived(Name = "allAttributes")]
+        public List<PropertyDescription> AllAttributes() {
+            var all = new Dictionary<string, PropertyDescription>();
+            CollectAllAttributes(all);
+            return all.Values.ToList<PropertyDescription>();
+        }
+        [FamePropertyWithDerived]
+        public bool IsPrimitive() {
+            return this == STRING || this == BOOLEAN || this == NUMBER || this == DATE || this.Name.Equals("Int32");
+        }
+
+        [FamePropertyWithDerived]
+        public bool IsRoot() {
+            return this == OBJECT;
+        }
+
+        private void CollectAllAttributes(Dictionary<string, PropertyDescription> all) {
+            // superclass first, to ensure correct shadowing
+            if (SuperClass != null)
+                SuperClass.CollectAllAttributes(all);
+            foreach (var attribute in _attributes) {
+                all[attribute.Key] = attribute.Value;
+            }
+        }
+
+        public PropertyDescription AttributeNamed(string name) {
+            var property = _attributes[name];
+            if (property == null && SuperClass != null)
+                property = SuperClass.AttributeNamed(name);
+
+            return property;
+        }
 
         public static bool HasPrimitiveNamed(string name) {
             return PrimitiveNamed(name) != null;
@@ -233,15 +241,12 @@ namespace Fame.Fm3 {
             //    throw new AssertionError(ex);
             //}
         }
-
         public bool HasSuperClass() {
             return SuperClass != null;
         }
-
         public PropertyDescription ContainerPropertyOrNull() {
             return AllAttributes().FirstOrDefault(property => property.IsContainer);
         }
-
         /// <summary>
         /// Answer if this is a subclass of type. This is, if type is a superclass of
         /// this: <code>A.conformsTo(B) -> A is B or A extends B</code>.
@@ -251,16 +256,6 @@ namespace Fame.Fm3 {
         /// <returns></returns>
         public bool ConformsTo(MetaDescription type) {
             return this == type || (SuperClass != null && SuperClass.ConformsTo(type));
-        }
-
-        [FamePropertyWithDerived]
-        public bool IsPrimitive() {
-            return this == STRING || this == BOOLEAN || this == NUMBER || this == DATE || this.Name.Equals("Int32");
-        }
-
-        [FamePropertyWithDerived]
-        public bool IsRoot() {
-            return this == OBJECT;
         }
     }
 }
