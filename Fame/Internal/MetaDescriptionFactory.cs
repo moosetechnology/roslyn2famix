@@ -18,12 +18,11 @@ namespace Fame.Internal {
             this.repository = repository;
             childFactories = new List<PropertyFactory>();
         }
-
+        
         public MetaDescription CreateInstance() {
             var name = type.GetTypeInfo().GetCustomAttribute<FameDescriptionAttribute>();
             if (name != null) {
-                instance = new MetaDescription(name.Value)
-                {
+                instance = new MetaDescription(name.Value) {
                     BaseClass = type
                 };
             } else {
@@ -32,12 +31,10 @@ namespace Fame.Internal {
                 else if (type.GetTypeInfo().FullName == "System.Boolean")
                     instance = MetaDescription.BOOLEAN;
                 else
-                    instance = new MetaDescription(type.GetTypeInfo().Name)
-                    {
+                    instance = new MetaDescription(type.GetTypeInfo().Name) {
                         BaseClass = type
                     };
             }
-
             return instance;
         }
 
@@ -48,7 +45,6 @@ namespace Fame.Internal {
             InitializeSuperclass();
             InitializeProperties();
         }
-
         private void InitializeSuperclass() {
             if (type.BaseType != null) {
                 repository.RegisterType(type.BaseType);
@@ -57,7 +53,6 @@ namespace Fame.Internal {
                     instance.SuperClass = superclass;
             }
         }
-
         private void InitializePackage() {
             var name = type.GetTypeInfo().GetCustomAttribute<FamePackageAttribute>();
             var packageName = type.GetTypeInfo().Namespace;
@@ -69,8 +64,8 @@ namespace Fame.Internal {
 
         private void CreatePropertyFactories() {
             var declaredProperties = type.GetTypeInfo().DeclaredProperties;
-            foreach (PropertyInfo method in declaredProperties) {
-                PropertyFactory propertyFactory = new PropertyFactory(new Access(method), repository);
+            foreach (PropertyInfo property in declaredProperties) {
+                PropertyFactory propertyFactory = new PropertyFactory(Access.CreateAccess(property), repository);
                 childFactories.Add(propertyFactory);
             }
         }

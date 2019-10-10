@@ -7,13 +7,8 @@ using System.Linq;
 namespace Fame {
     public class MetaRepository : Repository {
         private Dictionary<String, Element> bindings = new Dictionary<string, Element>();
-
         private Dictionary<Type, MetaDescription> classes = new Dictionary<Type, MetaDescription>();
-
-        public MetaRepository(MetaRepository metaRepository) : base(metaRepository) {
-
-        }
-
+        public MetaRepository(MetaRepository metaRepository) : base(metaRepository) { }
         internal static MetaRepository CreateFM3() {
             MetaRepository mse = new MetaRepository(null);
             mse.RegisterType(typeof(MetaDescription));
@@ -23,12 +18,9 @@ namespace Fame {
             mse.AddAll(mse.bindings.Values.ToList<object>());
             return mse;
         }
-
-        public static bool IsValidName(string name)//TODO
-        {
+        public static bool IsValidName(string name) {
             throw new System.NotImplementedException();
         }
-
         public void RegisterType(Type type) {
             if (!classes.ContainsKey(type)) {
                 MetaDescriptionFactory factory = new MetaDescriptionFactory(type, this);
@@ -40,7 +32,6 @@ namespace Fame {
                 }
             }
         }
-
         public override void Add(object element) {
             if (element is Element) {
                 if (!bindings.ContainsKey(((Element)element).Fullname)) {
@@ -49,19 +40,16 @@ namespace Fame {
             } else
                 throw new Exception("tried to add a non element");
         }
-
         internal MetaDescription GetDescription(Type type) {
             classes.TryGetValue(type, out MetaDescription value);
             if (value == null)
-                throw new ClassNotMetadescribedException("The type " + type.ToString() + " is not a valid type in this MetaRepository ");
+                throw new ClassNotMetadescribedException("The type " + type.ToString() + " is not a valid type in this MetaRepository");
             return value;
         }
-
         public Element Get(String fullName) {
             bindings.TryGetValue(fullName, out Element e);
             return e;
         }
-
         public PackageDescription InitializePackageNamed(String name) {
             if (!bindings.TryGetValue(name, out Element description)) {
                 description = new PackageDescription(name);

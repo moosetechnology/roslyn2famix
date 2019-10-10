@@ -23,11 +23,9 @@
     public class FamePackageAttribute : Attribute {
         public FamePackageAttribute() {
         }
-
         public FamePackageAttribute(string value) {
             Value = value;
         }
-
         public string Value { get; } = string.Empty;
     }
 }

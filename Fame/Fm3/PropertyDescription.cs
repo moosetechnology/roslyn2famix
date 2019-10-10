@@ -37,8 +37,7 @@
                 value.AddOwnedAttribute(this);
             }
         }
-        public PropertyDescription() {
-        }
+
         public PropertyDescription(string name) : base(name) {
             Name = name;
         }

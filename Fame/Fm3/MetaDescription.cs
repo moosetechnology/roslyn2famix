@@ -150,7 +150,7 @@ namespace Fame.Fm3 {
             _attributes = new Dictionary<string, PropertyDescription>();
         }
 
-        public MetaDescription(Func<string> toString) {
+        public MetaDescription(Func<string> toString) : this() {
             this.toString = toString;
         }
 

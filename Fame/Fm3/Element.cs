@@ -38,8 +38,7 @@
         }
         [FamePropertyWithDerived]
         public abstract Element GetOwner();
-        public Element() {
-        }
+   
         public Element(string name) {
             Name = name;
         }
