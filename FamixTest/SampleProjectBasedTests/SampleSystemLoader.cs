@@ -9,51 +9,47 @@ using RoslynMonoFamix;
 using Fame;
 using Model;
 
-namespace FamixTest
-{
-	[TestClass]
-	public class SampleSystemLoader
-	{
-		protected Repository metamodel = FamixModel.Metamodel();
+namespace FamixTest {
+    [TestClass]
+    public class SampleSystemLoader {
+        protected Repository metamodel = FamixModel.Metamodel();
 
         protected RoslynMonoFamix.InCSharp.InCSharpImporter importer = null;
 
-		[TestInitialize]
-		public void LoadSampleSystem()
-		{
-			string path = Assembly.GetAssembly(typeof(SampleSystemLoader)).Location;
-			path = path.Replace("FamixTest.dll", "");
-			string solutionPath = path + "../../../SampleCode/SampleCode.sln";
-            importer = new RoslynMonoFamix.InCSharp.InCSharpImporter(metamodel, Path.GetDirectoryName(new Uri(solutionPath).AbsolutePath));
-            var msWorkspace = MSBuildWorkspace.Create();
-			msWorkspace.WorkspaceFailed += (o, e) =>
-			{
-				System.Console.WriteLine(e.Diagnostic.Message);
-			};
+        [TestInitialize]
+        public void LoadSampleSystem() {
 
-			var solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
+            string path = Assembly.GetAssembly(typeof(SampleSystemLoader)).Location;
+            path = path.Replace("FamixTest.dll", "");
+            string solutionPath = path + "../../../SampleCode/SampleCode.sln";
+            
+            importer = new RoslynMonoFamix.InCSharp.InCSharpImporter(metamodel, Path.GetDirectoryName(new Uri(solutionPath).AbsolutePath));
+            
+            var msWorkspace = MSBuildWorkspace.Create();
+            msWorkspace.WorkspaceFailed += (o, e) => {
+                System.Console.WriteLine(e.Diagnostic.Message);
+            };
+
+            var solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
 
             Boolean fileWasFound = false;
-			foreach (var project in solution.Projects)
-			{
-				foreach (var document in project.Documents)
-				{
-					var targetFile = this.GetType().Name.Replace("Test", ".cs");
+            foreach (var project in solution.Projects) {
+                foreach (var document in project.Documents) {
+                    var targetFile = this.GetType().Name.Replace("Test", ".cs");
                     targetFile.Replace("2.cs", "1.cs");
-                    if (document.SupportsSyntaxTree && document.FilePath.Replace("2.cs", "1.cs").EndsWith(targetFile))
-					{
-						var syntaxTree = document.GetSyntaxTreeAsync().Result;
-						var compilationAsync = project.GetCompilationAsync().Result;
-						var semanticModel = compilationAsync.GetSemanticModel(syntaxTree);
+                    if (document.SupportsSyntaxTree && document.FilePath.Replace("2.cs", "1.cs").EndsWith(targetFile)) {
+                        var syntaxTree = document.GetSyntaxTreeAsync().Result;
+                        var compilationAsync = project.GetCompilationAsync().Result;
+                        var semanticModel = compilationAsync.GetSemanticModel(syntaxTree);
                         var visitor = new CSharpASTVisitor(semanticModel, importer);
-						visitor.Visit(syntaxTree.GetRoot());
+                        visitor.Visit(syntaxTree.GetRoot());
                         fileWasFound = true;
-					}
-				}
-			}
+                    }
+                }
+            }
             if (!fileWasFound) throw new Exception("File was not found!");
-			metamodel.ExportMSEFile("SampleCode.mse");
-		}
+            metamodel.ExportMSEFile("SampleCode.mse");
+        }
 
-	}
+    }
 }

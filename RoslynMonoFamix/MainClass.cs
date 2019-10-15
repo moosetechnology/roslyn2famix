@@ -10,84 +10,61 @@ using System.Collections.Generic;
 using System.IO;
 using Model;
 using System.Text;
-
+using Fame;
 using FAMIX;
+using RoslynMonoFamix.InCSharp;
 
 namespace RoslynMonoFamix {
     class MainClass {
+        private const string CSHARP = "C#";
+        private const string VISUALBASIC = "VB";
+
         static void Main(string[] args) {
+            ValidateArgs(args);
+            string language = args[0];
+            string solutionPath = args[1];
+            string exportPath = args[2];
+
+            string path = Assembly.GetAssembly(typeof(MainClass)).Location;
+            Console.WriteLine("--->>>" + path);
+            path = path.Replace("RoslynMonoFamix.exe", "");
+
+            MooseImporter importer = null;
+            if (language.Equals(VISUALBASIC)) {
+                importer = MooseImporter.VBImporter();
+            } else {
+                importer = MooseImporter.CSImporter();
+            }
             try {
-                //The code that causes the error goes here.
-
-                ValidateArgs(args);//validates arguments
-                string path = Assembly.GetAssembly(typeof(MainClass)).Location;
-                Console.WriteLine("--->>>" + path);
-                path = path.Replace("RoslynMonoFamix.exe", "");
-
-
-                var metamodel = FamixModel.Metamodel();
-
-                var msWorkspace = MSBuildWorkspace.Create();
-
-                string solutionPath = args[0];
-                var solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
-                Uri uri = null;
-                try {
-                    uri = new Uri(solutionPath); ;
-                } catch (UriFormatException e) {
-                    var currentFolder = new Uri(Environment.CurrentDirectory + "\\");
-                    uri = new Uri(currentFolder, solutionPath.Replace("\\", "/"));
-                    Console.WriteLine(e.StackTrace);
-                }
-
-                var ignoreFolder = Path.GetDirectoryName(uri.AbsolutePath);
-
-                var importer = new InCSharp.InCSharpImporter(metamodel, ignoreFolder);
-                var documents = new List<Document>();
-
-                for (int i = 0; i < solution.Projects.Count<Project>(); i++) {
-                    var project = solution.Projects.ElementAt<Project>(i);
-
-                    for (int j = 0; j < project.Documents.Count<Document>(); j++) {
-                        var document = project.Documents.ElementAt<Document>(j);
-                        if (document.SupportsSyntaxTree) {
-                            System.Console.Write("(project " + (i + 1) + " / " + solution.Projects.Count<Project>() + ")");
-                            System.Console.WriteLine("(document " + (j + 1) + " / " + project.Documents.Count<Document>() + " " + document.FilePath + ")");
-                            var syntaxTree = document.GetSyntaxTreeAsync().Result;
-
-
-                            var compilationAsync = project.GetCompilationAsync().Result;
-                            var semanticModel = compilationAsync.GetSemanticModel(syntaxTree);
-                            var visitor = new VBASTVisitor(semanticModel, importer);
-                            visitor.Visit(syntaxTree.GetRoot());
-                        }
-                    }
-                }
-
-                metamodel.ExportMSEFile(args[1]);
-
+                Repository metamodel = importer.import(solutionPath);
+                metamodel.ExportMSEFile(exportPath);
             } catch (ReflectionTypeLoadException ex) {
-                StringBuilder sb = new StringBuilder();
-                foreach (System.Exception exSub in ex.LoaderExceptions) {
-                    sb.AppendLine(exSub.Message);
-                    FileNotFoundException exFileNotFound = exSub as FileNotFoundException;
-                    if (exFileNotFound != null) {
-                        if (!string.IsNullOrEmpty(exFileNotFound.FusionLog)) {
-                            sb.AppendLine("Fusion Log:");
-                            sb.AppendLine(exFileNotFound.FusionLog);
-                        }
-                    }
-                    sb.AppendLine();
-                }
-                string errorMessage = sb.ToString();
-                Console.WriteLine(errorMessage);
+                Console.WriteLine(BuildErrorStringMessage(ex));
                 //Display or log the error based on your application.
             }
         }
 
+   
+        private static string BuildErrorStringMessage(ReflectionTypeLoadException ex) {
+            StringBuilder sb = new StringBuilder();
+            foreach (System.Exception exSub in ex.LoaderExceptions) {
+                sb.AppendLine(exSub.Message);
+                FileNotFoundException exFileNotFound = exSub as FileNotFoundException;
+                if (exFileNotFound != null) {
+                    if (!string.IsNullOrEmpty(exFileNotFound.FusionLog)) {
+                        sb.AppendLine("Fusion Log:");
+                        sb.AppendLine(exFileNotFound.FusionLog);
+                    }
+                }
+                sb.AppendLine();
+            }
+            return  sb.ToString();
 
-        private static void ValidateArgs(string[] args) {
-            //validate we receive solution file path and output file path
+        }
+        private static void ValidateArgs (string[] args) {
+            if (args.Length != 3 ) {
+                throw new System.Exception(" Error on arguments. {VB|C#} path/to/sln path/to/mse/destination was expected");
+            }
 
         }
     }

@@ -325,6 +325,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AST2XMLPrinter.cs" />
+    <Compile Include="MooseImporter.cs" />
     <Compile Include="VBASTVisitor.cs" />
     <Compile Include="InCSharp\InCSharpImporter.cs" />
     <Compile Include="InCSharp\NamedEntityAccumulator.cs" />
@@ -453,6 +454,9 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.9.4\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.9.4\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="InVisualBasic\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

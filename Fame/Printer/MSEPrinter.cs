@@ -12,11 +12,9 @@ namespace Fame.Parser {
         public static readonly object UNLIMITED = new Object();
         private bool newLineHasBeenWritten;
         private string filepath;
-
         public MSEPrinter(string filepath) {
             this.filepath = filepath;
         }
-
         protected void IndentLine() {
             if (!newLineHasBeenWritten) {
                 stream.Append('\n');
