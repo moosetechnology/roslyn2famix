@@ -1,4 +1,6 @@
-﻿namespace Fame.Fm3 {
+﻿
+
+namespace Fame.Fm3 {
     using System;
     using System.Reflection;
 

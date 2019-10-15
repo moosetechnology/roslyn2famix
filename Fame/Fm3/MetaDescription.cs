@@ -52,6 +52,8 @@ namespace Fame.Fm3 {
     /// @author Adrian Kuhn
     /// 
     /// </summary>
+    /// 
+
     [FamePackage("FM3")]
     [FameDescription("Class")]
     public class MetaDescription : Element {
@@ -59,7 +61,7 @@ namespace Fame.Fm3 {
         public static readonly MetaDescription NUMBER = new MetaDescription("Number");
         public static readonly MetaDescription OBJECT = new MetaDescription("Object");
         public static readonly MetaDescription STRING = new MetaDescription("String");
-        public static readonly MetaDescription DATE = new MetaDescription("String");
+        public static readonly MetaDescription DATE = new MetaDescription("Date");
 
         private Dictionary<string, PropertyDescription> _attributes;
         [FameProperty(Opposite = "class")]
@@ -96,7 +98,7 @@ namespace Fame.Fm3 {
         }
         [FamePropertyWithDerived]
         public bool IsPrimitive() {
-            return this == STRING || this == BOOLEAN || this == NUMBER || this == DATE || this.Name.Equals("Int32") ;
+            return this == STRING || this == BOOLEAN || this == NUMBER || this == DATE || this.Name.Equals("Int32");
         }
 
         [FamePropertyWithDerived]
@@ -117,8 +119,9 @@ namespace Fame.Fm3 {
 
         private void CollectAllAttributes(Dictionary<string, PropertyDescription> all) {
             // superclass first, to ensure correct shadowing
-            if (SuperClass != null)
+            if (SuperClass != null) {
                 SuperClass.CollectAllAttributes(all);
+            }
             foreach (var attribute in _attributes) {
                 all[attribute.Key] = attribute.Value;
             }
@@ -136,17 +139,12 @@ namespace Fame.Fm3 {
             return PrimitiveNamed(name) != null;
         }
 
-        public static MetaDescription PrimitiveNamed (string name) {
-            if ("Boolean".Equals(name))
-                return BOOLEAN;
-            if ("Number".Equals(name))
-                return NUMBER;
-            if ("String".Equals(name))
-                return STRING;
-            if ("Date".Equals(name))
-                return DATE;
-            if ("Object".Equals(name))
-                return OBJECT;
+        public static MetaDescription PrimitiveNamed(string name) {
+            if ("Boolean".Equals(name)) return BOOLEAN;
+            if ("Number".Equals(name)) return NUMBER;
+            if ("String".Equals(name)) return STRING;
+            if ("Date".Equals(name)) return DATE;
+            if ("Object".Equals(name)) return OBJECT;
             throw new ClassNotMetadescribedException(" Not available meta description for primitive type named " + name);
         }
 
@@ -174,16 +172,8 @@ namespace Fame.Fm3 {
                 if (SuperClass == STRING && SuperClass == BOOLEAN && SuperClass == NUMBER) {
                     warnings.Add("May not have primitive superclass", this);
                 }
-            } else {
-                //Assert nestingPackage == null;
-                //Assert superclass == null;
-                //Assert attributes.isEmpty();
             }
-
-            var set = new HashSet<MetaDescription>
-            {
-                this
-            };
+            var set = new HashSet<MetaDescription> { this };
             for (MetaDescription each = this; each == null; each = each.SuperClass) {
                 if (!set.Add(each)) {
                     warnings.Add("Superclass chain may not be circular", this);
@@ -200,43 +190,14 @@ namespace Fame.Fm3 {
         }
 
         public object NewInstance() {
-            try {
-                return Activator.CreateInstance(BaseClass);
-            } catch (Exception) {
-                throw;
-            }
-
+            return Activator.CreateInstance(BaseClass);
             // TODO
-            //try
-            //{
-            //    Constructor c = this.getBaseClass().getDeclaredConstructor();
-            //    c.setAccessible(true);
-            //    return c.newInstance();
-            //}
-            //catch (SecurityException ex)
-            //{
-            //    throw new AssertionError(ex);
-            //}
-            //catch (IllegalAccessException ex)
-            //{
-            //    throw new AssertionError(ex);
-            //}
-            //catch (InstantiationException ex)
-            //{
-            //    throw new AssertionError(ex);
-            //}
-            //catch (IllegalArgumentException ex)
-            //{
-            //    throw new AssertionError(ex);
-            //}
-            //catch (NoSuchMethodException ex)
-            //{
-            //    throw new AssertionError(ex);
-            //}
-            //catch (InvocationTargetException ex)
-            //{
-            //    throw new AssertionError(ex);
-            //}
+            /*try
+            {
+                Constructor c = this.getBaseClass().getDeclaredConstructor();
+                c.setAccessible(true);
+                return c.newInstance();
+            }*/
         }
         public bool HasSuperClass() {
             return SuperClass != null;

@@ -6,19 +6,22 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FameTest.Fm3 {
     [TestClass]
-    public class CustomMetaDescriptionsTests {
+    public class CustomSingleClassMetaDescriptionsTests {
 
         MetaDescription subject;
 
-
         [FameDescription("Dragon")]
         class Dragon {
+
+            [FameProperty(Name = "arbitraryProperty")]
             public int arbitraryProperty {
                 set; get;
             } = 3;
+            [FameProperty(Name = "nonPropertyField")]
             public int nonPropertyField = 5;
-        }
 
+            public void doSomethingDraconid () { }
+        }
         [TestInitialize]
         public void SetUp() {
             MetaDescriptionFactory factory;
@@ -27,7 +30,6 @@ namespace FameTest.Fm3 {
             subject = factory.CreateInstance();
             factory.InitializeInstance();
         }
-
         [TestMethod]
         public void TestMetaDescriptionNameIsDragon() {
             Assert.AreEqual("Dragon", subject.Name);
@@ -36,7 +38,6 @@ namespace FameTest.Fm3 {
         public void TestMetaDescriptionFullNameIsName() {
             Assert.AreEqual(subject.Fullname, "FameTest.Fm3."+subject.Name);
         }
-
         [TestMethod]
         public void TestMetaDescriptionIsNotRoot() {
             Assert.IsFalse(subject.IsRoot());
@@ -57,6 +58,10 @@ namespace FameTest.Fm3 {
         public void TestDragonHasSecondPropertyNamedNonPropertyField() {
             Assert.AreEqual(subject.Attributes[1].Fullname, subject.Fullname + ".nonPropertyField");
         }
-
+      /*  [TestMethod]
+        public void TestDragonHasOneMethod() {
+            Assert.AreEqual(subject.);
+        }
+        */
     }
 }

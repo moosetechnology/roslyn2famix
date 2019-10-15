@@ -5,7 +5,6 @@ using Fame.Fm3;
 using System.Reflection;
 using Fame;
 using System.Collections;
-
 namespace Fame.Internal {
    public  class MetaDescriptionFactory {
         private Type type;

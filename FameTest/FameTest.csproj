@@ -51,7 +51,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fm3\CustomMetaDescriptionsTests.cs" />
+    <Compile Include="Fm3\PackagesMetaDescriptionsTests.cs" />
+    <Compile Include="Fm3\CustomSingleClassMetaDescriptionsTests.cs" />
+    <Compile Include="Fm3\CustomClassHierarchClassMetaDescriptionsTests.cs" />
     <Compile Include="Metamodel\FameRepositoryTest.cs" />
     <Compile Include="Integration\DragonTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

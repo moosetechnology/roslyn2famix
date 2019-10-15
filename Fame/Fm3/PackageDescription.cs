@@ -52,14 +52,6 @@
                 warnings.Add("Name must be alphanumeric", this);
         }
 
-        
-
-        public void SetClasses(ISet<MetaDescription> classes) {
-            foreach (var c in classes) {
-                AddElement(c);
-            }
-        }
-
         public override Element GetOwner() {
             return null;
         }

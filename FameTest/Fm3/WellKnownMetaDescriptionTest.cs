@@ -7,7 +7,6 @@ namespace FameTest {
     [TestClass]
     public class WellKnownMetaDescriptionTest {
 
-
         [TestMethod]
         public void TestObjectIsRoot() {
             Assert.IsTrue(MetaDescription.OBJECT.IsRoot());
@@ -16,6 +15,7 @@ namespace FameTest {
         public void TestObjectHasNoParent() {
             Assert.IsFalse(MetaDescription.OBJECT.HasSuperClass());
         }
+
         [TestMethod]
         public void TestPrimitiveObjectGetsObject() {
             Assert.AreEqual(MetaDescription.OBJECT, MetaDescription.PrimitiveNamed("Object"));

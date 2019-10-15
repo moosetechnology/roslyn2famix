@@ -65,6 +65,7 @@
     <Compile Include="Exceptions\ClassNotMetadescribedException.cs" />
     <Compile Include="Common\Warnings.cs" />
     <Compile Include="Exceptions\ElementInPropertyNotMetadescribed.cs" />
+    <Compile Include="Fm3Internals\MetaDescriptionFactory.cs" />
     <Compile Include="Metamodel\FameDescriptionAttribute.cs" />
     <Compile Include="Metamodel\FamePackageAttribute.cs" />
     <Compile Include="Metamodel\FamePropertyAttribute.cs" />
@@ -73,12 +74,11 @@
     <Compile Include="Fm3\MetaDescription.cs" />
     <Compile Include="Fm3\PackageDescription.cs" />
     <Compile Include="Fm3\PropertyDescription.cs" />
-    <Compile Include="Internal\Access.cs" />
-    <Compile Include="Internal\MetaDescriptionFactory.cs" />
-    <Compile Include="Internal\Number.cs" />
-    <Compile Include="Internal\PropertyFactory.cs" />
-    <Compile Include="Internal\RepositoryVisitor.cs" />
-    <Compile Include="Internal\UnknownElementError.cs" />
+    <Compile Include="Fm3Internals\Access.cs" />
+    <Compile Include="Fm3Internals\Number.cs" />
+    <Compile Include="Fm3Internals\PropertyFactory.cs" />
+    <Compile Include="Fm3Internals\RepositoryVisitor.cs" />
+    <Compile Include="Fm3Internals\UnknownElementError.cs" />
     <Compile Include="Metamodel\MetaRepository.cs" />
     <Compile Include="Printer\MSEPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
