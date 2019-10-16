@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest {
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class AnnotationAttributeTest : SampleSystemCSharpLoader {
+    public class AnnotationAttributeTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void IngestedAnnotationTypes() {
             Assert.IsNotNull(importer.Types.Named("SampleProject.Basic.AnnotationAttribute"));

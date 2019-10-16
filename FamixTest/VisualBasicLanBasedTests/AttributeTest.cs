@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class AttributeTest : SampleSystemCSharpLoader
-    {
+    public class AttributeTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void SingleAttributeWasIngested() =>
             Assert.IsNotNull(importer.Attributes.Named("SampleProject.Basic.Attribute.i"));

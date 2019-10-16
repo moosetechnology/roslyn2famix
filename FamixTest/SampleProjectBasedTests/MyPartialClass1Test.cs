@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FamixTest
 {
     [TestClass]
-    public class MyPartialClass1Test : SampleSystemLoader
+    public class MyPartialClass1Test : SampleSystemCSharpLoader
     {
         [TestMethod]
         public void ClassHasTwoMethods() => Assert.AreEqual(3,importer.Types.Named("SampleProject.Basic.MyPartialClass").Methods.Count);

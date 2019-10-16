@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
     public class PropertiesTest : SampleSystemCSharpLoader
     {

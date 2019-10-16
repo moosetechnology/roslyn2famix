@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class CallsTest : SampleSystemCSharpLoader
-    {
+    public class CallsTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void TestStandardCall() =>
             Assert.AreEqual(2, importer.Methods.Named("SampleProject.Basic.StandardCaller.CallerMethod()").OutgoingInvocations.Count);

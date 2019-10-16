@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class ReturnTypeTest : SampleSystemCSharpLoader
-    {
+    public class ReturnTypeTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void VoidMethod()
         {

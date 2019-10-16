@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class BinarySuperclassesTest : SampleSystemCSharpLoader
-    {
+    public class BinarySuperclassesTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void LinkedListIsIngested() => Assert.IsNotNull(importer.Types.Named("DefinitionOfSystem.Collections.Generic.LinkedList<T>"));
 

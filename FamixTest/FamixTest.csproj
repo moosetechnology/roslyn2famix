@@ -285,7 +285,7 @@
     <Compile Include="SampleProjectBasedTests\Class1Test.cs" />
     <Compile Include="SampleProjectBasedTests\MyPartialClass1Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SampleProjectBasedTests\SampleSystemLoader.cs" />
+    <Compile Include="SampleProjectBasedTests\SampleSystemCSharpLoader.cs" />
     <Compile Include="SampleProjectBasedTests\CallsTest.cs" />
     <Compile Include="SampleProjectBasedTests\AttributeTest.cs" />
     <Compile Include="SampleProjectBasedTests\SubClassTest.cs" />
@@ -303,6 +303,24 @@
     <Compile Include="SampleProjectBasedTests\FanoutTest.cs" />
     <Compile Include="SampleProjectBasedTests\ExpressionBodyTest.cs" />
     <Compile Include="SampleProjectBasedTests\EventDelegateClassTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\AnnotationAttributeTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\AttributeTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\BinarySuperclassesTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\CallsTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\DelegateEventTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\EnumTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\EventDelegateClassTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\ExceptionsTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\ExpressionBodyTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\FanoutTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\GenericsTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\ImplementorTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\ISimpleInterfaceTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\PropertiesTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\ReturnTypeTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\LanProjectVisualBasicLoader.cs" />
+    <Compile Include="VisualBasicLanBasedTests\SimpleStructTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\SubClassTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

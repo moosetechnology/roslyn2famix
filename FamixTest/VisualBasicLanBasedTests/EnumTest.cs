@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class EnumTest : SampleSystemCSharpLoader
-    {
+    public class EnumTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void EnumIsIngested() => Assert.IsNotNull(importer.Types.Named("SampleProject.Basic.Enum.MyFavoriteEnum"));
 

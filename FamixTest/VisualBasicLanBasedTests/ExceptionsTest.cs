@@ -2,11 +2,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class ExceptionsTest : SampleSystemCSharpLoader
-    {
+    public class ExceptionsTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void CaughtExceptions()
         {

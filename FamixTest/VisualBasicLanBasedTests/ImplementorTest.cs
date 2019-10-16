@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class ImplementorTest : SampleSystemCSharpLoader
-    {
+    public class ImplementorTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void ClassImplementsInterfaces()
         {

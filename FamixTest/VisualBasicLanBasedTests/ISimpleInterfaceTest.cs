@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class ISimpleInterfaceTest : SampleSystemCSharpLoader
-    {
+    public class ISimpleInterfaceTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void InterfaceWasIngested() => Assert.IsNotNull(importer.Types.Named("SampleProject.Basic.ISimpleInterface"));
     }

@@ -14,13 +14,13 @@ using RoslynMonoFamix;
 
 namespace FamixTest {
     [TestClass]
-    public class SampleSystemLoader {
+    public class SampleSystemCSharpLoader {
         protected Repository metamodel = FamixModel.Metamodel();
         protected MooseImporter importer = null;
 
         [TestInitialize]
         public void LoadSampleSystem() {
-            string path = Assembly.GetAssembly(typeof(SampleSystemLoader)).Location;
+            string path = Assembly.GetAssembly(typeof(SampleSystemCSharpLoader)).Location;
             path = path.Replace("FamixTest.dll", "");
             string solutionPath = path + "../../../SampleCode/SampleCode.sln";
 

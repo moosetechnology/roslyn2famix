@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class GenericsTest : SampleSystemCSharpLoader
-    {
+    public class GenericsTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void GenericsTypeIsIngested() { 
             Assert.IsNotNull(importer.Types.Named("DefinitionOfSampleProject.Basic.Generics<T>"));

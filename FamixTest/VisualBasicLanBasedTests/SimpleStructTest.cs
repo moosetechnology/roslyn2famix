@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class SimpleStructTest : SampleSystemCSharpLoader
-    {
+    public class SimpleStructTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void StructIngested() => Assert.IsNotNull(importer.Types.Named("SampleProject.Basic.SimpleStruct"));
 

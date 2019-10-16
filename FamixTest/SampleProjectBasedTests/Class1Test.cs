@@ -10,7 +10,7 @@ using FAMIX;
 namespace FamixTest
 {
 	[TestClass]
-	public class Class1Test : SampleSystemLoader
+	public class Class1Test : SampleSystemCSharpLoader
 	{     
 		[TestMethod]
 		public void ClassWasIngested() => Assert.IsNotNull(importer.Types.Named("SampleProject.Basic.Class1"));

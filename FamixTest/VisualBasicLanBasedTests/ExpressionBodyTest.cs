@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest {
+namespace FamixTest.VisualBasic { 
     [TestClass]
-    public class ExpressionBodyTest : SampleSystemCSharpLoader {
+    public class ExpressionBodyTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void ConstructorCallsAndAccesses() {
             Assert.AreEqual(2, importer.Methods.Named("SampleProject.Basic.ExpressionBody..ctor(String)").Accesses.Count);

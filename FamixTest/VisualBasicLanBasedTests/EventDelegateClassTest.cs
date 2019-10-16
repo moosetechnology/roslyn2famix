@@ -1,11 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FamixTest
-{
+namespace FamixTest.VisualBasic {
     [TestClass]
-    public class EventDelegateClassTest : SampleSystemCSharpLoader
-    {
+    public class EventDelegateClassTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void EventDelegateClassPlainMethodCallsEvent()
         {
