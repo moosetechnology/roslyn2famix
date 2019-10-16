@@ -11,7 +11,7 @@ using System;
 using FAMIX;
 using Model;
 using Fame;
-
+using RoslynMonoFamix.InCSharp;
 
 namespace RoslynMonoFamix {
 
@@ -42,7 +42,15 @@ namespace RoslynMonoFamix {
     public abstract class MooseImporter {
         internal SemanticModel semanticModel;
         internal InCSharp.InCSharpImporter importer;
-        public Repository metamodel;
+        private Repository _repository;
+        public Repository MetaModel { get { return _repository; } }
+
+        public NamedEntityAccumulator<Method> Methods { get { return importer.Methods; } }
+        public NamedEntityAccumulator<FAMIX.StructuralEntity> Attributes { get { return importer.Attributes; } }
+        public NamedEntityAccumulator<FAMIX.Type> Types { get { return importer.Types; } }
+        public IEnumerable<T> AllElementsOfType<T>() {
+            return importer.AllElementsOfType<T>();
+        }
 
         /* Static constructors. Creates a VB or C# specific importer */
         public static MooseImporter VBImporter() {
@@ -64,12 +72,12 @@ namespace RoslynMonoFamix {
          */
         public Repository import(string solutionPath) {
             //The code that causes the error goes here.
-            metamodel = FamixModel.Metamodel();
+            _repository = FamixModel.Metamodel();
             var msWorkspace = MSBuildWorkspace.Create();
 
             var solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
             string ignoreFolder = this.PrivateDirectoryNameFor(solutionPath);
-            importer = new InCSharp.InCSharpImporter(metamodel, ignoreFolder);
+            importer = new InCSharp.InCSharpImporter(_repository, ignoreFolder);
 
             var documents = new List<Document>();
             for (int i = 0; i < solution.Projects.Count<Project>(); i++) {
@@ -86,7 +94,7 @@ namespace RoslynMonoFamix {
                     }
                 }
             }
-            return metamodel;
+            return _repository;
         }
 
         /*
