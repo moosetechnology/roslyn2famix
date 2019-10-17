@@ -1,6 +1,6 @@
 ﻿Public MustInherit Class OutputServer
     Inherits Node
-    Public Property serverType As String = Nothing
+    Public Property ServerType As String = Nothing
 
     Public Overrides Sub Accept(packet As Packet)
         If (packet.Addressee.IsDestinationFor(Me.Name)) Then

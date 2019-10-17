@@ -307,6 +307,7 @@
     <Compile Include="VisualBasicLanBasedTests\AttributeTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\BinarySuperclassesTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\CallsTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\ClassDigestingTests.cs" />
     <Compile Include="VisualBasicLanBasedTests\DelegateEventTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\EnumTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\EventDelegateClassTest.cs" />
