@@ -3,8 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FamixTest.VisualBasic {
     [TestClass]
-    public class PropertiesTest : SampleSystemCSharpLoader
-    {
+    public class PropertiesTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void TestPropertyHasSetter()
         {

@@ -3,8 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FamixTest.VisualBasic {
     [TestClass]
-    public class DelegateEventTest : SampleSystemCSharpLoader
-    {
+    public class DelegateEventTest : LanProjectVisualBasicLoader {
         [TestMethod]
         public void DelegateIngested() => Assert.IsNotNull(importer.Types.Named("SecondChangeEvent.Clock.SecondChangeHandler"));
 
