@@ -3,6 +3,7 @@
     Public Property ServerType As String = Nothing
 
     Public Overrides Sub Accept(packet As Packet)
+
         If (packet.Addressee.IsDestinationFor(Me.Name)) Then
             Me.Output(packet)
         Else

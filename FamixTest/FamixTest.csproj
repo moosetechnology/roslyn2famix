@@ -282,27 +282,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SampleProjectBasedTests\Class1Test.cs" />
-    <Compile Include="SampleProjectBasedTests\MyPartialClass1Test.cs" />
+    <Compile Include="CSharpSampleProjectTest\Class1Test.cs" />
+    <Compile Include="CSharpSampleProjectTest\MyPartialClass1Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SampleProjectBasedTests\SampleSystemCSharpLoader.cs" />
-    <Compile Include="SampleProjectBasedTests\CallsTest.cs" />
-    <Compile Include="SampleProjectBasedTests\AttributeTest.cs" />
-    <Compile Include="SampleProjectBasedTests\SubClassTest.cs" />
-    <Compile Include="SampleProjectBasedTests\ISimpleInterfaceTest.cs" />
-    <Compile Include="SampleProjectBasedTests\ImplementorTest.cs" />
-    <Compile Include="SampleProjectBasedTests\AnnotationAttributeTest.cs" />
-    <Compile Include="SampleProjectBasedTests\ExceptionsTest.cs" />
-    <Compile Include="SampleProjectBasedTests\DelegateEventTest.cs" />
-    <Compile Include="SampleProjectBasedTests\SimpleStructTest.cs" />
-    <Compile Include="SampleProjectBasedTests\GenericsTest.cs" />
-    <Compile Include="SampleProjectBasedTests\ReturnTypeTest.cs" />
-    <Compile Include="SampleProjectBasedTests\EnumTest.cs" />
-    <Compile Include="SampleProjectBasedTests\BinarySuperclassesTest.cs" />
-    <Compile Include="SampleProjectBasedTests\PropertiesTest.cs" />
-    <Compile Include="SampleProjectBasedTests\FanoutTest.cs" />
-    <Compile Include="SampleProjectBasedTests\ExpressionBodyTest.cs" />
-    <Compile Include="SampleProjectBasedTests\EventDelegateClassTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\SampleSystemCSharpLoader.cs" />
+    <Compile Include="CSharpSampleProjectTest\CallsTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\AttributeTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\SubClassTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\ISimpleInterfaceTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\ImplementorTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\AnnotationAttributeTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\ExceptionsTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\DelegateEventTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\SimpleStructTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\GenericsTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\ReturnTypeTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\EnumTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\BinarySuperclassesTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\PropertiesTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\FanoutTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\ExpressionBodyTest.cs" />
+    <Compile Include="CSharpSampleProjectTest\EventDelegateClassTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\AnnotationAttributeTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\AttributeTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\BinarySuperclassesTest.cs" />

@@ -13,7 +13,12 @@
 
     Public Overrides Sub Output(packet As Packet)
         Console.WriteLine()
-        Console.WriteLine("FileServer " + Name() + " saves " + packet.Contents())
+        Console.WriteLine("FileServer " \
+                        +Name() \
+                        +" saves " \
+                        +packet.Contents() \
+                        +" Kind " \
+                        +packet.Kind.ToString())
     End Sub
 
     Public Sub SetServerType()

@@ -70,7 +70,6 @@
     <Compile Include="servers\OutputServer .vb" />
     <Compile Include="servers\FileServer.vb" />
     <Compile Include="SingleDestinationAddress .vb" />
-    <Compile Include="LanModuleFacade.vb" />
     <Compile Include="Node.vb" />
     <Compile Include="Packet.vb" />
     <Compile Include="WorkStation.vb" />

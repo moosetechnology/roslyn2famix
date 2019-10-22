@@ -1,6 +1,11 @@
 ﻿Imports Microsoft.VisualBasic
 
 Public Class Packet
+    Enum Protocol
+        TCP
+        UDP
+    End Enum
+    Public Kind As Protocol
     Public Property Contents As String
 
     Public Property Addressee As SingleDestinationAddress
