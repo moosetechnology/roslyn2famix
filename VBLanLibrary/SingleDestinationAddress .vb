@@ -1,7 +1,10 @@
-﻿
+﻿Imports System.ComponentModel.DataAnnotations
+
 Public Class SingleDestinationAddress
     Inherits AbstractDestinationAddress
 
+    <Custom(SomeArbitraryValue:="ToastForIt")>
+    <Required(ErrorMessage:="Invalid ID number")>
     Public Property Id As String
 
     Public Overrides Function IsDestinationFor(anId As String) As Boolean
@@ -11,7 +14,7 @@ Public Class SingleDestinationAddress
         Return anId.Equals(Id)
     End Function
 
-    Public Function EqualsMultple(address As AbstractDestinationAddress) As Boolean
+    Public Function EqualsMultiple(address As AbstractDestinationAddress) As Boolean
         Return False
     End Function
 End Class

@@ -1,6 +1,7 @@
 ﻿Public Class FileServer
     Inherits OutputServer
 
+    <Custom(SomeArbitraryValue:="OtherValue")>
     Public Overrides Property Name As String
         Get
             Return Name
