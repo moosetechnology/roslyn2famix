@@ -12,6 +12,11 @@ namespace RoslynMonoFamix.InCSharp
 
         private Dictionary<string, T> entities;
 
+
+
+        public IList<T> RegisteredEntities () {
+            return entities.Values.ToList();
+        }
         public NamedEntityAccumulator()
         {
             entities = new Dictionary<string, T>();

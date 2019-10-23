@@ -305,7 +305,7 @@
     <Compile Include="CSharpSampleProjectTest\EventDelegateClassTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\AnnotationAttributeTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\AttributeTest.cs" />
-    <Compile Include="VisualBasicLanBasedTests\CallsTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\Approved\CallsTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\ClassDigestingTests.cs" />
     <Compile Include="VisualBasicLanBasedTests\DelegateEventTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\EnumTest.cs" />
@@ -315,7 +315,7 @@
     <Compile Include="VisualBasicLanBasedTests\FanoutTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\GenericsTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\ImplementorTest.cs" />
-    <Compile Include="VisualBasicLanBasedTests\ISimpleInterfaceTest.cs" />
+    <Compile Include="VisualBasicLanBasedTests\Approved\InterfaceDigestingTests.cs" />
     <Compile Include="VisualBasicLanBasedTests\PropertiesTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\ReturnTypeTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\LanProjectVisualBasicLoader.cs" />
