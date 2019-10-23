@@ -49,7 +49,7 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>RoslynMonoFamix.MainClass</StartupObject>
+    <StartupObject>RoslynMonoFamix.CommandLineHandler</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Esent.Interop, Version=1.9.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -325,11 +325,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AST2XMLPrinter.cs" />
-    <Compile Include="MooseImporter.cs" />
-    <Compile Include="VBASTVisitor.cs" />
+    <Compile Include="Importer\MooseImporter.cs" />
+    <Compile Include="Visitor\VBASTVisitor.cs" />
     <Compile Include="InCSharp\InCSharpImporter.cs" />
     <Compile Include="InCSharp\NamedEntityAccumulator.cs" />
-    <Compile Include="CSharpASTVisitor.cs" />
+    <Compile Include="Visitor\CSharpASTVisitor.cs" />
     <Compile Include="Model\CSharp\CSharpEvent.cs" />
     <Compile Include="Model\CSharp\CSharpProperty.cs" />
     <Compile Include="Model\CSharp\CSharpPropertyAccessor.cs" />
@@ -431,7 +431,7 @@
     <Compile Include="Model\Moose\Group.cs" />
     <Compile Include="Model\Moose\Model.cs" />
     <Compile Include="Model\Moose\PropertyGroup.cs" />
-    <Compile Include="MainClass.cs" />
+    <Compile Include="CommandLineHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

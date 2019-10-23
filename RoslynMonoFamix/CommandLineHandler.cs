@@ -15,7 +15,7 @@ using FAMIX;
 using RoslynMonoFamix.InCSharp;
 
 namespace RoslynMonoFamix {
-    class MainClass {
+    class CommandLineHandler {
         private const string CSHARP = "C#";
         private const string VISUALBASIC = "VB";
 
@@ -25,7 +25,7 @@ namespace RoslynMonoFamix {
             string solutionPath = args[1];
             string exportPath = args[2];
 
-            string path = Assembly.GetAssembly(typeof(MainClass)).Location;
+            string path = Assembly.GetAssembly(typeof(CommandLineHandler)).Location;
             Console.WriteLine("--->>>" + path);
             path = path.Replace("RoslynMonoFamix.exe", "");
 
