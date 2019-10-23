@@ -45,6 +45,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -65,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractDestinationAddress.vb" />
+    <Compile Include="CustomAttribute.vb" />
     <Compile Include="servers\PrinterServer.vb" />
     <Compile Include="servers\IPrinter.vb" />
     <Compile Include="servers\OutputServer .vb" />

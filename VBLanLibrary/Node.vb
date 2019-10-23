@@ -46,7 +46,9 @@ Public Class Node
     Public Overridable Sub Send(packet As Packet)
         NextNode.Accept(packet)
     End Sub
-
+    Public Overridable Function GetName() As String
+        Return Name
+    End Function
     Public Overridable Sub PrintOn(stringBuilder As System.Text.StringBuilder)
         stringBuilder.Append(": ").Append(Name)
         If (NextNode IsNot Nothing) Then

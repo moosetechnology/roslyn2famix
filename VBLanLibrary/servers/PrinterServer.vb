@@ -9,6 +9,7 @@ Public Class PrinterServer
         Private UselessNumber As Integer
 
         Public Sub Print(contents As String, rv As Boolean) Implements IPrinter.Print
+            Console.WriteLine(contents)
         End Sub
 
         Public Function IdNumber() As Integer

@@ -13,12 +13,14 @@ namespace FamixTest.VisualBasic {
         [TestMethod]
         public void BuiltInAnnotationIsDigested() {
             var annotation = importer.Types.Named("System.ComponentModel.DataAnnotations.Require");
+            Assert.IsNotNull(annotation);
             Assert.IsTrue(annotation is FAMIX.AnnotationType);
             Assert.IsTrue(annotation.isStub);
         }
         [TestMethod]
         public void CustomAnnotationIsDigested() {
             var annotation = importer.Types.Named("VBLanLibrary.Custom");
+            Assert.IsNotNull(annotation);
             Assert.IsTrue(annotation is FAMIX.AnnotationType);
             Assert.IsFalse(annotation.isStub);
         }
@@ -28,6 +30,5 @@ namespace FamixTest.VisualBasic {
             Assert.AreEqual(1, annotation.Attributes.Count);
             Assert.AreEqual("SomeArbitraryValue", annotation.Attributes.First().name);
         }
-
     }
 }
