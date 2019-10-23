@@ -1,11 +1,16 @@
-﻿Public Class WorkStation
+﻿
+Public Class WorkStation
     Inherits Node
     Private _type As String
-    Private _conf As Int64
+    Private _conf As LinkedList(Of Int64)
+    Public confTwo As IList(Of AbstractDestinationAddress)
 
-
-    Public WriteOnly Property Conf As Int64
-        Set(value As Int64)
+    Public Sub New()
+        Me._conf = New LinkedList(Of Int64)()
+        Me.confTwo = New ArrayList()
+    End Sub
+    Public WriteOnly Property Conf As IList(Of Int64)
+        Set(value As IList(Of Int64))
             _conf = value
         End Set
     End Property

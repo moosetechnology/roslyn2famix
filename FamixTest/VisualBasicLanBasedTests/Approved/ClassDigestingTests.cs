@@ -191,12 +191,32 @@ namespace FamixTest.VisualBasic {
         public void TestWorkStationClassIsComplete() {
             FAMIX.Class value = (FAMIX.Class)importer.Types.Named("VBLanLibrary.WorkStation");
             Assert.AreEqual(value.SuperInheritances.Count, 1);
-            Assert.AreEqual(value.SuperInheritances.First<FAMIX.Inheritance>().superclass.name, "Object");
-            Assert.AreEqual(value.Attributes.Count, 0);
-            Assert.AreEqual(value.Methods.Count, 0);
+            Assert.AreEqual(value.SuperInheritances.First<FAMIX.Inheritance>().superclass.name, "Node");
+            Assert.AreEqual(value.Methods.Count, 7);
+            Assert.AreEqual(value.Attributes.Count, 5);
         }
         #endregion
 
+        #region Binary
+        [TestMethod]
+        public void TestBinaryClassesAreAlsoDigested() {
+            List<String> classes = (
+                from famixClass
+                in importer.AllElementsOfType<FAMIX.Class>().ToList()
+                where famixClass.container == null || (famixClass.container != null && !famixClass.container.name.Equals("VBLanLibrary"))
+                select famixClass.name).ToList();
+            /* Not yet sure how to test this. But we should be counting with some 
+             * expected used classes/interfaces such as ILink, LinkedList, ArrayList.
+             * And in the case Linq usage we should be able to understand that the 
+             * class has being extent 
+             * 
+             */
 
+            Assert.AreEqual(33, importer.Types.Named("System.Collections.Generic.LinkedList<T>").Methods.Count);
+            Assert.AreEqual(classes.Count, 8);
+        }
+
+
+        #endregion
     }
 }

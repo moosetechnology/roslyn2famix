@@ -10,6 +10,7 @@ namespace FamixTest.VisualBasic {
             var allAnnotationTypes = (importer.AllElementsOfType<FAMIX.AnnotationType>()).ToList();
             Assert.AreEqual(allAnnotationTypes.Count(), 2);
         }
+
         [TestMethod]
         public void BuiltInAnnotationIsDigested() {
             var annotation = importer.Types.Named("System.ComponentModel.DataAnnotations.Require");

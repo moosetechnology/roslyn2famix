@@ -6,8 +6,8 @@ namespace FamixTest.VisualBasic {
     [TestClass]
     public class AttributeTest : LanProjectVisualBasicLoader {
         [TestMethod]
-        public void ThereIsATotalOf13AttributesInTheWholeProject() {
-            Assert.AreEqual(importer.Attributes.size(), 21);
+        public void ThereIsATotalOf22AttributesInTheWholeProject() {
+            Assert.AreEqual(importer.Attributes.size(), 22);
         }
         
         [TestMethod]

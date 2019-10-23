@@ -305,7 +305,6 @@
     <Compile Include="CSharpSampleProjectTest\EventDelegateClassTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\AnnotationAttributeTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\AttributeTest.cs" />
-    <Compile Include="VisualBasicLanBasedTests\BinarySuperclassesTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\CallsTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\ClassDigestingTests.cs" />
     <Compile Include="VisualBasicLanBasedTests\DelegateEventTest.cs" />
