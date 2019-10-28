@@ -10,6 +10,7 @@ using CSharp;
 namespace RoslynMonoFamix.InCSharp {
     public class InCSharpImporter {
         private Repository repository;
+        private ImportingHelper helper = new ImportingHelper(); 
         private string projectBaseFolder;
 
         private Dictionary<string, System.Type> typeNameMap = new Dictionary<string, System.Type>()
@@ -35,7 +36,7 @@ namespace RoslynMonoFamix.InCSharp {
 
         internal FAMIX.Type EnsureBinaryType(INamedTypeSymbol superType) {
 
-            string fullName = FullTypeName(superType.OriginalDefinition);
+            string fullName = helper.FullTypeName(superType.OriginalDefinition);
 
             if (Types.has(fullName))
                 return Types.Named(fullName);
@@ -64,9 +65,7 @@ namespace RoslynMonoFamix.InCSharp {
                 var superDuper = EnsureBinaryType(inter.OriginalDefinition);
                 LinkWithInheritance(binaryType, superDuper);
             }
-
             return binaryType;
-
         }
 
         private void LinkWithInheritance(FAMIX.Type subClass, FAMIX.Type superClass) {
@@ -77,63 +76,73 @@ namespace RoslynMonoFamix.InCSharp {
             subClass.AddSuperInheritance(inheritance);
         }
 
-        private Tuple<String, String> FullMethodName(ISymbol method) {
-            var parameters = "";
-            if (method is IMethodSymbol) {
-                parameters += "(";
-                foreach (var par in (method as IMethodSymbol).Parameters)
-                    parameters += par.Type.Name + ",";
-                if (parameters.LastIndexOf(",") > 0)
-                    parameters = parameters.Substring(0, parameters.Length - 1);
-                parameters += ")";
-            }
-            var fullClassName = "";
-            if (method.ContainingType != null) {
-                fullClassName = FullTypeName(method.ContainingType);
-            }
-
-            return Tuple.Create(fullClassName + "." + method.Name + parameters, method.Name + parameters);
-        }
-
         public NamedEntityAccumulator<Method> Methods { get; set; }
         public NamedEntityAccumulator<FAMIX.StructuralEntity> Attributes { get; set; }
 
-        public Method EnsureMethod(ISymbol aMethod) {
-            var methodFullName = FullMethodName(aMethod);
-            if (Methods.has(methodFullName.Item1))
-                return Methods.Named(methodFullName.Item1);
 
-            Method method = null;
-            if (aMethod is IMethodSymbol && ((aMethod as IMethodSymbol).MethodKind == MethodKind.PropertyGet || (aMethod as IMethodSymbol).MethodKind == MethodKind.PropertySet))
-                method = repository.New<CSharp.CSharpPropertyAccessor>(typeof(CSharp.CSharpPropertyAccessor).FullName);
-            else
-                if (aMethod is IEventSymbol)
-                method = repository.New<CSharp.CSharpEvent>(typeof(CSharp.CSharpEvent).FullName);
-            else
-                method = repository.New<Method>(typeof(FAMIX.Method).FullName);
+        public CSharp.CSharpPropertyAccessor EnsureAccessor (IMethodSymbol MethodSelector) {
+            return this.MethodNamedIfNone<CSharp.CSharpPropertyAccessor>(helper.FullMethodName(MethodSelector),
+              () => this.CreateAndRegisterAccessor(MethodSelector)
+          );
 
+        }
+        public CSharp.CSharpEvent EnsureEvent(IEventSymbol EventSelector) {
+            return this.MethodNamedIfNone<CSharp.CSharpEvent>(helper.FullEventName(EventSelector),
+               () => this.CreateAndRegisterEvent(EventSelector)
+           );
+        }
+
+        private T MethodNamedIfNone<T> (String methodFullName, Func<T> IfNone ) where T : Method {
+            if (Methods.has(methodFullName)) return Methods.Named(methodFullName) as T;
+            return IfNone(); 
+        }
+        public Method EnsureMethod(IMethodSymbol aMethod) {
+            return this.MethodNamedIfNone<Method>(helper.FullMethodName(aMethod),
+                () => this.CreateAndRegisterMethod(aMethod)
+            );
+        }
+
+        private void RegisterMethod(Method method, String methodFullName) {
+            Methods.Add(methodFullName, method);
+        }
+
+
+        private Method CreateAndRegisterMethod(IMethodSymbol methodSymbol) {
+            if (methodSymbol.MethodKind == MethodKind.PropertyGet || methodSymbol.MethodKind == MethodKind.PropertySet) {
+                throw new System.Exception("The given Method Symbol belongs to a property Accessor! ");
+            }
+            Method method = repository.New<Method>(typeof(FAMIX.Method).FullName);
             method.isStub = true;
-            method.name = aMethod.Name;
-            method.signature = methodFullName.Item2;
-            Methods.Add(methodFullName.Item1, method);
+            method.name = methodSymbol.Name;
+            method.signature = helper.MethodSignature(methodSymbol);
+            this.RegisterMethod(method, helper.FullMethodName(methodSymbol));
             return method;
         }
 
-        private String FullTypeName(ISymbol aType) {
-            var symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
-            string fullyQualifiedName = aType.ToDisplayString(symbolDisplayFormat);
-            if (aType is INamedTypeSymbol) {
-                if ((aType as INamedTypeSymbol).IsGenericType && (aType as INamedTypeSymbol).IsDefinition)
-                    fullyQualifiedName = "DefinitionOf" + fullyQualifiedName;
+        private CSharp.CSharpPropertyAccessor CreateAndRegisterAccessor(IMethodSymbol accessorSymbol) {
+            if (accessorSymbol.MethodKind != MethodKind.PropertyGet && accessorSymbol.MethodKind != MethodKind.PropertySet) {
+                throw new System.Exception("The given method symbol do not belongs to a property accessor!");
             }
-            return fullyQualifiedName;
+            CSharp.CSharpPropertyAccessor Accessor = repository.New<CSharp.CSharpPropertyAccessor>(typeof(CSharp.CSharpPropertyAccessor).FullName) ;
+            Accessor.isStub = true;
+            Accessor.name = accessorSymbol.Name;
+            Accessor.signature = helper.MethodSignature(accessorSymbol);
+            this.RegisterMethod(Accessor, helper.FullMethodName(accessorSymbol));
+            return Accessor;
         }
 
-        private String TypeName(ISymbol aType) {
-            var symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly, genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
-            string fullyQualifiedName = aType.ToDisplayString(symbolDisplayFormat);
-            return fullyQualifiedName;
+        private CSharp.CSharpEvent CreateAndRegisterEvent(IEventSymbol eventSymbol) {
+            CSharp.CSharpEvent Event = repository.New<CSharp.CSharpEvent>(typeof(CSharp.CSharpEvent).FullName);
+            Event.isStub = true;
+            Event.name = eventSymbol.Name;
+            Event.signature = helper.EventSignature(eventSymbol);
+            this.RegisterMethod(Event, helper.FullEventName(eventSymbol));
+            return Event;
         }
+
+
+
+
 
         private FAMIX.Namespace EnsureNamespace(INamespaceSymbol ns) {
             if (Namespaces.has(ns.Name))
@@ -147,7 +156,7 @@ namespace RoslynMonoFamix.InCSharp {
 
         public FAMIX.Type EnsureType(ISymbol aType) {
 
-            string fullName = FullTypeName(aType);
+            string fullName = helper.FullTypeName(aType);
 
             if (Types.has(fullName))
                 return Types.Named(fullName);
@@ -164,7 +173,7 @@ namespace RoslynMonoFamix.InCSharp {
                 (type as FAMIX.ParameterizedType).parameterizableClass = parameterizedClass as FAMIX.ParameterizableClass;
             }
 
-            type.name = TypeName(aType);
+            type.name = helper.TypeName(aType);
             if (aType.ContainingType != null) {
                 var containingType = EnsureType(aType.ContainingType);
                 type.container = containingType;
@@ -241,7 +250,7 @@ namespace RoslynMonoFamix.InCSharp {
         private String FullFieldName(ISymbol field) {
             var fullClassName = "";
             if (field.ContainingType != null) {
-                fullClassName = FullTypeName(field.ContainingType);
+                fullClassName = helper.FullTypeName(field.ContainingType);
             }
             return fullClassName + "." + field.Name;
         }

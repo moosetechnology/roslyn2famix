@@ -2,24 +2,46 @@
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using System;
 using Fame;
-using FAMIX;
 using Microsoft.CodeAnalysis;
 using RoslynMonoFamix.InCSharp;
 using CSharp;
 using System.Linq.Expressions;
 using System.Linq;
 
+
 public class VBASTVisitor : VisualBasicSyntaxWalker {
     private SemanticModel semanticModel;
     private InCSharpImporter importer;
-    private Method currentMethod;
-    private System.Collections.Stack currentTypeStack;
+
+
+    private FAMIX.Method currentMethod;
+    private System.Collections.Stack currentTypetack;
+    private System.Collections.Stack stack;
     private CSharp.CSharpProperty currentProperty;
 
-    public VBASTVisitor(SemanticModel semanticModel, InCSharpImporter importer) {
+    public T CurrentContextIfNone<T>(Func<T> IfNone) where T : FAMIX.Entity {
+        if(stack.Count == 0) {
+            return IfNone();
+        }
+        return stack.Peek() as T;
+    }
+    public T CurrentContext<T>() where T : FAMIX.Entity {
+        return this.CurrentContextIfNone<T>(() => throw new System.Exception("Empty Stack!"));
+    }
+    public T CurrentContextOrNull<T>() where T : FAMIX.Entity {
+        return this.CurrentContextIfNone<T>(() => null);
+    }
+    public void PushContext(FAMIX.Entity context)  {
+        stack.Push(context);
+    }
+    public FAMIX.Entity PopContext () {
+        return stack.Pop() as FAMIX.Entity ;
+    }
+
+        public VBASTVisitor(SemanticModel semanticModel, InCSharpImporter importer) {
         this.semanticModel = semanticModel;
         this.importer = importer;
-        currentTypeStack = new System.Collections.Stack();
+        stack = new System.Collections.Stack();
     }
 
 
@@ -34,14 +56,15 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
 
         FAMIX.Type type = type = importer.EnsureType(typeSymbol);
         var superType = typeSymbol.BaseType;
-
+        
         if (superType != null) {
             FAMIX.Type baseType = null;
-            if (superType.DeclaringSyntaxReferences.Length == 0)
+            if (superType.DeclaringSyntaxReferences.Length == 0) {
                 baseType = importer.EnsureBinaryType(superType);
-            else
-                baseType = importer.EnsureType(typeSymbol.BaseType);
-            Inheritance inheritance = importer.CreateNewAssociation<Inheritance>(typeof(FAMIX.Inheritance).FullName);
+            } else {
+                baseType = importer.EnsureType(superType);
+            }
+            FAMIX.Inheritance inheritance = importer.CreateNewAssociation<FAMIX.Inheritance>(typeof(FAMIX.Inheritance).FullName);
             inheritance.subclass = type;
             inheritance.superclass = baseType;
             baseType.AddSubInheritance(inheritance);
@@ -53,14 +76,18 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         AddAnnotations(typeSymbol, type);
         AddParameterTypes(typeSymbol, type);
 
-        currentTypeStack.Push(type);
+        this.PushContext(type);
+
         importer.CreateSourceAnchor(type, node);
         type.isStub = false;
-        if (type.container != null)
+
+        if (type.container != null) {
             type.container.isStub = false;
+        }
+
         base.VisitClassBlock(node);
-        ComputeFanout(currentTypeStack.Peek() as FAMIX.Type);
-        currentTypeStack.Pop();
+        ComputeFanout(this.CurrentContext<FAMIX.Type>());
+        this.PopContext();
     }
 
 
@@ -68,22 +95,22 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         var typeSymbol = semanticModel.GetDeclaredSymbol(node);
         FAMIX.Type type = importer.EnsureType(typeSymbol);
 
-        currentTypeStack.Push(type);
+        this.PushContext(type);
         importer.CreateSourceAnchor(type, node);
         type.isStub = false;
         base.VisitStructureBlock(node);
-        currentTypeStack.Pop();
+        this.PopContext();
     }
 
     public override void VisitEnumBlock(EnumBlockSyntax node) {
         var typeSymbol = semanticModel.GetDeclaredSymbol(node);
         FAMIX.Type type = importer.EnsureType(typeSymbol);
 
-        currentTypeStack.Push(type);
+        this.PushContext(type);
         importer.CreateSourceAnchor(type, node);
         type.isStub = false;
         base.VisitEnumBlock(node);
-        currentTypeStack.Pop();
+        this.PopContext();
     }
 
     public override void VisitEnumMemberDeclaration(EnumMemberDeclarationSyntax node) {
@@ -91,11 +118,10 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         var symbol = semanticModel.GetDeclaredSymbol(node);
         FAMIX.EnumValue anEnumValue = importer.EnsureAttribute(symbol) as FAMIX.EnumValue;
         importer.CreateSourceAnchor(anEnumValue, node);
-        if (currentTypeStack.Peek() is FAMIX.Enum) {
-            anEnumValue.parentEnum = currentTypeStack.Peek() as FAMIX.Enum;
-            anEnumValue.parentEnum.AddValue(anEnumValue);
-            anEnumValue.isStub = false;
-        }
+
+        anEnumValue.parentEnum = this.CurrentContext<FAMIX.Enum>();
+        anEnumValue.parentEnum.AddValue(anEnumValue);
+        anEnumValue.isStub = false;
     }
 
     public override void VisitInterfaceBlock(InterfaceBlockSyntax node) {
@@ -104,12 +130,11 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         type.isInterface = true;
         //type.name = node.Identifier.ToString();
         AddSuperInterfaces(typeSymbol, type);
-
-        currentTypeStack.Push(type);
+        this.PushContext(type);
         importer.CreateSourceAnchor(type, node);
         type.isStub = false;
         base.VisitInterfaceBlock(node);
-        currentTypeStack.Pop();
+        this.PopContext();
     }
 
     public override void VisitConstructorBlock(ConstructorBlockSyntax node) {
@@ -139,26 +164,27 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
      }
      */
     public override void VisitAccessorBlock(AccessorBlockSyntax node) {
+        CSharp.CSharpProperty property = this.CurrentContext<CSharp.CSharpProperty>();
+
         if (currentProperty != null) {
-            var methodSymbol = semanticModel.GetDeclaredSymbol(node);
+            var accessorName = semanticModel.GetDeclaredSymbol(node);
 
-            CSharp.CSharpPropertyAccessor aMethod = importer.EnsureMethod(methodSymbol) as CSharp.CSharpPropertyAccessor;
-            if (methodSymbol.MethodKind == MethodKind.PropertyGet)
-                currentProperty.getter = aMethod as CSharp.CSharpPropertyAccessor;
-            else
-                currentProperty.setter = aMethod as CSharp.CSharpPropertyAccessor;
-
-            if (currentTypeStack.Count > 0) {
-                aMethod.property = currentProperty;
-                aMethod.parentType = currentTypeStack.Peek() as FAMIX.Type;
-                aMethod.parentType.AddMethod(aMethod);
+            CSharp.CSharpPropertyAccessor Accessor = importer.EnsureMethod(accessorName) as CSharp.CSharpPropertyAccessor;
+            if (accessorName.MethodKind == MethodKind.PropertyGet) {
+                currentProperty.getter = Accessor ;
+            } else {
+                currentProperty.setter = Accessor ;
             }
+            
+            Accessor.property = currentProperty;
+            Accessor.parentType = this.CurrentContextOrNull<FAMIX.Type>();
+            Accessor.parentType.AddMethod(Accessor);            
 
-            currentMethod = aMethod;
+            currentMethod = Accessor;
 
-            var returnType = importer.EnsureType(methodSymbol.ReturnType);
+            var returnType = importer.EnsureType(accessorName.ReturnType);
             currentMethod.declaredType = returnType;
-            importer.CreateSourceAnchor(aMethod, node);
+            importer.CreateSourceAnchor(Accessor, node);
             currentMethod.isStub = false;
         }
         base.VisitAccessorBlock(node);
@@ -173,19 +199,14 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
     }
 
 
-
-
-
-
-
-
-
     public override void VisitPropertyBlock(PropertyBlockSyntax node) {
 
         string propertyName = node.PropertyStatement.Identifier.ToString();
         var prop = AddProperty(node, propertyName);
+        this.PushContext(prop);
         if (prop is CSharp.CSharpProperty) currentProperty = prop as CSharp.CSharpProperty;
         base.VisitPropertyBlock(node);
+
         currentProperty = null;
     }
 
@@ -193,31 +214,30 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         ISymbol symbol = semanticModel.GetDeclaredSymbol(node);
         FAMIX.Attribute propertyAttribute = null;
 
-        if (currentTypeStack.Count > 0) {
-            propertyAttribute = importer.EnsureAttribute(symbol) as FAMIX.Attribute;
-            propertyAttribute.parentType = importer.EnsureType(symbol.ContainingType);
-            propertyAttribute.parentType.AddAttribute(propertyAttribute);
+        
+        propertyAttribute = importer.EnsureAttribute(symbol) as FAMIX.Attribute;
+        propertyAttribute.parentType = importer.EnsureType(symbol.ContainingType);
+        propertyAttribute.parentType.AddAttribute(propertyAttribute);
 
-            propertyAttribute.isStub = false;
-            importer.CreateSourceAnchor(propertyAttribute, node);
-        }
+        propertyAttribute.isStub = false;
+        importer.CreateSourceAnchor(propertyAttribute, node);
+        
         return propertyAttribute;
     }
 
     public override void VisitEventBlock(EventBlockSyntax node) {
 
         string propertyName = node.EventStatement.Identifier.ToString();
-        if (currentTypeStack.Count > 0) {
-            var methodSymbol = semanticModel.GetDeclaredSymbol(node);
-            var aMethod = importer.EnsureMethod(methodSymbol);
-            aMethod.name = propertyName;
-            aMethod.parentType = importer.EnsureType(methodSymbol.ContainingType);
-            aMethod.parentType.AddMethod(aMethod);
-            currentMethod = aMethod;
-            importer.CreateSourceAnchor(aMethod, node);
-            currentMethod.isStub = false;
+        
+        var EventSymbol = semanticModel.GetDeclaredSymbol(node);
+        var aMethod = importer.EnsureEvent(EventSymbol);
+        aMethod.name = propertyName;
+        aMethod.parentType = importer.EnsureType(EventSymbol.ContainingType);
+        aMethod.parentType.AddMethod(aMethod);
+        currentMethod = aMethod;
+        importer.CreateSourceAnchor(aMethod, node);
+        currentMethod.isStub = false;
 
-        }
         base.VisitEventBlock(node);
     }
 
@@ -290,12 +310,18 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         base.VisitObjectCreationExpression(node);
     }
 
+
+
+    public override void VisitVariableDeclarator(VariableDeclaratorSyntax node) {
+        throw new Exception("Var");
+      }
+      
     public override void VisitAssignmentStatement(AssignmentStatementSyntax node) {
         var isEvent = semanticModel.GetSymbolInfo(node.Left).Symbol;
         if (isEvent != null && isEvent.Kind == SymbolKind.Event) {
             var isMethod = semanticModel.GetSymbolInfo(node.Right).Symbol;
             if (isMethod != null && isMethod.Kind == SymbolKind.Method) {
-                CSharpEvent cSharpEvent = importer.EnsureMethod(isEvent) as CSharpEvent;
+                CSharpEvent cSharpEvent = importer.EnsureEvent(isEvent as IEventSymbol) as CSharpEvent;
                 var handlerMethod = importer.EnsureMethod(isMethod as IMethodSymbol);
                 AddMethodCall(node, cSharpEvent, handlerMethod);
             }
@@ -303,6 +329,7 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         base.VisitAssignmentStatement(node);
     }
 
+    
 
 
     public override void VisitWhileStatement(WhileStatementSyntax node) {
@@ -353,7 +380,7 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
 
     private void AddParameterTypes(INamedTypeSymbol typeSymbol, FAMIX.Type type) {
         foreach (var typeParameter in typeSymbol.TypeParameters) {
-            (type as ParameterizableClass).Parameters.Add(importer.EnsureType(typeParameter) as FAMIX.ParameterType);
+            (type as FAMIX.ParameterizableClass).Parameters.Add(importer.EnsureType(typeParameter) as FAMIX.ParameterType);
         }
     }
     //TODO add AnnotationInstanceAttribute link to AnnotationAttribute is not implemented
@@ -371,12 +398,12 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
                 annotationInstance.annotationType = annonType;
 
                 foreach (var constrArgument in attr.ConstructorArguments) {
-                    AnnotationInstanceAttribute annotationInstanceAttribute = importer.New<FAMIX.AnnotationInstanceAttribute>();
+                    FAMIX.AnnotationInstanceAttribute annotationInstanceAttribute = importer.New<FAMIX.AnnotationInstanceAttribute>();
                     annotationInstanceAttribute.value = constrArgument.Value.ToString();
                     annotationInstance.AddAttribute(annotationInstanceAttribute);
                 }
                 foreach (var namedArgument in attr.NamedArguments) {
-                    AnnotationInstanceAttribute annotationInstanceAttribute = importer.New<FAMIX.AnnotationInstanceAttribute>();
+                    FAMIX.AnnotationInstanceAttribute annotationInstanceAttribute = importer.New<FAMIX.AnnotationInstanceAttribute>();
                     annotationInstanceAttribute.value = namedArgument.Value.ToString();
                     annotationInstance.AddAttribute(annotationInstanceAttribute);
                 }
@@ -390,7 +417,7 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         foreach (var inter in typeSymbol.Interfaces) {
             FAMIX.Type fInterface = (FAMIX.Type)importer.EnsureType(inter);
             if (fInterface is FAMIX.Class) (fInterface as FAMIX.Class).isInterface = true;
-            Inheritance inheritance = importer.CreateNewAssociation<Inheritance>("FAMIX.Inheritance");
+            FAMIX.Inheritance inheritance = importer.CreateNewAssociation<FAMIX.Inheritance>("FAMIX.Inheritance");
             inheritance.subclass = type;
             inheritance.superclass = fInterface;
             fInterface.AddSubInheritance(inheritance);
@@ -402,27 +429,27 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
     */
 
 
-    private Method AddMethod(SubNewStatementSyntax node, string name) {
+    private FAMIX.Method AddMethod(SubNewStatementSyntax node, string name) {
         return AddMethod(semanticModel.GetDeclaredSymbol(node), node, name);
     }
-    private Method AddMethod(MethodStatementSyntax node, string name) {
+    private FAMIX.Method AddMethod(MethodStatementSyntax node, string name) {
         return AddMethod(semanticModel.GetDeclaredSymbol(node), node, name);
     }
 
 
-    private Method AddMethod(IMethodSymbol methodSymbol, SyntaxNode node, string name) {
-        if (currentTypeStack.Count > 0) {
-            Method aMethod = importer.EnsureMethod(methodSymbol);
-            aMethod.name = name;
-            aMethod.parentType = importer.EnsureType(methodSymbol.ContainingType);
-            aMethod.parentType.AddMethod(aMethod);
-            currentMethod = aMethod;
+    private FAMIX.Method AddMethod(IMethodSymbol methodSymbol, SyntaxNode node, string name) {
 
-            var returnType = importer.EnsureType(methodSymbol.ReturnType);
-            currentMethod.declaredType = returnType;
-            importer.CreateSourceAnchor(aMethod, node);
-            currentMethod.isStub = false;
-        }
+        FAMIX.Method aMethod = importer.EnsureMethod(methodSymbol);
+        aMethod.name = name;
+        aMethod.parentType = importer.EnsureType(methodSymbol.ContainingType);
+        aMethod.parentType.AddMethod(aMethod);
+        currentMethod = aMethod;
+
+        var returnType = importer.EnsureType(methodSymbol.ReturnType);
+        currentMethod.declaredType = returnType;
+        importer.CreateSourceAnchor(aMethod, node);
+        currentMethod.isStub = false;
+        
         return currentMethod;
     }
 
@@ -434,13 +461,11 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
                 var symbol = semanticModel.GetDeclaredSymbol(variableDeclarator);
 
                 if (symbol is IFieldSymbol || symbol is IEventSymbol) {
-                    if (currentTypeStack.Count > 0) {
-                        FAMIX.Attribute anAttribute = importer.EnsureAttribute(symbol) as FAMIX.Attribute;
-                        anAttribute.parentType = importer.EnsureType(symbol.ContainingType);
-                        anAttribute.parentType.AddAttribute(anAttribute);
-                        importer.CreateSourceAnchor(anAttribute, node);
-                        anAttribute.isStub = false;
-                    }
+                    FAMIX.Attribute anAttribute = importer.EnsureAttribute(symbol) as FAMIX.Attribute;
+                    anAttribute.parentType = importer.EnsureType(symbol.ContainingType);
+                    anAttribute.parentType.AddAttribute(anAttribute);
+                    importer.CreateSourceAnchor(anAttribute, node);
+                    anAttribute.isStub = false;
                 }
             }
         }
@@ -461,8 +486,8 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
      */
 
 
-    private void AddAttributeAccess(SyntaxNode node, Method clientMethod, FAMIX.Attribute attribute) {
-        Access access = importer.CreateNewAssociation<Access>("FAMIX.Access");
+    private void AddAttributeAccess(SyntaxNode node, FAMIX.Method clientMethod, FAMIX.Attribute attribute) {
+        FAMIX.Access access = importer.CreateNewAssociation<FAMIX.Access>("FAMIX.Access");
         access.accessor = currentMethod;
         access.variable = attribute;
         clientMethod.AddAccesse(access);
@@ -470,8 +495,8 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         importer.CreateSourceAnchor(access, node);
     }
 
-    private void AddMethodCall(SyntaxNode node, Method clientMethod, Method referencedEntity) {
-        Invocation invocation = importer.CreateNewAssociation<Invocation>("FAMIX.Invocation");
+    private void AddMethodCall(SyntaxNode node, FAMIX.Method clientMethod, FAMIX.Method referencedEntity) {
+        FAMIX.Invocation invocation = importer.CreateNewAssociation<FAMIX.Invocation>("FAMIX.Invocation");
         invocation.sender = clientMethod;
         invocation.AddCandidate(referencedEntity);
         invocation.signature = node.Span.ToString();
@@ -481,13 +506,11 @@ public class VBASTVisitor : VisualBasicSyntaxWalker {
         importer.CreateSourceAnchor(invocation, node);
     }
 
-    private NamedEntity FindReferencedEntity(ExpressionSyntax node) {
+    private FAMIX.NamedEntity FindReferencedEntity(ExpressionSyntax node) {
         var symbol = semanticModel.GetSymbolInfo(node).Symbol;
         if (symbol is IMethodSymbol || symbol is IEventSymbol)
-            return importer.EnsureMethod(symbol);
-        if (symbol is IFieldSymbol)
-            return importer.EnsureAttribute(symbol);
-        if (symbol is IPropertySymbol)
+            return importer.EnsureMethod(symbol as IMethodSymbol);
+        if (symbol is IFieldSymbol || symbol is IPropertySymbol)
             return importer.EnsureAttribute(symbol);
         return null;
     }
