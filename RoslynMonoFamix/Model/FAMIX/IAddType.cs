@@ -7,11 +7,8 @@ using System.Collections.Generic;
 
 namespace FAMIX
 {
-    [FamePackage("FAMIX")]
-    [FameDescription("Entity")]
-   
-  public class Entity 
-  {
+  
+  public interface IAddType{
+         void AddType(Type type);
   }
-
 }

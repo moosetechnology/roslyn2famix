@@ -11,7 +11,8 @@ using System;
 using FAMIX;
 using Model;
 using Fame;
-using RoslynMonoFamix.InCSharp;
+using RoslynMonoFamix.ModelBuilder;
+using RoslynMonoFamix.Visitor;
 
 namespace RoslynMonoFamix {
 
@@ -19,8 +20,11 @@ namespace RoslynMonoFamix {
         The VisualBasicMooseImporter delegates to VBASTVisitor for loading 
      */
     public class VisualBasicMooseImporter : MooseImporter {
+        public override void InitializeForImport() {
+            importer = new ModelBuilder.VisualBasicModelBuilder(_repository, ignoreFolder);
+        }
         public override void Visit(SyntaxNode node) {
-            var visitor = new VBASTVisitor(semanticModel, importer);
+            var visitor = new VBImportingVisitor (importer as VisualBasicModelBuilder) ;
             visitor.Visit(node);
         }
     }
@@ -29,8 +33,11 @@ namespace RoslynMonoFamix {
         The VisualBasicMooseImporter delegates to CSharpVisitor for loading 
      */
     public class CSharpMooseImporter : MooseImporter {
+        public override void InitializeForImport() {
+            importer = new ModelBuilder.InCSharpImporter(_repository, ignoreFolder);
+        }
         public override void Visit(SyntaxNode node) {
-            var visitor = new CSharpASTVisitor(semanticModel, importer);
+            var visitor = new CSharpASTVisitor(importer as InCSharpImporter);
             visitor.Visit(node);
         }
     }
@@ -40,9 +47,12 @@ namespace RoslynMonoFamix {
         creating a AST and visiting for loading all the information of this project into a Famix Metamodel   
      */
     public abstract class MooseImporter {
-        internal SemanticModel semanticModel;
-        internal InCSharp.InCSharpImporter importer;
-        private Repository _repository;
+
+
+
+        internal ModelBuilder.AbstractModelBuilder importer;
+        internal Repository _repository;
+        internal string ignoreFolder;
         public Repository MetaModel { get { return _repository; } }
 
         public NamedEntityAccumulator<Method> Methods { get { return importer.Methods; } }
@@ -52,8 +62,16 @@ namespace RoslynMonoFamix {
             return importer.AllElementsOfType<T>();
         }
 
+
+        public MooseImporter() {
+            _repository = FamixModel.Metamodel();
+            ignoreFolder = "";
+            this.InitializeForImport();
+        }
+
         /* Static constructors. Creates a VB or C# specific importer */
         public static MooseImporter VBImporter() {
+
             return new VisualBasicMooseImporter();
         }
         public static MooseImporter CSImporter() {
@@ -64,20 +82,22 @@ namespace RoslynMonoFamix {
             Method to be defined according the kind of project. Nodes in each languages  are not compatible. 
          */
         public abstract void Visit(SyntaxNode node);
-
+        public abstract void InitializeForImport();
 
         /*
            Given the path to a solution file, import will open the solution and it internal projects. 
            For each of the documents inside this sucessive projects, its going to vist it AST representation 
          */
-        public Repository import(string solutionPath) {
+        public Repository ImportProject(string solutionPath) {
             //The code that causes the error goes here.
-            _repository = FamixModel.Metamodel();
+            
             var msWorkspace = MSBuildWorkspace.Create();
 
             var solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
-            string ignoreFolder = this.PrivateDirectoryNameFor(solutionPath);
-            importer = new InCSharp.InCSharpImporter(_repository, ignoreFolder);
+            ignoreFolder = this.PrivateDirectoryNameFor(solutionPath);
+
+            this.InitializeForImport();
+
 
             var documents = new List<Document>();
             for (int i = 0; i < solution.Projects.Count<Project>(); i++) {
@@ -87,16 +107,21 @@ namespace RoslynMonoFamix {
                     if (document.SupportsSyntaxTree) {
                         this.log("(project " + (i + 1) + " / " + solution.Projects.Count<Project>() + ")");
                         this.logln("(document " + (j + 1) + " / " + project.Documents.Count<Document>() + " " + document.FilePath + ")");
-                        var syntaxTree = document.GetSyntaxTreeAsync().Result;
+                        var tree = document.GetSyntaxTreeAsync().Result;
                         var compilationAsync = project.GetCompilationAsync().Result;
-                        semanticModel = compilationAsync.GetSemanticModel(syntaxTree);
-                        this.Visit(syntaxTree.GetRoot());
+                        var semanticModel = compilationAsync.GetSemanticModel(tree);
+                        this.Import(tree, semanticModel);
+
+                        
                     }
                 }
             }
             return _repository;
         }
-
+        public void Import (SyntaxTree tree, SemanticModel model) {
+            importer.model = model;
+            this.Visit(tree.GetRoot());
+        }
         /*
           Log functions are here just to be able to easily override and/or get rid of them 
         */
@@ -113,7 +138,7 @@ namespace RoslynMonoFamix {
         private string PrivateDirectoryNameFor(string solutionPath) {
             Uri uri = null;
             try {
-                uri = new Uri(solutionPath); ;
+                uri = new Uri(solutionPath);
             } catch (UriFormatException e) {
                 var currentFolder = new Uri(Environment.CurrentDirectory + "\\");
                 uri = new Uri(currentFolder, solutionPath.Replace("\\", "/"));

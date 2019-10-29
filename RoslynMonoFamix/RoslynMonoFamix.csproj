@@ -326,10 +326,14 @@
   <ItemGroup>
     <Compile Include="AST2XMLPrinter.cs" />
     <Compile Include="Importer\MooseImporter.cs" />
-    <Compile Include="InCSharp\ImportingHelper.cs" />
-    <Compile Include="Visitor\VBASTVisitor.cs" />
-    <Compile Include="InCSharp\InCSharpImporter.cs" />
-    <Compile Include="InCSharp\NamedEntityAccumulator.cs" />
+    <Compile Include="ModelBuilder\AbstractModelBuilder.cs" />
+    <Compile Include="ModelBuilder\VisualBasicModelBuilder.cs" />
+    <Compile Include="ModelBuilder\ImportingHelper.cs" />
+    <Compile Include="Model\FAMIX\IAddType.cs" />
+    <Compile Include="Visitor\VBImportingVisitor.cs" />
+    <Compile Include="Visitor\VisualBasicStackedVisitor.cs" />
+    <Compile Include="ModelBuilder\InCSharpImporter.cs" />
+    <Compile Include="ModelBuilder\NamedEntityAccumulator.cs" />
     <Compile Include="Visitor\CSharpASTVisitor.cs" />
     <Compile Include="Model\CSharp\CSharpEvent.cs" />
     <Compile Include="Model\CSharp\CSharpProperty.cs" />

@@ -9,7 +9,7 @@ namespace FAMIX
 {
   [FamePackage("FAMIX")]
   [FameDescription("ContainerEntity")]
-  public class ContainerEntity : FAMIX.NamedEntity
+  public class ContainerEntity : FAMIX.NamedEntity, FAMIX.IAddType
   {
     private List<FAMIX.AnnotationType> definedAnnotationTypes = new List<FAMIX.AnnotationType>();
     

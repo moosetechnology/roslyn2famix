@@ -321,6 +321,8 @@
     <Compile Include="VisualBasicLanBasedTests\LanProjectVisualBasicLoader.cs" />
     <Compile Include="VisualBasicLanBasedTests\SimpleStructTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\SubClassTest.cs" />
+    <Compile Include="VisualBasicUnitTest\NamespaceTest.cs" />
+    <Compile Include="VisualBasicUnitTest\VisualBasicUnitTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -25,7 +25,7 @@ namespace FamixTest {
             string solutionPath = path + "../../../SampleCode/SampleCode.sln";
 
             importer = MooseImporter.CSImporter();
-            Repository metamodel = importer.import(solutionPath);
+            Repository metamodel = importer.ImportProject(solutionPath);
             metamodel.ExportMSEFile("SampleCode.mse");
         }
 

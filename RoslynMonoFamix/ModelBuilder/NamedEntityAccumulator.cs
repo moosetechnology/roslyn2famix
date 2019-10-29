@@ -5,14 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RoslynMonoFamix.InCSharp
+namespace RoslynMonoFamix.ModelBuilder
 {
     public class NamedEntityAccumulator<T>
     {
-
         private Dictionary<string, T> entities;
-
-
 
         public IList<T> RegisteredEntities () {
             return entities.Values.ToList();

@@ -12,7 +12,7 @@ using Model;
 using System.Text;
 using Fame;
 using FAMIX;
-using RoslynMonoFamix.InCSharp;
+using RoslynMonoFamix.ModelBuilder;
 
 namespace RoslynMonoFamix {
     class CommandLineHandler {
@@ -36,7 +36,7 @@ namespace RoslynMonoFamix {
                 importer = MooseImporter.CSImporter();
             }
             try {
-                Repository metamodel = importer.import(solutionPath);
+                Repository metamodel = importer.ImportProject(solutionPath);
                 metamodel.ExportMSEFile(exportPath);
             } catch (ReflectionTypeLoadException ex) {
                 Console.WriteLine(BuildErrorStringMessage(ex));

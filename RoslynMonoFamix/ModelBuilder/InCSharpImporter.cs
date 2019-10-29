@@ -7,13 +7,14 @@ using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CSharp;
 
-namespace RoslynMonoFamix.InCSharp {
-    public class InCSharpImporter {
-        private Repository repository;
-        private ImportingHelper helper = new ImportingHelper(); 
-        private string projectBaseFolder;
+namespace RoslynMonoFamix.ModelBuilder {
+    public class InCSharpImporter : AbstractModelBuilder  {
 
-        private Dictionary<string, System.Type> typeNameMap = new Dictionary<string, System.Type>()
+        public InCSharpImporter(Fame.Repository repository, string projectBaseFolder) : base(repository, projectBaseFolder) {
+
+        }
+
+        protected Dictionary<string, System.Type> typeNameMap = new Dictionary<string, System.Type>()
             {
                 { "Struct", typeof(CSharp.CSharpStruct) },
                 { "Class", typeof(FAMIX.Class) },
@@ -22,17 +23,6 @@ namespace RoslynMonoFamix.InCSharp {
                 { "TypeParameter", typeof(FAMIX.ParameterType)},
                 { "Enum", typeof(FAMIX.Enum) },
             };
-
-        public InCSharpImporter(Repository repository, string projectBaseFolder) {
-            this.repository = repository;
-            this.Methods = new NamedEntityAccumulator<Method>();
-            this.Types = new NamedEntityAccumulator<FAMIX.Type>();
-            this.Namespaces = new NamedEntityAccumulator<Namespace>();
-            this.Attributes = new NamedEntityAccumulator<FAMIX.StructuralEntity>();
-            this.projectBaseFolder = projectBaseFolder;
-        }
-        public NamedEntityAccumulator<FAMIX.Namespace> Namespaces { get; set; }
-        public NamedEntityAccumulator<FAMIX.Type> Types { get; set; }
 
         internal FAMIX.Type EnsureBinaryType(INamedTypeSymbol superType) {
 
@@ -75,10 +65,6 @@ namespace RoslynMonoFamix.InCSharp {
             superClass.AddSubInheritance(inheritance);
             subClass.AddSuperInheritance(inheritance);
         }
-
-        public NamedEntityAccumulator<Method> Methods { get; set; }
-        public NamedEntityAccumulator<FAMIX.StructuralEntity> Attributes { get; set; }
-
 
         public CSharp.CSharpPropertyAccessor EnsureAccessor (IMethodSymbol MethodSelector) {
             return this.MethodNamedIfNone<CSharp.CSharpPropertyAccessor>(helper.FullMethodName(MethodSelector),
@@ -261,9 +247,6 @@ namespace RoslynMonoFamix.InCSharp {
             return repository.New<T>(typeof(T).FullName);
         }
 
-        public IEnumerable<T> AllElementsOfType<T>() {
-            return repository.GetElements().OfType<T>();
-        }
 
         public void CreateSourceAnchor(SourcedEntity sourcedEntity, SyntaxNode node) {
 

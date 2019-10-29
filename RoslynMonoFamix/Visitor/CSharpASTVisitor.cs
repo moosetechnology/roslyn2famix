@@ -4,26 +4,26 @@ using System;
 using Fame;
 using FAMIX;
 using Microsoft.CodeAnalysis;
-using RoslynMonoFamix.InCSharp;
+using RoslynMonoFamix.ModelBuilder;
 using CSharp;
 using System.Linq.Expressions;
 using System.Linq;
 
 public class CSharpASTVisitor : CSharpSyntaxWalker {
-    private SemanticModel semanticModel;
+
     private InCSharpImporter importer;
     private Method currentMethod;
     private System.Collections.Stack currentTypeStack;
     private CSharp.CSharpProperty currentProperty;
 
-    public CSharpASTVisitor(SemanticModel semanticModel, InCSharpImporter importer) {
-        this.semanticModel = semanticModel;
+    public CSharpASTVisitor(InCSharpImporter importer) {
+
         this.importer = importer;
         currentTypeStack = new System.Collections.Stack();
     }
 
     public override void VisitClassDeclaration(ClassDeclarationSyntax node) {
-        var typeSymbol = semanticModel.GetDeclaredSymbol(node);
+        var typeSymbol = importer.model.GetDeclaredSymbol(node);
 
         FAMIX.Type type = type = importer.EnsureType(typeSymbol);
         var superType = typeSymbol.BaseType;
@@ -72,7 +72,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     public override void VisitStructDeclaration(StructDeclarationSyntax node) {
-        var typeSymbol = semanticModel.GetDeclaredSymbol(node);
+        var typeSymbol = importer.model.GetDeclaredSymbol(node);
         FAMIX.Type type = importer.EnsureType(typeSymbol);
 
         currentTypeStack.Push(type);
@@ -83,7 +83,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     public override void VisitEnumDeclaration(EnumDeclarationSyntax node) {
-        var typeSymbol = semanticModel.GetDeclaredSymbol(node);
+        var typeSymbol = importer.model.GetDeclaredSymbol(node);
         FAMIX.Type type = importer.EnsureType(typeSymbol);
 
         currentTypeStack.Push(type);
@@ -95,7 +95,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
 
     public override void VisitEnumMemberDeclaration(EnumMemberDeclarationSyntax node) {
         string attributeName = node.Identifier.ToString();
-        var symbol = semanticModel.GetDeclaredSymbol(node);
+        var symbol = importer.model.GetDeclaredSymbol(node);
         FAMIX.EnumValue anEnumValue = importer.EnsureAttribute(symbol) as FAMIX.EnumValue;
         importer.CreateSourceAnchor(anEnumValue, node);
         if (currentTypeStack.Peek() is FAMIX.Enum) {
@@ -147,7 +147,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node) {
-        var typeSymbol = semanticModel.GetDeclaredSymbol(node);
+        var typeSymbol = importer.model.GetDeclaredSymbol(node);
         FAMIX.Class type = (FAMIX.Class)importer.EnsureType(typeSymbol);
         type.isInterface = true;
         //type.name = node.Identifier.ToString();
@@ -184,7 +184,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
 
     public override void VisitAccessorDeclaration(AccessorDeclarationSyntax node) {
         if (currentProperty != null) {
-            var methodSymbol = semanticModel.GetDeclaredSymbol(node);
+            var methodSymbol = importer.model.GetDeclaredSymbol(node);
 
             CSharp.CSharpPropertyAccessor aMethod = importer.EnsureMethod(methodSymbol) as CSharp.CSharpPropertyAccessor;
             if (methodSymbol.MethodKind == MethodKind.PropertyGet)
@@ -218,7 +218,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
 
     private Method AddMethod(BaseMethodDeclarationSyntax node, string name) {
         if (currentTypeStack.Count > 0) {
-            var methodSymbol = semanticModel.GetDeclaredSymbol(node);
+            var methodSymbol = importer.model.GetDeclaredSymbol(node);
             Method aMethod = importer.EnsureMethod(methodSymbol);
             aMethod.name = name;
             aMethod.parentType = importer.EnsureType(methodSymbol.ContainingType);
@@ -242,7 +242,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     private FAMIX.Attribute AddProperty(BasePropertyDeclarationSyntax node, String propertyName) {
-        ISymbol symbol = semanticModel.GetDeclaredSymbol(node);
+        ISymbol symbol = importer.model.GetDeclaredSymbol(node);
         FAMIX.Attribute propertyAttribute = null;
 
         if (currentTypeStack.Count > 0) {
@@ -259,7 +259,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     public override void VisitEventDeclaration(EventDeclarationSyntax node) {
         string propertyName = node.Identifier.ToString();
         if (currentTypeStack.Count > 0) {
-            var eventSymbol = semanticModel.GetDeclaredSymbol(node) as IEventSymbol;
+            var eventSymbol = importer.model.GetDeclaredSymbol(node) as IEventSymbol;
             var Event = importer.EnsureEvent(eventSymbol);
             Event.name = propertyName;
             Event.parentType = importer.EnsureType(eventSymbol.ContainingType);
@@ -275,7 +275,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
         foreach (var variable in node.Declaration.Variables) {
             string attributeName = variable.Identifier.ToString();
 
-            var symbol = semanticModel.GetDeclaredSymbol(variable) as IEventSymbol;
+            var symbol = importer.model.GetDeclaredSymbol(variable) as IEventSymbol;
 
             if (currentTypeStack.Count > 0) {
                 var anEvent = importer.EnsureEvent(symbol) as CSharp.CSharpEvent;
@@ -290,7 +290,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     public override void VisitDelegateDeclaration(DelegateDeclarationSyntax node) {
-        var typeSymbol = semanticModel.GetDeclaredSymbol(node);
+        var typeSymbol = importer.model.GetDeclaredSymbol(node);
         importer.EnsureType(typeSymbol);
         base.VisitDelegateDeclaration(node);
     }
@@ -303,8 +303,8 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     private void AddField(BaseFieldDeclarationSyntax node) {
         foreach (var variable in node.Declaration.Variables) {
             string attributeName = variable.Identifier.ToString();
-            var returnTypeSymbol = semanticModel.GetDeclaredSymbol(node.Declaration.Type);
-            var symbol = semanticModel.GetDeclaredSymbol(variable);
+            var returnTypeSymbol = importer.model.GetDeclaredSymbol(node.Declaration.Type);
+            var symbol = importer.model.GetDeclaredSymbol(variable);
             if (symbol is IFieldSymbol || symbol is IEventSymbol) {
                 if (currentTypeStack.Count > 0) {
                     FAMIX.Attribute anAttribute = importer.EnsureAttribute(symbol) as FAMIX.Attribute;
@@ -318,7 +318,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     public override void VisitCatchDeclaration(CatchDeclarationSyntax node) {
-        ISymbol typeSymbol = semanticModel.GetTypeInfo(node.Type).Type;
+        ISymbol typeSymbol = importer.model.GetTypeInfo(node.Type).Type;
         var exceptionClass = (FAMIX.Class)importer.EnsureType(typeSymbol);
         FAMIX.CaughtException caughtException = importer.New<FAMIX.CaughtException>();
         caughtException.definingMethod = currentMethod;
@@ -328,7 +328,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
 
     public override void VisitThrowStatement(ThrowStatementSyntax node) {
         if (node.Expression != null) {
-            var symbolInfo = semanticModel.GetTypeInfo(node.Expression).Type;
+            var symbolInfo = importer.model.GetTypeInfo(node.Expression).Type;
 
             var exceptionClass = (FAMIX.Class)importer.EnsureType(symbolInfo);
             FAMIX.ThrownException thrownException = importer.New<FAMIX.ThrownException>();
@@ -339,7 +339,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     private T GetSymbol<T>(SyntaxNode node) {
-        var symbolInfo = semanticModel.GetSymbolInfo(node).Symbol;
+        var symbolInfo = importer.model.GetSymbolInfo(node).Symbol;
         if (symbolInfo is T methodSymbol)
             return methodSymbol;
         return default(T);
@@ -409,7 +409,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     private NamedEntity FindReferencedEntity(ExpressionSyntax node) {
-        var symbol = semanticModel.GetSymbolInfo(node).Symbol;
+        var symbol = importer.model.GetSymbolInfo(node).Symbol;
         if (symbol is IMethodSymbol)
             return importer.EnsureMethod(symbol as IMethodSymbol);
         if (symbol is IEventSymbol)
@@ -422,9 +422,9 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     public override void VisitAssignmentExpression(AssignmentExpressionSyntax node) {
-        var MaybeEventSymbol = semanticModel.GetSymbolInfo(node.Left).Symbol;
+        var MaybeEventSymbol = importer.model.GetSymbolInfo(node.Left).Symbol;
         if (MaybeEventSymbol != null && MaybeEventSymbol.Kind == SymbolKind.Event) {
-            var isMethod = semanticModel.GetSymbolInfo(node.Right).Symbol;
+            var isMethod = importer.model.GetSymbolInfo(node.Right).Symbol;
             if (isMethod != null && isMethod.Kind == SymbolKind.Method) {
                 CSharpEvent cSharpEvent = importer.EnsureEvent(MaybeEventSymbol as IEventSymbol) as CSharpEvent;
                 var handlerMethod = importer.EnsureMethod(isMethod as IMethodSymbol);

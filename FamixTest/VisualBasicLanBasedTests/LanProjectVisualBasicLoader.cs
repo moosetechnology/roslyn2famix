@@ -25,7 +25,7 @@ namespace FamixTest.VisualBasic {
             string solutionPath = path + "../../../VBLanLibrary/VBLanLibrary.sln";
 
             importer = MooseImporter.VBImporter();
-            Repository metamodel = importer.import(solutionPath);
+            Repository metamodel = importer.ImportProject(solutionPath);
             metamodel.ExportMSEFile("VBLanLibrary.mse");
         }
 

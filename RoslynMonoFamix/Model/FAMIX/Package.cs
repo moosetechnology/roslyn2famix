@@ -9,7 +9,7 @@ namespace FAMIX
 {
   [FamePackage("FAMIX")]
   [FameDescription("Package")]
-  public class Package : FAMIX.ScopingEntity
+  public class Package : FAMIX.ScopingEntity, FAMIX.IAddType
   {
     private List<FAMIX.NamedEntity> childNamedEntities = new List<FAMIX.NamedEntity>();
     

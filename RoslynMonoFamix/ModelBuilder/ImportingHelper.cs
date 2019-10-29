@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 
-namespace RoslynMonoFamix.InCSharp {
+namespace RoslynMonoFamix.ModelBuilder {
 
     public class ImportingHelper {
+
         public String FullTypeName(ISymbol aType) {
             var symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces, genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
             string fullyQualifiedName = aType.ToDisplayString(symbolDisplayFormat);
