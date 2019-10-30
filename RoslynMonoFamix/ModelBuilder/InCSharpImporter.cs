@@ -14,15 +14,6 @@ namespace RoslynMonoFamix.ModelBuilder {
 
         }
 
-        protected Dictionary<string, System.Type> typeNameMap = new Dictionary<string, System.Type>()
-            {
-                { "Struct", typeof(CSharp.CSharpStruct) },
-                { "Class", typeof(FAMIX.Class) },
-                { "Interface", typeof(FAMIX.Class) },
-                { "Delegate", typeof(CSharp.Delegate) },
-                { "TypeParameter", typeof(FAMIX.ParameterType)},
-                { "Enum", typeof(FAMIX.Enum) },
-            };
 
         internal FAMIX.Type EnsureBinaryType(INamedTypeSymbol superType) {
 
@@ -139,7 +130,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             Namespaces.Add(ns.Name, newNs);
             return newNs;
         }
-
+       
         public FAMIX.Type EnsureType(ISymbol aType) {
 
             string fullName = helper.FullTypeName(aType);
@@ -147,7 +138,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             if (Types.has(fullName))
                 return Types.Named(fullName);
 
-            string typeKind = ResolveFAMIXTypeName(aType).FullName;
+            string typeKind = helper.ResolveFAMIXTypeName(aType).FullName;
 
             FAMIX.Type type = repository.New<FAMIX.Type>(typeKind);
             type.isStub = true;
@@ -172,35 +163,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             return type;
         }
 
-        private System.Type ResolveFAMIXTypeName(ISymbol aType) {
-            System.Type result = typeof(FAMIX.Class);
-            if (aType is ITypeSymbol) typeNameMap.TryGetValue(((ITypeSymbol)aType).TypeKind.ToString(), out result);
-            if (aType is INamedTypeSymbol) {
-                var superType = (aType as INamedTypeSymbol).BaseType;
-                while (superType != null) {
-                    if (superType.Name.Equals("Attribute") && superType.ContainingNamespace.Name.Equals("System"))
-                        return typeof(FAMIX.AnnotationType);
-                    superType = superType.BaseType;
-                }
-
-                if ((aType as INamedTypeSymbol).IsGenericType) {
-                    if ((aType as INamedTypeSymbol).IsDefinition)
-                        result = typeof(FAMIX.ParameterizableClass);
-                    else
-                        result = typeof(FAMIX.ParameterizedType);
-                }
-            }
-            if (aType is IArrayTypeSymbol)
-                return ResolveFAMIXTypeName((aType as IArrayTypeSymbol).ElementType);
-            if (aType is IPointerTypeSymbol)
-                return ResolveFAMIXTypeName((aType as IPointerTypeSymbol).PointedAtType);
-            if (result == null) {
-                Console.WriteLine("Could not resolve type for  " + aType);
-                if (aType.ContainingAssembly != null) Console.WriteLine("Containing Assembly " + aType.ContainingAssembly);
-                result = typeof(FAMIX.Class);
-            }
-            return result;
-        }
+       
 
         public FAMIX.NamedEntity EnsureAttribute(ISymbol field) {
             String attributeFullName = FullFieldName(field);
@@ -221,9 +184,9 @@ namespace RoslynMonoFamix.ModelBuilder {
 
         private string ResolveAttritbuteTypeName(ISymbol field) {
             if (field.ContainingType != null) {
-                if (ResolveFAMIXTypeName(field.ContainingType).Equals(typeof(FAMIX.Enum)))
+                if (helper.ResolveFAMIXTypeName(field.ContainingType).Equals(typeof(FAMIX.Enum)))
                     return typeof(FAMIX.EnumValue).FullName;
-                if (ResolveFAMIXTypeName(field.ContainingType).Equals(typeof(FAMIX.AnnotationType)))
+                if (helper.ResolveFAMIXTypeName(field.ContainingType).Equals(typeof(FAMIX.AnnotationType)))
                     return typeof(FAMIX.AnnotationTypeAttribute).FullName;
             }
             if (field is IEventSymbol)

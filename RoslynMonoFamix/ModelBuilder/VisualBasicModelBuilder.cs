@@ -50,7 +50,8 @@ namespace RoslynMonoFamix.ModelBuilder {
         }
 
         public FAMIX.Class EnsureClass(ClassStatementSyntax node) {
-           string classname = helper.FullTypeName(model.GetDeclaredSymbol(node));
+            ClassBlockSyntax block = (ClassBlockSyntax) node.Parent;
+            string classname = helper.FullTypeName(model.GetDeclaredSymbol(block));
            return this.EnsureTypeNamed<FAMIX.Class>(classname,
                 () => { return this.CreateNewClass(node); } );
         }
@@ -73,8 +74,13 @@ namespace RoslynMonoFamix.ModelBuilder {
             return this.EnsureNamespaceNamed<FAMIX.Namespace>(NamespaceName,
                  () => { return this.CreateNamespace(NamespaceName); });
         }
+
+
         private FAMIX.Class CreateNewClass(ClassStatementSyntax node) {
-            FAMIX.Class entity = this.CreateNewEntity<FAMIX.Class>(helper.FullTypeName(model.GetDeclaredSymbol(node)));
+            ClassBlockSyntax block = (ClassBlockSyntax) node.Parent;
+            FAMIX.Class entity = this.CreateNewEntity<FAMIX.Class>(typeof(FAMIX.Class).FullName);
+            var symbol = model.GetDeclaredSymbol(node);
+            entity.name = helper.FullTypeName(symbol);
             entity.isAbstract = node.Modifiers.ToFullString().Contains("MustInherit");
             return entity;
         }

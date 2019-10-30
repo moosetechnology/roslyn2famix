@@ -44,17 +44,17 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void TestEmptyNamespaceIsRecogniced () {
             this.ParseEmptyNamespace();
-            Assert.IsTrue(MetaModel.GetElements()[0] is FAMIX.Namespace);
+            Assert.IsTrue(this.GetElement<FAMIX.Entity>(0) is FAMIX.Namespace);
         }
         [TestMethod]
         public void TestEmptyNamespaceGeneratesOnlyOneElement() {
             this.ParseEmptyNamespace();
-            Assert.AreEqual(1, MetaModel.GetElements().Count);
+            this.AssertAmountElements(1);
         }
         [TestMethod]
         public void TestEmptyNamespaceGeneratesAnEmptyNamespace() {
             this.ParseEmptyNamespace();
-            FAMIX.Namespace nspace = (FAMIX.Namespace)MetaModel.GetElements()[0];
+            FAMIX.Namespace nspace = this.GetElement<FAMIX.Namespace>(0);
             Assert.AreEqual(0, nspace.ChildScopes.Count);
         }
         #endregion
@@ -64,23 +64,23 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void TestSingleElementNamespaceIsRecogniced() {
             this.ParseNamespaceWithNamespaceInside();
-            Assert.IsTrue(MetaModel.GetElements()[0] is FAMIX.Namespace);
+            Assert.IsTrue(this.GetElement<FAMIX.Entity>(0) is FAMIX.Namespace);
         }
         [TestMethod]
         public void TestSingleElementNamespaceGeneratesOnlyTwoElements() {
             this.ParseNamespaceWithNamespaceInside();
-            Assert.AreEqual(2, MetaModel.GetElements().Count);
+            this.AssertAmountElements(2);
         }
         [TestMethod]
         public void TestSingleElementNamespaceGeneratesANamespaceWithOneChilds() {
             this.ParseNamespaceWithNamespaceInside();
-            FAMIX.Namespace nspace = (FAMIX.Namespace)MetaModel.GetElements()[0];
+            FAMIX.Namespace nspace = this.GetElement<FAMIX.Namespace>(0);
             Assert.AreEqual(1, nspace.ChildScopes.Count);
         }
         public void TestSingleElementNamespaceContainsTheSecondNamespace() {
             this.ParseNamespaceWithNamespaceInside();
-            FAMIX.Namespace nspace = (FAMIX.Namespace)MetaModel.GetElements()[0];
-            this.AssertNamespaceContains(nspace, (FAMIX.Namespace)MetaModel.GetElements()[1]);
+            FAMIX.Namespace nspace = this.GetElement<FAMIX.Namespace>(0);
+            this.AssertNamespaceContains(nspace, this.GetElement<FAMIX.Namespace>(1));
         }
         #endregion
 
@@ -94,19 +94,19 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void TestMultipleElementNamespaceGeneratesOnlyMultipleElements() {
             this.ParseNamespaceWithManyNamespacesInside();
-            Assert.AreEqual(3, MetaModel.GetElements().Count);
+            this.AssertAmountElements(3);
         }
         [TestMethod]
         public void TestMultipleElementNamespaceGeneratesANamespaceWithManyChilds() {
             this.ParseNamespaceWithManyNamespacesInside();
-            FAMIX.Namespace nspace = (FAMIX.Namespace)MetaModel.GetElements()[0];
+            FAMIX.Namespace nspace = this.GetElement<FAMIX.Namespace>(0);
             Assert.AreEqual(2, nspace.ChildScopes.Count);
         }
         public void TestMultipleElementNamespaceContainsTheFurtherNamespaces() {
             this.ParseNamespaceWithManyNamespacesInside();
-            FAMIX.Namespace nspace = (FAMIX.Namespace)MetaModel.GetElements()[0];
-            this.AssertNamespaceContains(nspace, (FAMIX.Namespace)MetaModel.GetElements()[1]);
-            this.AssertNamespaceContains(nspace, (FAMIX.Namespace)MetaModel.GetElements()[2]);
+            FAMIX.Namespace nspace = this.GetElement<FAMIX.Namespace>(0);
+            this.AssertNamespaceContains(nspace, this.GetElement<FAMIX.Namespace>(1));
+            this.AssertNamespaceContains(nspace, this.GetElement<FAMIX.Namespace>(2));
         }
         #endregion
     }
