@@ -40,9 +40,6 @@ namespace RoslynMonoFamix.ModelBuilder {
             return type;
         }
 
-
-
-
         internal ScopingEntity CreateScopingEntity(CompilationUnitSyntax node) {
             if (entity != null) throw new System.Exception (" NOOOOOOO ");
              entity = new FAMIX.ScopingEntity();
@@ -81,7 +78,12 @@ namespace RoslynMonoFamix.ModelBuilder {
             FAMIX.Class entity = this.CreateNewEntity<FAMIX.Class>(typeof(FAMIX.Class).FullName);
             var symbol = model.GetDeclaredSymbol(node);
             entity.name = helper.FullTypeName(symbol);
-            entity.isAbstract = node.Modifiers.ToFullString().Contains("MustInherit");
+            entity.isAbstract = node.Modifiers.Any(SyntaxKind.MustInheritKeyword);
+            entity.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
+            entity.isFinal = node.Modifiers.Any(SyntaxKind.NotInheritableKeyword);
+            entity.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword);
+            entity.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword);
+            entity.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
             return entity;
         }
 

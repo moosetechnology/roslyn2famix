@@ -12,8 +12,9 @@ namespace FAMIX
   public class Class : FAMIX.Type
   {
     private List<FAMIX.Exception> exceptions = new List<FAMIX.Exception>();
-    
-    [FameProperty(Name = "exceptions",  Opposite = "exceptionClass")]    
+        public bool isShadow;
+
+        [FameProperty(Name = "exceptions",  Opposite = "exceptionClass")]    
     public List <FAMIX.Exception> Exceptions
     {
       get { return exceptions; }

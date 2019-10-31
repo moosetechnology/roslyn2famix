@@ -39,7 +39,6 @@ namespace RoslynMonoFamix.Visitor {
         public override void VisitOptionStatement(OptionStatementSyntax node) {
             throw new Exception("MustReview");
         }
-
         public override void VisitImportsStatement(ImportsStatementSyntax node) {
             throw new Exception("MustReview");
         }

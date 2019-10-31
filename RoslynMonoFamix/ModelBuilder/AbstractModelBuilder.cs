@@ -13,7 +13,6 @@ namespace RoslynMonoFamix.ModelBuilder {
         public NamedEntityAccumulator<FAMIX.Method> Methods { get; set; }
         public NamedEntityAccumulator<FAMIX.StructuralEntity> Attributes { get; set; }
 
-
         public SemanticModel model { get; set; }
         protected Fame.Repository repository;
         protected ImportingHelper helper = new ImportingHelper();

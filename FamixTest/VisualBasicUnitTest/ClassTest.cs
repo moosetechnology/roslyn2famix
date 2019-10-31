@@ -21,37 +21,200 @@ namespace FamixTest.VisualBasicUnitTest {
                End Class
             ");
         }
-
-        public void ParseEmptyClassInsideNamespace() {
+        public void ParseEmptyMustInheritClass() {
             this.Import(@"
-                Namespace TopLevel 
-                    Class Example 
+                    public MustInherit Class Example 
                     End Class
-                End Namespace  
             ");
         }
-
-        public void ParseClassWithEmptyClassInsideInsideNamespace() {
+        public void ParseEmptyNonInheritableClass() {
             this.Import(@"
-                Namespace TopLevel 
-                    Class Example    
-                        Class Inner 
-                        End Class
+                    protected NotInheritable Class Example 
                     End Class
-                End Namespace  
             ");
         }
-
+        public void ParseEmptyShadowsClass() {
+            this.Import(@"
+                    private Shadows Class Example 
+                    End Class
+            ");
+        }
         #endregion
 
 
+        #region Visibility
+        [TestMethod]
+        public void PrivateClassIsPrivate () {
+            this.ParseEmptyShadowsClass();
+            Assert.IsTrue(this.GetElement<FAMIX.Class>(0).isPrivate);
+        }
+        [TestMethod]
+        public void PublicClassIsPublic() {
+            this.ParseEmptyMustInheritClass();
+            Assert.IsTrue(this.GetElement<FAMIX.Class>(0).isPublic);
+        }
+        [TestMethod]
+        public void ProtectedClassIsProtected() {
+            this.ParseEmptyNonInheritableClass();
+            this.AssertAmountElements(1);
+            Assert.IsTrue(this.GetElement<FAMIX.Class>(0).isProtected);
+        }
+        #endregion
+
+        #region Shadows
+        [TestMethod]
+        public void EmptyNotShadowsClassModelContainsOneOnlyElement() {
+            this.ParseEmptyShadowsClass();
+            this.AssertAmountElements(1);
+        }
+
+        [TestMethod]
+        public void EmptyShadowsClassIsClass() {
+            this.ParseEmptyShadowsClass();
+            Assert.IsTrue(this.GetElement<FAMIX.Entity>(0) is FAMIX.Class);
+        }
+        [TestMethod]
+        public void EmptyShadowsClassIsEmpty() {
+            this.ParseEmptyShadowsClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsTrue(element.Types.Count == 0);
+        }
+        [TestMethod]
+        public void EmptyShadowsClassIsNamedExample() {
+            this.ParseEmptyShadowsClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.AreEqual(element.name, "Example");
+        }
+        [TestMethod]
+        public void EmptyShadowsClassIsNotAbstract() {
+            this.ParseEmptyShadowsClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsFalse(element.isAbstract);
+        }
+
+        [TestMethod]
+        public void EmptyShadowsClassIsNotFinal() {
+            this.ParseEmptyShadowsClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsFalse(element.isFinal);
+        }
+
+        [TestMethod]
+        public void EmptyShadowsClassIsShadowing () {
+            this.ParseEmptyShadowsClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsTrue(element.isShadow);
+        }
+
+
+
+        #endregion
+
+        #region NotInheritable
+        [TestMethod]
+        public void EmptyNotInheritableClassModelContainsOneOnlyElement() {
+            this.ParseEmptyNonInheritableClass();
+            this.AssertAmountElements(1);
+        }
+        [TestMethod]
+        public void EmptyNotInheritableClassIsClass() {
+            this.ParseEmptyNonInheritableClass();
+            Assert.IsTrue(this.GetElement<FAMIX.Entity>(0) is FAMIX.Class);
+        }
+        [TestMethod]
+        public void EmptyNotInheritableClassIsEmpty() {
+            this.ParseEmptyNonInheritableClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsTrue(element.Types.Count == 0);
+        }
+        [TestMethod]
+        public void EmptyNotInheritabletClassIsNamedExample() {
+            this.ParseEmptyNonInheritableClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.AreEqual(element.name, "Example");
+        }
+        [TestMethod]
+        public void EmptyNotInheritableClassIsNotAbstract() {
+            this.ParseEmptyNonInheritableClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsFalse(element.isAbstract);
+        }
+
+        [TestMethod]
+         public void EmptyNotInheritableIsFinal() {
+            this.ParseEmptyNonInheritableClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsTrue(element.isFinal);
+        }
+
+        [TestMethod]
+        public void EmptyNotInheritableIsNotShadowing() {
+            this.ParseEmptyNonInheritableClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsFalse(element.isShadow);
+        }
+      
+
+
+
+        #endregion
+
+        #region MustInherit
+        [TestMethod]
+        public void EmptyMustInheritClassModelContainsOneOnlyElement() {
+            this.ParseEmptyMustInheritClass();
+            this.AssertAmountElements(1);
+        }
+
+        [TestMethod]
+        public void EmptyMustInheritClassIsClass() {
+            this.ParseEmptyMustInheritClass();
+            Assert.IsTrue(this.GetElement<FAMIX.Entity>(0) is FAMIX.Class);
+        }
+        [TestMethod]
+        public void EmptyMustInheritClassIsEmpty() {
+            this.ParseEmptyMustInheritClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsTrue(element.Types.Count == 0);
+        }
+        [TestMethod]
+        public void EmptyMustInheritClassIsNamedExample() {
+            this.ParseEmptyMustInheritClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.AreEqual(element.name, "Example");
+        }
+        [TestMethod]
+        public void EmptyMustInheritClassIsAbstract() {
+            this.ParseEmptyMustInheritClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsTrue(element.isAbstract);
+        }
+
+        [TestMethod]
+        public void EmptyMustInheritIsNotFinal() {
+            this.ParseEmptyMustInheritClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsFalse(element.isFinal);
+        }
+
+        [TestMethod]
+        
+        public void EmptyMustInheritIsNotShadowing() {
+            this.ParseEmptyMustInheritClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsFalse(element.isShadow);
+        }
+
+
+        #endregion
+
+        #region EmptyClass
         [TestMethod]
         public void EmptyClassModelContainsOneOnlyElement() {
             this.ParseEmptyClass();
             this.AssertAmountElements(1);
             
         }
-
         [TestMethod]
         public void EmptyClassIsClass() {
             this.ParseEmptyClass();
@@ -69,7 +232,31 @@ namespace FamixTest.VisualBasicUnitTest {
             FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
             Assert.AreEqual(element.name, "Example");
         }
+        [TestMethod]
+        public void EmptyClassIsNotAbstract() {
+            this.ParseEmptyClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsFalse(element.isAbstract);
+            
+        }
+        [TestMethod]
+        public void EmptyClassIsNotFinal() {
+            this.ParseEmptyClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsFalse(element.isFinal);
+        }
 
+        [TestMethod]
+        public void EmptyClassIsNotShadowing() {
+            this.ParseEmptyClass();
+            FAMIX.Class element = this.GetElement<FAMIX.Class>(0);
+            Assert.IsFalse(element.isShadow);
+        }
+
+
+        #endregion
+
+        #region NotEmptyClass
 
         [TestMethod]
         public void NotEmptyClassIsClass() {
@@ -121,6 +308,7 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(element.name, "Example");
         }
 
+        #endregion
 
     }
 }
