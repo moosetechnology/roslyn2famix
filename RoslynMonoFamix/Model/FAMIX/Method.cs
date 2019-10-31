@@ -11,6 +11,10 @@ namespace FAMIX
   [FameDescription("Method")]
   public class Method : FAMIX.BehaviouralEntity
   {
+
+    [FameProperty(Name = "returnType")]
+    public FAMIX.Type returnType;
+
     [FameProperty(Name = "category")]    
     public String category { get; set; }
     

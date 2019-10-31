@@ -20,15 +20,6 @@ namespace RoslynMonoFamix.ModelBuilder {
             return inheritance;
         }
 
-        protected T EnsureTypeNamed<T>(string name, Func<T> func) where T : FAMIX.Type {
-            T type;
-            if (Types.has(name)) {
-                return (T)Types.Named(name);
-            }
-            type = func();
-            Types.Add(name, type);
-            return type;
-        }
 
         protected T EnsureNamespaceNamed<T>(string name, Func<T> func) where T : FAMIX.Namespace {
             T type;
@@ -39,7 +30,6 @@ namespace RoslynMonoFamix.ModelBuilder {
             Namespaces.Add(name, type);
             return type;
         }
-
         internal ScopingEntity CreateScopingEntity(CompilationUnitSyntax node) {
             if (entity != null) throw new System.Exception (" NOOOOOOO ");
              entity = new FAMIX.ScopingEntity();
@@ -49,16 +39,15 @@ namespace RoslynMonoFamix.ModelBuilder {
         public FAMIX.Class EnsureClass(ClassStatementSyntax node) {
             ClassBlockSyntax block = (ClassBlockSyntax) node.Parent;
             string classname = helper.FullTypeName(model.GetDeclaredSymbol(block));
-           return this.EnsureTypeNamed<FAMIX.Class>(classname,
+           return Types.EnsureEntityNamed<FAMIX.Class>(classname,
                 () => { return this.CreateNewClass(node); } );
         }
 
         public FAMIX.Class EnsureIterface(InterfaceStatementSyntax node) {
             string classname = helper.FullTypeName(model.GetDeclaredSymbol(node));
-            return this.EnsureTypeNamed<FAMIX.Class>(classname,
+            return Types.EnsureEntityNamed<FAMIX.Class>(classname,
                  () => { return this.CreateNewInterface(node); });
         }
-
         public FAMIX.Namespace EnsureNamespace(NamespaceStatementSyntax node) {
             SyntaxNode Current = node.Parent;
             string NamespaceName = node.Name.ToString(); 
@@ -68,10 +57,39 @@ namespace RoslynMonoFamix.ModelBuilder {
                  }
                 Current = Current.Parent; 
             }
-            return this.EnsureNamespaceNamed<FAMIX.Namespace>(NamespaceName,
+            return Namespaces.EnsureEntityNamed<FAMIX.Namespace>(NamespaceName,
                  () => { return this.CreateNamespace(NamespaceName); });
         }
 
+        public Method EnsureMethod(MethodStatementSyntax node) {
+            string classname = helper.FullTypeName(model.GetDeclaredSymbol(node));
+            return Methods.EnsureEntityNamed<FAMIX.Method>(classname,
+                 () => { return this.CreateNewMethod(node); });
+        }
+
+        private Method CreateNewMethod(MethodStatementSyntax node) {
+            var methodSymbol = model.GetDeclaredSymbol(node);
+                Method method = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName); 
+                method.isStub = true;
+                method.name = methodSymbol.Name;
+                method.signature = helper.MethodSignature(methodSymbol);
+            return method;
+        }
+        private Method CreateNewConstructor(SubNewStatementSyntax node) {
+            var methodSymbol = model.GetDeclaredSymbol(node);
+            Method method = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName);
+            method.isStub = true;
+            method.name = methodSymbol.Name;
+            method.signature = helper.MethodSignature(methodSymbol);
+            method.isConstructor = true;
+            return method;
+        }
+
+        public Method EnsureConstructor(SubNewStatementSyntax node) {
+            string classname = helper.FullTypeName(model.GetDeclaredSymbol(node));
+            return Methods.EnsureEntityNamed<FAMIX.Method>(classname,
+                 () => { return this.CreateNewConstructor(node); });
+        }
 
         private FAMIX.Class CreateNewClass(ClassStatementSyntax node) {
             ClassBlockSyntax block = (ClassBlockSyntax) node.Parent;
@@ -100,7 +118,6 @@ namespace RoslynMonoFamix.ModelBuilder {
             entity.isAbstract = true;
             return entity;
         }
-
 
     }
 }

@@ -129,7 +129,7 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitMethodBlock(MethodBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitMethodBlock(node);
         }
         public override void VisitConstructorBlock(ConstructorBlockSyntax node) {
             throw new Exception("MustReview");
@@ -150,10 +150,18 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitMethodStatement(MethodStatementSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.Method FamixClass = importer.EnsureMethod(node);
+            FAMIX.Type AGoodSuperContext = this.CurrentContext<FAMIX.Type>();
+            AGoodSuperContext.AddMethod(FamixClass);
+            this.PushContext(FamixClass);
+            base.VisitMethodStatement(node);
         }
         public override void VisitSubNewStatement(SubNewStatementSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.Method FamixClass = importer.EnsureConstructor(node);
+            FAMIX.Type AGoodSuperContext = this.CurrentContext<FAMIX.Type>();
+            AGoodSuperContext.AddMethod(FamixClass);
+            this.PushContext(FamixClass);
+            base.VisitSubNewStatement(node);
         }
         public override void VisitDeclareStatement(DeclareStatementSyntax node) {
             throw new Exception("MustReview");

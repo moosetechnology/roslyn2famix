@@ -323,6 +323,7 @@
     <Compile Include="VisualBasicLanBasedTests\Approved\SubClassTest.cs" />
     <Compile Include="VisualBasicUnitTest\NamespaceTest.cs" />
     <Compile Include="VisualBasicUnitTest\ClassTest.cs" />
+    <Compile Include="VisualBasicUnitTest\MethodTests.cs" />
     <Compile Include="VisualBasicUnitTest\VisualBasicUnitTest.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace RoslynMonoFamix.ModelBuilder
 {
-    public class NamedEntityAccumulator<T>
-    {
+    public class NamedEntityAccumulator<T> where T : FAMIX.Entity {
         private Dictionary<string, T> entities;
 
         public IList<T> RegisteredEntities () {
@@ -61,6 +60,14 @@ namespace RoslynMonoFamix.ModelBuilder
         {
             return entities.Count == 0;
         }
-
+        public Tp EnsureEntityNamed<Tp> (string name, Func<Tp> func) where Tp: T{
+            Tp type;
+            if (this.has(name)) {
+                return (Tp)this.Named(name);
+            }
+            type = func();
+            this.Add(name, type);
+            return type;
+        }
     }
 }
