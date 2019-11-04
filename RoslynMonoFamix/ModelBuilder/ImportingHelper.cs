@@ -21,7 +21,9 @@ namespace RoslynMonoFamix.ModelBuilder {
 
 
         public System.Type ResolveFAMIXTypeName(ISymbol aType) {
+            
             System.Type result = typeof(FAMIX.Class);
+
             if (aType is ITypeSymbol) typeNameMap.TryGetValue(((ITypeSymbol)aType).TypeKind.ToString(), out result);
             if (aType is INamedTypeSymbol) {
                 var superType = (aType as INamedTypeSymbol).BaseType;
@@ -85,6 +87,31 @@ namespace RoslynMonoFamix.ModelBuilder {
         public String FullEventName(IEventSymbol Event) {
             return FullTypeName(Event.ContainingType) + "." + EventSignature(Event);
         }
-       
+
+        public string AccessibilityName(Accessibility declaredAccessibility) {
+            switch (declaredAccessibility) {
+                case Accessibility.NotApplicable:
+                    return "NotApplicable";
+                case Accessibility.Private:
+                    return "Private";
+                case Accessibility.ProtectedAndInternal:
+                    return "ProtectedAndInternal";
+                case Accessibility.Protected:
+                    return "Protected";
+                case Accessibility.Internal:
+                    return "Internal";
+                case Accessibility.ProtectedOrInternal:
+                    return "ProtectedOrInternal";
+                case Accessibility.Public:
+                    return "Public";
+            }
+            throw new Exception("The declaredAccessibility value is not possible");
+      
+
+
+        }
+
+
+
     }
 }

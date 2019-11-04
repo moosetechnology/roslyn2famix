@@ -393,7 +393,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
         access.accessor = currentMethod;
         access.variable = attribute;
         clientMethod.AddAccesse(access);
-        attribute.AddIncomingAccesse(access);
+        attribute.AddIncomingAccess(access);
         importer.CreateSourceAnchor(access, node);
     }
 

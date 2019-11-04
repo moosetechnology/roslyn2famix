@@ -329,7 +329,9 @@
     <Compile Include="ModelBuilder\AbstractModelBuilder.cs" />
     <Compile Include="ModelBuilder\VisualBasicModelBuilder.cs" />
     <Compile Include="ModelBuilder\ImportingHelper.cs" />
-    <Compile Include="Model\FAMIX\IAddType.cs" />
+    <Compile Include="Model\Building\TypingContext.cs" />
+    <Compile Include="Model\Building\ITyped.cs" />
+    <Compile Include="Model\Building\IAddType.cs" />
     <Compile Include="Visitor\VBImportingVisitor.cs" />
     <Compile Include="Visitor\VisualBasicStackedVisitor.cs" />
     <Compile Include="ModelBuilder\InCSharpImporter.cs" />

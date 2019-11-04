@@ -55,7 +55,7 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitNamespaceBlock(node);
         }
         public override void VisitNamespaceStatement(NamespaceStatementSyntax node) {
-            FAMIX.Namespace nspace = importer.EnsureNamespace(node);
+            FAMIX.Namespace nspace = importer.EnsureNamespace(importer.model.GetDeclaredSymbol(node));
             this.CurrentContext<FAMIX.ScopingEntity>().AddChildScope(nspace);
             this.PushContext(nspace);
         }
@@ -98,7 +98,13 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitInterfaceStatement(node);
         }
         public override void VisitClassStatement(ClassStatementSyntax node) {
-            FAMIX.Class FamixClass = importer.EnsureClass(node);
+            FAMIX.Class FamixClass = importer.EnsureClass(importer.model.GetDeclaredSymbol(node));
+
+            FamixClass.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
+            FamixClass.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
+            FamixClass.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword); ;
+            FamixClass.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword); ;
+
             FAMIX.IAddType AGoodSuperContext = (FAMIX.IAddType)this.CurrentContext<FAMIX.Entity>();
             AGoodSuperContext.AddType(FamixClass);
             this.PushContext(FamixClass);
@@ -147,17 +153,23 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitParameterList(ParameterListSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitParameterList(node);
         }
         public override void VisitMethodStatement(MethodStatementSyntax node) {
-            FAMIX.Method FamixClass = importer.EnsureMethod(node);
+            FAMIX.Method FamixMethod = importer.EnsureMethod(importer.model.GetDeclaredSymbol(node));
+
+            FamixMethod.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
+            FamixMethod.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
+            FamixMethod.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword); ;
+            FamixMethod.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword); ;
+
             FAMIX.Type AGoodSuperContext = this.CurrentContext<FAMIX.Type>();
-            AGoodSuperContext.AddMethod(FamixClass);
-            this.PushContext(FamixClass);
+            AGoodSuperContext.AddMethod(FamixMethod);
+            this.PushContext(FamixMethod);
             base.VisitMethodStatement(node);
         }
         public override void VisitSubNewStatement(SubNewStatementSyntax node) {
-            FAMIX.Method FamixClass = importer.EnsureConstructor(node);
+            FAMIX.Method FamixClass = importer.EnsureConstructor(importer.model.GetDeclaredSymbol(node));
             FAMIX.Type AGoodSuperContext = this.CurrentContext<FAMIX.Type>();
             AGoodSuperContext.AddMethod(FamixClass);
             this.PushContext(FamixClass);
@@ -209,7 +221,10 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitSimpleAsClause(SimpleAsClauseSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.ITyped Typing = (this.CurrentContext<FAMIX.Entity>() as FAMIX.ITyped);
+            this.PushContext(Typing.TypingContext(importer.model.GetDeclaredSymbol(node.Parent)));
+            base.VisitSimpleAsClause(node);
+            this.PopContext();
         }
         public override void VisitAsNewClause(AsNewClauseSyntax node) {
             throw new Exception("MustReview");
@@ -671,7 +686,10 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitPredefinedType(PredefinedTypeSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
+            FAMIX.Type type = importer.EnsureType(typing.RelatedSymbol);
+            typing.SetType(type);
+            base.VisitPredefinedType(node);
         }
         public override void VisitIdentifierName(IdentifierNameSyntax node) {
             throw new Exception("MustReview");

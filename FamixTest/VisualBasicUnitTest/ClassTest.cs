@@ -41,7 +41,6 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         #endregion
 
-
         #region Visibility
         [TestMethod]
         public void PrivateClassIsPrivate () {

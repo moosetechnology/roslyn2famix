@@ -19,96 +19,73 @@ namespace RoslynMonoFamix.ModelBuilder {
             inheritance.subclass = inheritingClass;
             return inheritance;
         }
-
-
-        protected T EnsureNamespaceNamed<T>(string name, Func<T> func) where T : FAMIX.Namespace {
-            T type;
-            if (Types.has(name)) {
-                return (T)Namespaces.Named(name);
-            }
-            type = func();
-            Namespaces.Add(name, type);
-            return type;
-        }
         internal ScopingEntity CreateScopingEntity(CompilationUnitSyntax node) {
-            if (entity != null) throw new System.Exception (" NOOOOOOO ");
-             entity = new FAMIX.ScopingEntity();
+            if (entity != null) throw new System.Exception(" NOOOOOOO ");
+            entity = new FAMIX.ScopingEntity();
             return entity;
         }
 
-        public FAMIX.Class EnsureClass(ClassStatementSyntax node) {
-            ClassBlockSyntax block = (ClassBlockSyntax) node.Parent;
-            string classname = helper.FullTypeName(model.GetDeclaredSymbol(block));
-           return Types.EnsureEntityNamed<FAMIX.Class>(classname,
-                () => { return this.CreateNewClass(node); } );
+        public FAMIX.Class EnsureClass(INamedTypeSymbol type) {
+            string classname = helper.FullTypeName(type);
+            return Types.EntityNamedIfNone<FAMIX.Class>(classname,
+                 () => { return this.CreateNewClass(type); });
         }
 
         public FAMIX.Class EnsureIterface(InterfaceStatementSyntax node) {
             string classname = helper.FullTypeName(model.GetDeclaredSymbol(node));
-            return Types.EnsureEntityNamed<FAMIX.Class>(classname,
+            return Types.EntityNamedIfNone<FAMIX.Class>(classname,
                  () => { return this.CreateNewInterface(node); });
         }
-        public FAMIX.Namespace EnsureNamespace(NamespaceStatementSyntax node) {
-            SyntaxNode Current = node.Parent;
-            string NamespaceName = node.Name.ToString(); 
-            while (Current != null) {
-                if (Current is NamespaceStatementSyntax) {
-                    NamespaceName = ((NamespaceStatementSyntax)Current).Name.ToFullString() + "." + NamespaceName;
-                 }
-                Current = Current.Parent; 
-            }
-            return Namespaces.EnsureEntityNamed<FAMIX.Namespace>(NamespaceName,
-                 () => { return this.CreateNamespace(NamespaceName); });
+        public FAMIX.Namespace EnsureNamespace(INamespaceSymbol ns) {
+
+            //while (Current != null) {
+            //    if (Current is NamespaceStatementSyntax) {
+            //        NamespaceName = ((NamespaceStatementSyntax)Current).Name.ToFullString() + "." + NamespaceName;
+            //    }
+            //    Current = Current.Parent;
+            //}
+            return Namespaces.EntityNamedIfNone<FAMIX.Namespace>(ns.Name,
+                 () => { return this.CreateNamespace(ns); });
         }
 
-        public Method EnsureMethod(MethodStatementSyntax node) {
-            string classname = helper.FullTypeName(model.GetDeclaredSymbol(node));
-            return Methods.EnsureEntityNamed<FAMIX.Method>(classname,
-                 () => { return this.CreateNewMethod(node); });
+        public Method EnsureMethod(IMethodSymbol method) {
+            string name = helper.FullTypeName(method);
+            return Methods.EntityNamedIfNone<FAMIX.Method>(name,
+                 () => { return this.CreateNewMethod(method); });
         }
 
-        private Method CreateNewMethod(MethodStatementSyntax node) {
-            var methodSymbol = model.GetDeclaredSymbol(node);
-                Method method = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName); 
-                method.isStub = true;
-                method.name = methodSymbol.Name;
-                method.signature = helper.MethodSignature(methodSymbol);
-            return method;
+        private Method CreateNewMethod(IMethodSymbol method) {
+            Method FamixMethod = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName);
+            FamixMethod.isStub = true;
+            FamixMethod.name = method.Name;
+            FamixMethod.signature = helper.MethodSignature(method);
+            return FamixMethod;
         }
-        private Method CreateNewConstructor(SubNewStatementSyntax node) {
-            var methodSymbol = model.GetDeclaredSymbol(node);
-            Method method = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName);
-            method.isStub = true;
-            method.name = methodSymbol.Name;
-            method.signature = helper.MethodSignature(methodSymbol);
-            method.isConstructor = true;
-            return method;
+        private Method CreateNewConstructor(IMethodSymbol method) {
+            Method FamixMethod = this.CreateNewMethod(method);
+            FamixMethod.isConstructor = true;
+            return FamixMethod;
         }
 
-        public Method EnsureConstructor(SubNewStatementSyntax node) {
-            string classname = helper.FullTypeName(model.GetDeclaredSymbol(node));
-            return Methods.EnsureEntityNamed<FAMIX.Method>(classname,
-                 () => { return this.CreateNewConstructor(node); });
+        public Method EnsureConstructor(IMethodSymbol method) {
+            string name = helper.FullTypeName(method);
+            return Methods.EntityNamedIfNone<FAMIX.Method>(name,
+                 () => { return this.CreateNewConstructor(method); });
         }
 
-        private FAMIX.Class CreateNewClass(ClassStatementSyntax node) {
-            ClassBlockSyntax block = (ClassBlockSyntax) node.Parent;
+        private FAMIX.Class CreateNewClass(INamedTypeSymbol type) {
             FAMIX.Class entity = this.CreateNewEntity<FAMIX.Class>(typeof(FAMIX.Class).FullName);
-            var symbol = model.GetDeclaredSymbol(node);
-            entity.name = helper.FullTypeName(symbol);
-            entity.isAbstract = node.Modifiers.Any(SyntaxKind.MustInheritKeyword);
-            entity.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
-            entity.isFinal = node.Modifiers.Any(SyntaxKind.NotInheritableKeyword);
-            entity.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword);
-            entity.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword);
-            entity.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
+            entity.name = helper.FullTypeName(type);
+            entity.isAbstract = type.IsAbstract;
+            entity.isFinal = type.IsSealed;
+            entity.accessibility = helper.AccessibilityName(type.DeclaredAccessibility);
             return entity;
         }
 
 
-        private Namespace CreateNamespace(string NamespaceName) {
+        private Namespace CreateNamespace(INamespaceSymbol ns) {
             FAMIX.Namespace entity = this.CreateNewEntity<FAMIX.Namespace>(typeof(FAMIX.Namespace).FullName);
-            entity.name = NamespaceName;
+            entity.name = ns.Name;
             return entity;
         }
 
@@ -119,5 +96,38 @@ namespace RoslynMonoFamix.ModelBuilder {
             return entity;
         }
 
+
+        public FAMIX.Type EnsureType(ISymbol aType) {
+
+            string fullName = helper.FullTypeName(aType);
+
+            if (Types.has(fullName))
+                return Types.Named(fullName);
+
+            string typeKind = helper.ResolveFAMIXTypeName(aType).FullName;
+
+            FAMIX.Type type = repository.New<FAMIX.Type>(typeKind);
+            type.isStub = true;
+
+            Types.Add(fullName, type);
+
+            if (typeKind.Equals(typeof(FAMIX.ParameterizedType).FullName)) {
+                var parameterizedClass = EnsureType(aType.OriginalDefinition);
+                (type as FAMIX.ParameterizedType).parameterizableClass = parameterizedClass as FAMIX.ParameterizableClass;
+            }
+
+            type.name = helper.TypeName(aType);
+            if (aType.ContainingType != null) {
+                var containingType = EnsureType(aType.ContainingType);
+                type.container = containingType;
+            } else
+            if (aType.ContainingNamespace != null) {
+                var ns = EnsureNamespace(aType.ContainingNamespace);
+                type.container = ns;
+            }
+
+            return type;
+
+        }
     }
 }

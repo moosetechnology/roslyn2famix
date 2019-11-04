@@ -70,13 +70,13 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptyFunctionManyParameters_Protected() {
             this.ParseEmptyFunctionManyParameters();
-            var MethodElement = this.GetElement<FAMIX.Method>(0);
+            var MethodElement = this.GetElement<FAMIX.Method>(1);
             Assert.IsTrue(MethodElement.isPrivate);
         }
         [TestMethod]
         public void ParseEmptyFunctionManyParameters_HasTwoParameters() {
             this.ParseEmptyFunctionManyParameters();
-            var MethodElement = this.GetElement<FAMIX.Method>(0);
+            var MethodElement = this.GetElement<FAMIX.Method>(1);
             Assert.AreEqual(MethodElement.Parameters.Count, 2);
         }
 
@@ -89,38 +89,38 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_IsNamedExample() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(0);
+            var MethodElement = this.GetElement<FAMIX.Method>(1);
             Assert.AreEqual(MethodElement.name, "ExampleFunction");
         }
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_ReturnsBoolean() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(0);
-            Assert.AreEqual(MethodElement.returnType.name, "boolean");
+            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            Assert.AreEqual(MethodElement.returnType.name, "Boolean");
         }
 
        
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_IsContainedInExampleClass() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(0);
+            var MethodElement = this.GetElement<FAMIX.Method>(1);
             Assert.AreEqual(MethodElement.parentType, this.GetElement<FAMIX.Class>(0));
         }
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_TwoElements() {
             this.ParseEmptyFunctionParameterLess();
-            this.AssertAmountElements(2);
+            this.AssertAmountElements(4);
         }
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_Public() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(0);
+            var MethodElement = this.GetElement<FAMIX.Method>(1);
             Assert.IsTrue(MethodElement.isPublic);
         }
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_HasNoParameter() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(0);
+            var MethodElement = this.GetElement<FAMIX.Method>(1);
             Assert.AreEqual(MethodElement.Parameters.Count, 0);
         }
 
