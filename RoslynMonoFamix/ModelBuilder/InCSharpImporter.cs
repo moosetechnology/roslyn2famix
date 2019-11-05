@@ -118,9 +118,6 @@ namespace RoslynMonoFamix.ModelBuilder {
         }
 
 
-
-
-
         private FAMIX.Namespace EnsureNamespace(INamespaceSymbol ns) {
             if (Namespaces.has(ns.Name))
                 return Namespaces.Named(ns.Name);

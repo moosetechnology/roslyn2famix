@@ -104,7 +104,7 @@ namespace RoslynMonoFamix.Visitor {
             FamixClass.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
             FamixClass.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword); ;
             FamixClass.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword); ;
-
+            FamixClass.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
             FAMIX.IAddType AGoodSuperContext = (FAMIX.IAddType)this.CurrentContext<FAMIX.Entity>();
             AGoodSuperContext.AddType(FamixClass);
             this.PushContext(FamixClass);
@@ -160,8 +160,9 @@ namespace RoslynMonoFamix.Visitor {
 
             FamixMethod.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
             FamixMethod.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
-            FamixMethod.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword); ;
-            FamixMethod.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword); ;
+            FamixMethod.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword);
+            FamixMethod.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword);
+            FamixMethod.Modifiers.AddRange( node.Modifiers.Select(p => p.Text).ToList());
 
             FAMIX.Type AGoodSuperContext = this.CurrentContext<FAMIX.Type>();
             AGoodSuperContext.AddMethod(FamixMethod);
@@ -245,10 +246,15 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitParameter(ParameterSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.Method CurrentMethod = this.CurrentContext<FAMIX.Method>();
+            FAMIX.Parameter parameter = importer.EnsureParameterInMethod(importer.model.GetDeclaredSymbol(node), CurrentMethod);
+            this.PushContext(parameter);
+            base.VisitParameter(node);
+            this.PopContext();           
         }
         public override void VisitModifiedIdentifier(ModifiedIdentifierSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitModifiedIdentifier(node);
+    
         }
         public override void VisitArrayRankSpecifier(ArrayRankSpecifierSyntax node) {
             throw new Exception("MustReview");

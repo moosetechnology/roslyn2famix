@@ -14,15 +14,15 @@ namespace RoslynMonoFamix.ModelBuilder {
         public VisualBasicModelBuilder(Fame.Repository repository, string projectBaseFolder) : base(repository, projectBaseFolder) {
 
         }
-        public FAMIX.Inheritance CreateInheritanceFor(FAMIX.Class inheritingClass) {
-            FAMIX.Inheritance inheritance = this.CreateNewEntity<FAMIX.Inheritance>(typeof(FAMIX.Inheritance).FullName);
-            inheritance.subclass = inheritingClass;
-            return inheritance;
-        }
-        internal ScopingEntity CreateScopingEntity(CompilationUnitSyntax node) {
-            if (entity != null) throw new System.Exception(" NOOOOOOO ");
-            entity = new FAMIX.ScopingEntity();
-            return entity;
+
+
+        public FAMIX.Parameter EnsureParameterInMethod(IParameterSymbol parameterSymbol, Method CurrentMethod) {
+            if (CurrentMethod.Parameters.Any(p => p.name == parameterSymbol.Name)) { 
+                return CurrentMethod.Parameters.Find(p => p.name == parameterSymbol.Name);
+            }
+            FAMIX.Parameter parameter = this.CreateParameter(parameterSymbol);
+            CurrentMethod.AddParameter(parameter);
+            return parameter;
         }
 
         public FAMIX.Class EnsureClass(INamedTypeSymbol type) {
@@ -37,13 +37,6 @@ namespace RoslynMonoFamix.ModelBuilder {
                  () => { return this.CreateNewInterface(node); });
         }
         public FAMIX.Namespace EnsureNamespace(INamespaceSymbol ns) {
-
-            //while (Current != null) {
-            //    if (Current is NamespaceStatementSyntax) {
-            //        NamespaceName = ((NamespaceStatementSyntax)Current).Name.ToFullString() + "." + NamespaceName;
-            //    }
-            //    Current = Current.Parent;
-            //}
             return Namespaces.EntityNamedIfNone<FAMIX.Namespace>(ns.Name,
                  () => { return this.CreateNamespace(ns); });
         }
@@ -54,11 +47,28 @@ namespace RoslynMonoFamix.ModelBuilder {
                  () => { return this.CreateNewMethod(method); });
         }
 
+        private FAMIX.Parameter CreateParameter(IParameterSymbol parameterSymbol) {
+            FAMIX.Parameter parameter = this.CreateNewEntity<FAMIX.Parameter>(typeof(FAMIX.Parameter).FullName);
+
+            parameter.Modifiers = (parameterSymbol.CustomModifiers.Select(p => p.Modifier.Name)
+                                     .Concat(
+                                            parameterSymbol.RefCustomModifiers.Select(p => p.Modifier.Name)
+                                      )
+                                   ).ToList();
+            parameter.referenceType = helper.RefKindName(parameterSymbol.RefKind);
+            if (parameterSymbol.IsParams) throw new System.Exception("Should cehck this");
+            if (parameterSymbol.HasExplicitDefaultValue) parameter.defaultValue = parameterSymbol.ExplicitDefaultValue.ToString();
+;            return parameter; 
+            
+        }
+
         private Method CreateNewMethod(IMethodSymbol method) {
             Method FamixMethod = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName);
             FamixMethod.isStub = true;
             FamixMethod.name = method.Name;
+            FamixMethod.Modifiers = method.RefCustomModifiers.Select(p => p.Modifier.Name).ToList();
             FamixMethod.signature = helper.MethodSignature(method);
+            FamixMethod.accessibility = helper.AccessibilityName(method.DeclaredAccessibility); 
             return FamixMethod;
         }
         private Method CreateNewConstructor(IMethodSymbol method) {
@@ -81,7 +91,16 @@ namespace RoslynMonoFamix.ModelBuilder {
             entity.accessibility = helper.AccessibilityName(type.DeclaredAccessibility);
             return entity;
         }
-
+        public FAMIX.Inheritance CreateInheritanceFor(FAMIX.Class inheritingClass) {
+            FAMIX.Inheritance inheritance = this.CreateNewEntity<FAMIX.Inheritance>(typeof(FAMIX.Inheritance).FullName);
+            inheritance.subclass = inheritingClass;
+            return inheritance;
+        }
+        public ScopingEntity CreateScopingEntity(CompilationUnitSyntax node) {
+            if (entity != null) throw new System.Exception(" NOOOOOOO ");
+            entity = new FAMIX.ScopingEntity();
+            return entity;
+        }
 
         private Namespace CreateNamespace(INamespaceSymbol ns) {
             FAMIX.Namespace entity = this.CreateNewEntity<FAMIX.Namespace>(typeof(FAMIX.Namespace).FullName);
@@ -95,7 +114,6 @@ namespace RoslynMonoFamix.ModelBuilder {
             entity.isAbstract = true;
             return entity;
         }
-
 
         public FAMIX.Type EnsureType(ISymbol aType) {
 
@@ -129,5 +147,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             return type;
 
         }
+
+   
     }
 }

@@ -61,6 +61,21 @@ namespace RoslynMonoFamix.ModelBuilder {
             return fullyQualifiedName;
         }
 
+        public string RefKindName(RefKind refKind) {
+
+            switch (refKind) {
+                case RefKind.None:
+                    return "None";
+                case RefKind.Ref:
+                    return "Ref";
+                case RefKind.Out:
+                    return "Out";
+                case RefKind.In:
+                    return "In/RefReadOnly";
+            }
+            throw new Exception("The declaredAccessibility value is not possible");
+        }
+
         public String TypeName(ISymbol aType) {
             var symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly, genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters);
             string fullyQualifiedName = aType.ToDisplayString(symbolDisplayFormat);
