@@ -321,6 +321,7 @@
     <Compile Include="VisualBasicLanBasedTests\LanProjectVisualBasicLoader.cs" />
     <Compile Include="VisualBasicLanBasedTests\SimpleStructTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\SubClassTest.cs" />
+    <Compile Include="VisualBasicUnitTest\ClassInheritance.cs" />
     <Compile Include="VisualBasicUnitTest\NamespaceTest.cs" />
     <Compile Include="VisualBasicUnitTest\ClassTest.cs" />
     <Compile Include="VisualBasicUnitTest\MethodTests.cs" />

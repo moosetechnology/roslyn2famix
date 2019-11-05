@@ -76,7 +76,8 @@ namespace RoslynMonoFamix.Visitor {
         }
         public override void VisitInheritsStatement(InheritsStatementSyntax node) {
             FAMIX.Inheritance inheritance = importer.CreateInheritanceFor(this.CurrentContext<FAMIX.Class>());
-            this.PushContext(inheritance);
+            
+            this.PushContext(inheritance.TypingContext(importer.model.GetDeclaredSymbol(node.Parent)));
             base.VisitInheritsStatement(node);
             this.PopContext();
         }
@@ -698,7 +699,10 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitPredefinedType(node);
         }
         public override void VisitIdentifierName(IdentifierNameSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
+            FAMIX.Type type = importer.EnsureType(typing.RelatedSymbol);
+            typing.SetType(type);
+            base.VisitIdentifierName(node);
         }
         public override void VisitGenericName(GenericNameSyntax node) {
             throw new Exception("MustReview");

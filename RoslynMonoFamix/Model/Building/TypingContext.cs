@@ -22,6 +22,10 @@ namespace FAMIX {
         public static TypingContext StructuralEntity (FAMIX.StructuralEntity entity, ISymbol symbol) {
             return new StructuralEntityTypingContext(entity, symbol);
         }
+
+        public static TypingContext Inheritance(FAMIX.Inheritance entity, INamedTypeSymbol symbol) {
+            return new InheritanceTypingContext(entity, symbol);
+        }
     }
 
     public class MethodTypingContext : TypingContext {
@@ -34,6 +38,18 @@ namespace FAMIX {
             method.returnType = type;
         }
     }
+
+    public class InheritanceTypingContext : TypingContext {
+        protected FAMIX.Inheritance entity;
+
+        public InheritanceTypingContext(FAMIX.Inheritance entity, INamedTypeSymbol relatedSymbol) : base(relatedSymbol.BaseType) {
+            this.entity = entity;
+        }
+        public override void SetType(Type type) {
+            entity.SetSuperType(type);
+        }
+    }
+
 
     public class StructuralEntityTypingContext : TypingContext {
         protected FAMIX.StructuralEntity entity;
