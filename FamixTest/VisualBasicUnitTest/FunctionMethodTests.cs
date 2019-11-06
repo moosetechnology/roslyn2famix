@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace FamixTest.VisualBasicUnitTest {
     [TestClass]
-    public class MethodTests : VisualBasicUnitTest {
+    public class FunctionMethodTests : VisualBasicUnitTest {
 
 
         #region SettingUp
@@ -32,30 +32,7 @@ namespace FamixTest.VisualBasicUnitTest {
                     End Class
             ");
         }
-        public void ParseEmptySubParameterLess() {
-            this.Import(@"
-                    Class Example 
-                        Private Overridable Sub ExampleSub()
-                        End Sub 
-                    End Class
-            ");
-        }
-        public void ParseEmptySubOneParameter() {
-            this.Import(@"
-                    Class Example 
-                        Public Overridable Sub ExampleSub(Parameter As Integer)
-                        End Sub 
-                    End Class
-            ");
-        }
-        public void ParseEmptySubManyParameters() {
-            this.Import(@"
-                     Class Example 
-                        Public Overridable Sub ExampleSub(Parameter1 As Integer, Parameter2 as String)
-                        End Sub 
-                    End Class
-            ");
-        }
+   
 
         #endregion
 

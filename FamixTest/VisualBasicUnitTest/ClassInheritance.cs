@@ -65,27 +65,19 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(inh.subclass.name, "ExampleSubclass");
         }
 
-
-
-
         [TestMethod]
         public void ParseMustInheritNotInheritableSimpleInheritance_HasOneInheritanceRelationShip() {
             this.ParseMustInheritNotInheritableSimpleInheritance();
             Assert.AreEqual(importer.AllElementsOfType<FAMIX.Inheritance>().Count(), 1);
         }
 
-
         [TestMethod]
         public void ParseMustInheritNotInheritableSimpleInheritance_HasAPropperInheritanceRelationShip() {
             this.ParseMustInheritNotInheritableSimpleInheritance();
             FAMIX.Inheritance inh = importer.AllElementsOfType<FAMIX.Inheritance>().ToList()[0];
-
             Assert.AreEqual(inh.superclass.name, "ExampleSuperclass");
             Assert.AreEqual(inh.subclass.name, "ExampleSubclass");
         }
-
-
-
 
         [TestMethod]
         public void ParseMustInheritNotInheritableSimpleInheritance_HasFourElements() {
