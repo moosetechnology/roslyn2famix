@@ -17,7 +17,7 @@ namespace RoslynMonoFamix.ModelBuilder {
 
 
         public FAMIX.Parameter EnsureParameterInMethod(IParameterSymbol parameterSymbol, Method CurrentMethod) {
-            if (CurrentMethod.Parameters.Any(p => p.name == parameterSymbol.Name)) { 
+            if (CurrentMethod.Parameters.Any(p => p.name == parameterSymbol.Name)) {
                 return CurrentMethod.Parameters.Find(p => p.name == parameterSymbol.Name);
             }
             FAMIX.Parameter parameter = this.CreateParameter(parameterSymbol);
@@ -57,9 +57,19 @@ namespace RoslynMonoFamix.ModelBuilder {
                                    ).ToList();
             parameter.referenceType = helper.RefKindName(parameterSymbol.RefKind);
             if (parameterSymbol.IsParams) throw new System.Exception("Should cehck this");
-            if (parameterSymbol.HasExplicitDefaultValue) parameter.defaultValue = parameterSymbol.ExplicitDefaultValue.ToString();
-;            return parameter; 
-            
+            if (parameterSymbol.HasExplicitDefaultValue) {
+                if (parameterSymbol.ExplicitDefaultValue == null) {
+                    if (parameterSymbol.Language == LanguageNames.CSharp) {
+                        parameter.defaultValue = "null";
+                    } else {
+                        parameter.defaultValue = "Nothing";
+                    }
+                } else {
+                    parameter.defaultValue = parameterSymbol.ExplicitDefaultValue.ToString();
+                }
+            }
+            return parameter;
+
         }
 
         private Method CreateNewMethod(IMethodSymbol method) {
@@ -68,7 +78,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             FamixMethod.name = method.Name;
             FamixMethod.Modifiers = method.RefCustomModifiers.Select(p => p.Modifier.Name).ToList();
             FamixMethod.signature = helper.MethodSignature(method);
-            FamixMethod.accessibility = helper.AccessibilityName(method.DeclaredAccessibility); 
+            FamixMethod.accessibility = helper.AccessibilityName(method.DeclaredAccessibility);
             return FamixMethod;
         }
         private Method CreateNewConstructor(IMethodSymbol method) {
@@ -148,6 +158,6 @@ namespace RoslynMonoFamix.ModelBuilder {
 
         }
 
-   
+
     }
 }

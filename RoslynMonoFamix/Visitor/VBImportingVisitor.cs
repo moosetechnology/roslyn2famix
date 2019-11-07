@@ -244,11 +244,13 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitEqualsValue(EqualsValueSyntax node) {
-            throw new Exception("MustReview");
+            if (!(this.CurrentContext<FAMIX.Parameter>() is FAMIX.Parameter)) throw new Exception("Should check what's happening here. The parameters are managing the default value. What about this thing in the stack? ");
+            base.VisitEqualsValue(node);
         }
         public override void VisitParameter(ParameterSyntax node) {
             FAMIX.Method CurrentMethod = this.CurrentContext<FAMIX.Method>();
             FAMIX.Parameter parameter = importer.EnsureParameterInMethod(importer.model.GetDeclaredSymbol(node), CurrentMethod);
+            parameter.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
             this.PushContext(parameter);
             base.VisitParameter(node);
             this.PopContext();           
@@ -465,7 +467,7 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitLiteralExpression(LiteralExpressionSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitLiteralExpression(node);
         }
         public override void VisitParenthesizedExpression(ParenthesizedExpressionSyntax node) {
             throw new Exception("MustReview");

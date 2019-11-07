@@ -16,7 +16,7 @@ namespace RoslynMonoFamix.Visitor {
             stack = new System.Collections.Stack();
         } 
         public T CurrentContextIfNone<T>(Func<T> IfNone) where T : FAMIX.Entity {
-            if (stack.Count == 0) {
+            if (stack.Count == 0 || !(stack.Peek() is T)) {
                 return IfNone();
             }
             return stack.Peek() as T;

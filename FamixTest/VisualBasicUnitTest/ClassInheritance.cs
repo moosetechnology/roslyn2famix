@@ -55,7 +55,6 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(importer.AllElementsOfType<FAMIX.Inheritance>().Count(), 1);
         }
 
-
         [TestMethod]
         public void ParseSimpleInheritance_HasAPropperInheritanceRelationShip() {
             this.ParseSimpleInheritance();
