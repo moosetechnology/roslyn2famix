@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace RoslynMonoFamix.ModelBuilder {
-    class VisualBasicModelBuilder : AbstractModelBuilder {
+   public  class VisualBasicModelBuilder : AbstractModelBuilder {
         FAMIX.ScopingEntity entity;
         public VisualBasicModelBuilder(Fame.Repository repository, string projectBaseFolder) : base(repository, projectBaseFolder) {
 
@@ -158,6 +158,17 @@ namespace RoslynMonoFamix.ModelBuilder {
 
         }
 
+        public FAMIX.Attribute EnsureField(IFieldSymbol symbol) {
+            FAMIX.Attribute attribute = this.CreateNewEntity<FAMIX.Attribute>(typeof(FAMIX.Attribute).FullName);
+            attribute.accessibility = helper.AccessibilityName(symbol.DeclaredAccessibility);
+            attribute.declaredType = this.EnsureType(symbol.Type);
+            attribute.name = symbol.Name;
+            
+            return attribute;
+        }
 
+        internal AttributeGroup CreateStructuralEntityGroup() {
+            return new AttributeGroup();
+        }
     }
 }

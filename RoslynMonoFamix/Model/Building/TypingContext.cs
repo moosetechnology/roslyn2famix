@@ -5,6 +5,7 @@ using Dynamix;
 using FAMIX;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
+using RoslynMonoFamix.ModelBuilder;
 
 namespace FAMIX {
 
@@ -13,18 +14,31 @@ namespace FAMIX {
         public TypingContext (ISymbol relatedSymbol) {
             this.RelatedSymbol = relatedSymbol;
         }
-        public ISymbol RelatedSymbol { set; get; }
+        private ISymbol RelatedSymbol { set; get; }
+
+        public virtual ISymbol GetRelatedSymbol() {
+            return RelatedSymbol;
+        }
+
         public abstract void SetType(FAMIX.Type type);
         
         public static TypingContext Method(FAMIX.Method method, IMethodSymbol relatedSymbol) {
             return new MethodTypingContext(method, relatedSymbol);
         }
         public static TypingContext StructuralEntity (FAMIX.StructuralEntity entity, ISymbol symbol) {
-            return new StructuralEntityTypingContext(entity, symbol);
+            return new AttributeTypingContext(entity, symbol);
         }
-
+        public static TypingContext StructuralEntityGroup(FAMIX.AttributeGroup entity, ISymbol symbol) {
+            return new AttributeGroupTypingContext(entity, symbol);
+        }
         public static TypingContext Inheritance(FAMIX.Inheritance entity, INamedTypeSymbol symbol) {
             return new InheritanceTypingContext(entity, symbol);
+        }
+
+        public virtual FAMIX.Type TypeUsing(VisualBasicModelBuilder importer) {
+            FAMIX.Type type = importer.EnsureType(this.RelatedSymbol);
+            this.SetType(type);
+            return type;
         }
     }
 
@@ -50,11 +64,10 @@ namespace FAMIX {
         }
     }
 
-
-    public class StructuralEntityTypingContext : TypingContext {
+    public class AttributeTypingContext : TypingContext {
         protected FAMIX.StructuralEntity entity;
 
-        public StructuralEntityTypingContext(FAMIX.StructuralEntity entity, ISymbol relatedSymbol) : base(relatedSymbol) {
+        public AttributeTypingContext(FAMIX.StructuralEntity entity, ISymbol relatedSymbol) : base(relatedSymbol) {
             this.entity = entity;
         }
         public override void SetType(Type type) {
@@ -62,7 +75,20 @@ namespace FAMIX {
         }
     }
 
+    public class AttributeGroupTypingContext : TypingContext {
+        protected FAMIX.AttributeGroup entity;
 
-    
+        public AttributeGroupTypingContext(FAMIX.AttributeGroup entity, ISymbol relatedSymbol) : base(relatedSymbol) {
+            this.entity = entity;
+        }
+        public override void SetType(Type type) {
+            entity.SetType(type);
+        }
+        public override FAMIX.Type TypeUsing(VisualBasicModelBuilder importer) {
+            return entity.Type();
+        }
+    }
+
+
 
 }

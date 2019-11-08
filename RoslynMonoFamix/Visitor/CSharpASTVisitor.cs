@@ -296,6 +296,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     public override void VisitFieldDeclaration(FieldDeclarationSyntax node) {
+        
         AddField(node);
         base.VisitFieldDeclaration(node);
     }

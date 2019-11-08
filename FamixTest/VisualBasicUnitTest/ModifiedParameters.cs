@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace FamixTest.VisualBasicUnitTest {
     [TestClass]
-    public class ComplexParameters : VisualBasicUnitTest {
+    public class ModifiedParameters : VisualBasicUnitTest {
 
 
         #region SettingUp
@@ -46,7 +46,6 @@ namespace FamixTest.VisualBasicUnitTest {
             this.ParsingExample();
             Assert.AreEqual(this.importer.AllElementsOfType<FAMIX.Method>().Count(), 1);
         }
-
 
         [TestMethod]
         public void ParsingExample_FourthParameterTwoModifiers() {

@@ -76,7 +76,7 @@ namespace RoslynMonoFamix.Visitor {
         }
         public override void VisitInheritsStatement(InheritsStatementSyntax node) {
             FAMIX.Inheritance inheritance = importer.CreateInheritanceFor(this.CurrentContext<FAMIX.Class>());
-            
+
             this.PushContext(inheritance.TypingContext(importer.model.GetDeclaredSymbol(node.Parent)));
             base.VisitInheritsStatement(node);
             this.PopContext();
@@ -163,7 +163,7 @@ namespace RoslynMonoFamix.Visitor {
             FamixMethod.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
             FamixMethod.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword);
             FamixMethod.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword);
-            FamixMethod.Modifiers.AddRange( node.Modifiers.Select(p => p.Text).ToList());
+            FamixMethod.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
 
             FAMIX.Type AGoodSuperContext = this.CurrentContext<FAMIX.Type>();
             AGoodSuperContext.AddMethod(FamixMethod);
@@ -216,11 +216,34 @@ namespace RoslynMonoFamix.Visitor {
         public override void VisitIncompleteMember(IncompleteMemberSyntax node) {
             throw new Exception("MustReview");
         }
+
+
         public override void VisitFieldDeclaration(FieldDeclarationSyntax node) {
-            throw new Exception("MustReview");
+            // this define that whaever-is declared inside is mean to be a field (meaning that it belongs to a class or type)  
+            FAMIX.AttributeGroup Group = this.importer.CreateStructuralEntityGroup();
+            FAMIX.Class FamixClass = this.CurrentContext<FAMIX.Class>();
+            this.PushContext(Group);
+            base.VisitFieldDeclaration(node);
+            this.PopContext();
+            Group.AddModifiers(node.Modifiers.Select(p => p.Text).ToList());
+            Group.AddAllInto(FamixClass);
+        }
+        /*
+         *   aca tendria que manejar la definicion de una variable en particular, con un  tipo en particular definido en visitVariabledeclarator. El problema es que este modified identifier ya lo use antes, o sea, hay mas de un caso
+         *   en el que uno visitaria este nodo, y no solo desde la declaracion de un field. lo importante es que es importer.model.GetDeclaredSymbol solo va a darnos info interesante con este node, ni con el variable declarator ni con el field declaration 
+         */
+        public override void VisitModifiedIdentifier(ModifiedIdentifierSyntax node) {
+            var symbol = this.importer.model.GetDeclaredSymbol(node);
+            if (symbol != null && symbol is IFieldSymbol) {
+                FAMIX.AttributeGroup Group = this.CurrentContext<FAMIX.AttributeGroup>();
+                FAMIX.Attribute Attribute = this.importer.EnsureField((IFieldSymbol)symbol);
+                Group.AddAttribute(Attribute);
+            }
+            base.VisitModifiedIdentifier(node);
         }
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node) {
-            throw new Exception("MustReview");
+            // A variable declarator is mean to put together a a set names along side a type. Int i, j, k; 
+            base.VisitVariableDeclarator(node);
         }
         public override void VisitSimpleAsClause(SimpleAsClauseSyntax node) {
             FAMIX.ITyped Typing = (this.CurrentContext<FAMIX.Entity>() as FAMIX.ITyped);
@@ -253,12 +276,9 @@ namespace RoslynMonoFamix.Visitor {
             parameter.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
             this.PushContext(parameter);
             base.VisitParameter(node);
-            this.PopContext();           
+            this.PopContext();
         }
-        public override void VisitModifiedIdentifier(ModifiedIdentifierSyntax node) {
-            base.VisitModifiedIdentifier(node);
-    
-        }
+
         public override void VisitArrayRankSpecifier(ArrayRankSpecifierSyntax node) {
             throw new Exception("MustReview");
         }
@@ -696,14 +716,12 @@ namespace RoslynMonoFamix.Visitor {
         }
         public override void VisitPredefinedType(PredefinedTypeSyntax node) {
             FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
-            FAMIX.Type type = importer.EnsureType(typing.RelatedSymbol);
-            typing.SetType(type);
+            typing.TypeUsing(importer);
             base.VisitPredefinedType(node);
         }
         public override void VisitIdentifierName(IdentifierNameSyntax node) {
             FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
-            FAMIX.Type type = importer.EnsureType(typing.RelatedSymbol);
-            typing.SetType(type);
+            typing.TypeUsing(importer);
             base.VisitIdentifierName(node);
         }
         public override void VisitGenericName(GenericNameSyntax node) {

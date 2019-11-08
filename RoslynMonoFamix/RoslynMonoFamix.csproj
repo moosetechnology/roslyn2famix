@@ -329,6 +329,7 @@
     <Compile Include="ModelBuilder\AbstractModelBuilder.cs" />
     <Compile Include="ModelBuilder\VisualBasicModelBuilder.cs" />
     <Compile Include="ModelBuilder\ImportingHelper.cs" />
+    <Compile Include="Model\Building\AttributeGroup.cs" />
     <Compile Include="Model\Building\TypingContext.cs" />
     <Compile Include="Model\Building\ITyped.cs" />
     <Compile Include="Model\Building\IAddType.cs" />
