@@ -12,7 +12,7 @@ namespace FamixTest.VisualBasic {
 
         [TestMethod]
         public void PropertySetterAccesses() {
-            Assert.AreEqual(2, (importer.Attributes.Named("SampleProject.Basic.ExpressionBody.Name") as CSharp.CSharpProperty).setter.Accesses.Count);
+            Assert.AreEqual(2, (importer.Attributes.Named("SampleProject.Basic.ExpressionBody.Name") as Net.Property).setter.Accesses.Count);
         }
     }
 }

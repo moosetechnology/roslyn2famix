@@ -338,11 +338,11 @@
     <Compile Include="ModelBuilder\InCSharpImporter.cs" />
     <Compile Include="ModelBuilder\NamedEntityAccumulator.cs" />
     <Compile Include="Visitor\CSharpASTVisitor.cs" />
-    <Compile Include="Model\CSharp\CSharpEvent.cs" />
-    <Compile Include="Model\CSharp\CSharpProperty.cs" />
-    <Compile Include="Model\CSharp\CSharpPropertyAccessor.cs" />
-    <Compile Include="Model\CSharp\CSharpStruct.cs" />
-    <Compile Include="Model\CSharp\Delegate.cs" />
+    <Compile Include="Model\Net\Event.cs" />
+    <Compile Include="Model\Net\Property.cs" />
+    <Compile Include="Model\Net\PropertyAccessor.cs" />
+    <Compile Include="Model\Net\Struct.cs" />
+    <Compile Include="Model\Net\Delegate.cs" />
     <Compile Include="Model\Dynamix\Activation.cs" />
     <Compile Include="Model\Dynamix\Alias.cs" />
     <Compile Include="Model\Dynamix\Entity.cs" />

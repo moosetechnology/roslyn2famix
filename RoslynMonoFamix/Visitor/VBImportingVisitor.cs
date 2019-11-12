@@ -145,10 +145,11 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitAccessorBlock(AccessorBlockSyntax node) {
-            throw new Exception("MustReview");
+
+            base.VisitAccessorBlock(node);
         }
         public override void VisitPropertyBlock(PropertyBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitPropertyBlock(node);
         }
         public override void VisitEventBlock(EventBlockSyntax node) {
             throw new Exception("MustReview");
@@ -190,10 +191,50 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitPropertyStatement(PropertyStatementSyntax node) {
-            throw new Exception("MustReview");
+            var symbol = this.importer.model.GetDeclaredSymbol(node);
+            FAMIX.Class FamixClass = this.CurrentContext<FAMIX.Class>();
+            Net.Property property = this.importer.EnsureProperty(symbol);
+            property.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
+            FamixClass.AddAttribute(property);
+            this.PushContext(property);
+            base.VisitPropertyStatement(node);
+
+            if (node.Parent is ClassBlockSyntax) {
+                this.PopContext();
+            } else {
+                if (!(node.Parent is PropertyBlockSyntax)) {
+                    /*
+                     It seems that property statement can be included directly into the class body (for the fully automatic properties)
+                     And it can be included also by a property block, when we define a body for the property.
+                     If we have a body, means we have an end property statement, where we should be doing the pop of the statemet.
+                     Still, none of this affirmations are completely 
+                     */
+
+                    throw new Exception("Unexpected parent. ");
+                }
+
+            }
+
+
+
+            // The poping of this content happens during the end statement . 
+      
         }
         public override void VisitAccessorStatement(AccessorStatementSyntax node) {
-            throw new Exception("MustReview");
+
+            Net.Property Owner = this.CurrentContext<Net.Property>();
+            Net.PropertyAccessor NetPropertyAccessor = importer.EnsureAccessorInto(importer.model.GetDeclaredSymbol(node), Owner);
+            
+            NetPropertyAccessor.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
+            NetPropertyAccessor.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
+            NetPropertyAccessor.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword);
+            NetPropertyAccessor.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword);
+            NetPropertyAccessor.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
+
+            this.PushContext(NetPropertyAccessor);
+            
+            base.VisitAccessorStatement(node); 
+
         }
         public override void VisitImplementsClause(ImplementsClauseSyntax node) {
             throw new Exception("MustReview");
@@ -334,7 +375,9 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitReturnStatement(ReturnStatementSyntax node) {
-            throw new Exception("MustReview");
+            this.PushContext(FAMIX.TypingContext.NullContext());
+            base.VisitReturnStatement(node);
+            this.PopContext();
         }
         public override void VisitSingleLineIfStatement(SingleLineIfStatementSyntax node) {
             throw new Exception("MustReview");
@@ -460,7 +503,9 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitAssignmentStatement(AssignmentStatementSyntax node) {
-            throw new Exception("MustReview");
+            this.PushContext(FAMIX.TypingContext.NullContext());
+            base.VisitAssignmentStatement(node);
+            this.PopContext();
         }
         public override void VisitMidExpression(MidExpressionSyntax node) {
             throw new Exception("MustReview");

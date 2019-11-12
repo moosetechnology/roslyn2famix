@@ -5,11 +5,11 @@ using Dynamix;
 using FAMIX;
 using System.Collections.Generic;
 
-namespace CSharp
+namespace Net
 {
-  [FamePackage("CSharp")]
-  [FameDescription("CSharpEvent")]
-  public class CSharpEvent : FAMIX.Method
+  [FamePackage("Net")]
+  [FameDescription("Event")]
+  public class Event : FAMIX.Method
   {
     [FameProperty(Name = "addMethod")]    
     public FAMIX.Method addMethod { get; set; }

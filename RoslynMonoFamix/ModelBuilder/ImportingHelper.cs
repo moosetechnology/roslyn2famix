@@ -11,10 +11,10 @@ namespace RoslynMonoFamix.ModelBuilder {
     public class ImportingHelper {
         protected Dictionary<string, System.Type> typeNameMap = new Dictionary<string, System.Type>()
             {
-                { "Struct", typeof(CSharp.CSharpStruct) },
+                { "Struct", typeof(Net.Struct) },
                 { "Class", typeof(FAMIX.Class) },
                 { "Interface", typeof(FAMIX.Class) },
-                { "Delegate", typeof(CSharp.Delegate) },
+                { "Delegate", typeof(Net.Delegate) },
                 { "TypeParameter", typeof(FAMIX.ParameterType)},
                 { "Enum", typeof(FAMIX.Enum) },
             };
@@ -94,6 +94,49 @@ namespace RoslynMonoFamix.ModelBuilder {
                 parameters = parameters.Substring(0, parameters.Length - 1);
             parameters += ")";
             return method.Name + parameters;
+        }
+
+
+        public string MethodKindName(MethodKind methodKind) {
+            switch (methodKind) {
+                case MethodKind.AnonymousFunction:
+                    return "AnonymousFunction";
+                case MethodKind.Constructor:
+                    return "Constructor";
+                case MethodKind.Conversion:
+                    return "Conversion";
+                case MethodKind.DelegateInvoke:
+                    return "DelegateInvoke";
+                case MethodKind.Destructor:
+                    return "Destructor";
+                case MethodKind.EventAdd:
+                    return "EventAdd";
+                case MethodKind.EventRaise:
+                    return "EventRaise";
+                case MethodKind.EventRemove:
+                    return "EventRemove";
+                case MethodKind.ExplicitInterfaceImplementation:
+                    return "ExplicitInterfaceImplementation";
+                case MethodKind.UserDefinedOperator:
+                    return "UserDefinedOperator";
+                case MethodKind.Ordinary:
+                    return "Ordinary";
+                case MethodKind.PropertyGet:
+                    return "PropertyGet";
+                case MethodKind.PropertySet:
+                    return "PropertySet";
+                case MethodKind.ReducedExtension:
+                    return "ReducedExtension";
+                case MethodKind.StaticConstructor:
+                    return "StaticConstructor/SharedConstructor";
+                case MethodKind.BuiltinOperator:
+                    return "BuiltinOperator";
+                case MethodKind.DeclareMethod:
+                    return "DeclareMethod";
+                case MethodKind.LocalFunction:
+                    return "LocalFunction";
+            }
+            throw new Exception("The MethodKind value is not possible");
         }
 
         public String EventSignature (IEventSymbol Event) {

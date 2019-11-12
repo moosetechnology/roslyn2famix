@@ -15,13 +15,13 @@ namespace Model
             metaRepo.RegisterType(typeof(ContainerEntity));
             metaRepo.RegisterType(typeof(NamedEntity));
             metaRepo.RegisterType(typeof(Attribute));
-            metaRepo.RegisterType(typeof(CSharp.CSharpEvent));
+            metaRepo.RegisterType(typeof(Net.Event));
             metaRepo.RegisterType(typeof(BehaviouralEntity));
             metaRepo.RegisterType(typeof(Class));
             metaRepo.RegisterType(typeof(Method));
             metaRepo.RegisterType(typeof(Type));
-            metaRepo.RegisterType(typeof(CSharp.CSharpProperty));
-            metaRepo.RegisterType(typeof(CSharp.CSharpPropertyAccessor));
+            metaRepo.RegisterType(typeof(Net.Property));
+            metaRepo.RegisterType(typeof(Net.PropertyAccessor));
             metaRepo.RegisterType(typeof(AnnotationType));
             metaRepo.RegisterType(typeof(AnnotationTypeAttribute));
             metaRepo.RegisterType(typeof(AnnotationInstance));
@@ -29,8 +29,8 @@ namespace Model
             metaRepo.RegisterType(typeof(Exception));
             metaRepo.RegisterType(typeof(CaughtException));
             metaRepo.RegisterType(typeof(ThrownException));
-            metaRepo.RegisterType(typeof(CSharp.Delegate));
-            metaRepo.RegisterType(typeof(CSharp.CSharpStruct));
+            metaRepo.RegisterType(typeof(Net.Delegate));
+            metaRepo.RegisterType(typeof(Net.Struct));
             metaRepo.RegisterType(typeof(ParameterizableClass));
             metaRepo.RegisterType(typeof(ParameterizedType));
             metaRepo.RegisterType(typeof(ParameterType));

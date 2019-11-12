@@ -5,7 +5,7 @@ using Fame;
 using FAMIX;
 using Microsoft.CodeAnalysis;
 using RoslynMonoFamix.ModelBuilder;
-using CSharp;
+using Net;
 using System.Linq.Expressions;
 using System.Linq;
 
@@ -14,7 +14,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     private InCSharpImporter importer;
     private Method currentMethod;
     private System.Collections.Stack currentTypeStack;
-    private CSharp.CSharpProperty currentProperty;
+    private Net.Property currentProperty;
 
     public CSharpASTVisitor(InCSharpImporter importer) {
 
@@ -186,11 +186,11 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
         if (currentProperty != null) {
             var methodSymbol = importer.model.GetDeclaredSymbol(node);
 
-            CSharp.CSharpPropertyAccessor aMethod = importer.EnsureMethod(methodSymbol) as CSharp.CSharpPropertyAccessor;
+            Net.PropertyAccessor aMethod = importer.EnsureMethod(methodSymbol) as Net.PropertyAccessor;
             if (methodSymbol.MethodKind == MethodKind.PropertyGet)
-                currentProperty.getter = aMethod as CSharp.CSharpPropertyAccessor;
+                currentProperty.getter = aMethod as Net.PropertyAccessor;
             else
-                currentProperty.setter = aMethod as CSharp.CSharpPropertyAccessor;
+                currentProperty.setter = aMethod as Net.PropertyAccessor;
 
             if (currentTypeStack.Count > 0) {
                 aMethod.property = currentProperty;
@@ -236,7 +236,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node) {
         string propertyName = node.Identifier.ToString();
         var prop = AddProperty(node, propertyName);
-        if (prop is CSharp.CSharpProperty) currentProperty = prop as CSharp.CSharpProperty;
+        if (prop is Net.Property) currentProperty = prop as Net.Property;
         base.VisitPropertyDeclaration(node);
         currentProperty = null;
     }
@@ -278,7 +278,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
             var symbol = importer.model.GetDeclaredSymbol(variable) as IEventSymbol;
 
             if (currentTypeStack.Count > 0) {
-                var anEvent = importer.EnsureEvent(symbol) as CSharp.CSharpEvent;
+                var anEvent = importer.EnsureEvent(symbol) as Net.Event;
                 anEvent.parentType = importer.EnsureType(symbol.ContainingType);
                 anEvent.parentType.AddMethod(anEvent);
                 importer.CreateSourceAnchor(anEvent, node);
@@ -296,7 +296,6 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
     }
 
     public override void VisitFieldDeclaration(FieldDeclarationSyntax node) {
-        
         AddField(node);
         base.VisitFieldDeclaration(node);
     }
@@ -427,7 +426,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
         if (MaybeEventSymbol != null && MaybeEventSymbol.Kind == SymbolKind.Event) {
             var isMethod = importer.model.GetSymbolInfo(node.Right).Symbol;
             if (isMethod != null && isMethod.Kind == SymbolKind.Method) {
-                CSharpEvent cSharpEvent = importer.EnsureEvent(MaybeEventSymbol as IEventSymbol) as CSharpEvent;
+                Event cSharpEvent = importer.EnsureEvent(MaybeEventSymbol as IEventSymbol) as Event;
                 var handlerMethod = importer.EnsureMethod(isMethod as IMethodSymbol);
                 AddMethodCall(node, cSharpEvent, handlerMethod);
             }

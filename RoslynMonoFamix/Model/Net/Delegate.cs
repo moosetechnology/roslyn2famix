@@ -5,11 +5,11 @@ using Dynamix;
 using FAMIX;
 using System.Collections.Generic;
 
-namespace CSharp
+namespace Net
 {
   [FamePackage("CSharp")]
-  [FameDescription("CSharpStruct")]
-  public class CSharpStruct : FAMIX.Type
+  [FameDescription("Delegate")]
+  public class Delegate : FAMIX.Type
   {
   }
 }

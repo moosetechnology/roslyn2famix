@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Net;
 using FAMIX;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
@@ -47,6 +48,13 @@ namespace RoslynMonoFamix.ModelBuilder {
                  () => { return this.CreateNewMethod(method); });
         }
 
+        public Net.PropertyAccessor EnsureAccessorInto(IMethodSymbol method, Net.Property Owner) {
+            string name = helper.FullTypeName(method);
+            return Methods.EntityNamedIfNone<Net.PropertyAccessor>(name,
+                 () => { return this.CreateNewAccessor(method, Owner); });
+        }
+
+
         private FAMIX.Parameter CreateParameter(IParameterSymbol parameterSymbol) {
             FAMIX.Parameter parameter = this.CreateNewEntity<FAMIX.Parameter>(typeof(FAMIX.Parameter).FullName);
 
@@ -72,15 +80,38 @@ namespace RoslynMonoFamix.ModelBuilder {
 
         }
 
-        private Method CreateNewMethod(IMethodSymbol method) {
-            Method FamixMethod = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName);
+
+
+        private void ConfigureMethodWith(FAMIX.Method FamixMethod, IMethodSymbol method) {
             FamixMethod.isStub = true;
             FamixMethod.name = method.Name;
             FamixMethod.Modifiers = method.RefCustomModifiers.Select(p => p.Modifier.Name).ToList();
             FamixMethod.signature = helper.MethodSignature(method);
             FamixMethod.accessibility = helper.AccessibilityName(method.DeclaredAccessibility);
+            FamixMethod.kind = helper.MethodKindName(method.MethodKind);
+        }
+
+
+        private Method CreateNewMethod(IMethodSymbol method) {
+            Method FamixMethod = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName);
+            ConfigureMethodWith(FamixMethod, method);
             return FamixMethod;
         }
+
+        private Net.PropertyAccessor CreateNewAccessor(IMethodSymbol method, Net.Property Owner) {
+            Net.PropertyAccessor NetAccessor = this.CreateNewEntity<Net.PropertyAccessor>(typeof(Net.PropertyAccessor).FullName);
+            ConfigureMethodWith(NetAccessor, method);
+            NetAccessor.property = Owner;
+            if (method.MethodKind == MethodKind.PropertySet) {
+                Owner.setter = NetAccessor;
+            } else if (method.MethodKind == MethodKind.PropertyGet) {
+                Owner.getter = NetAccessor;
+            } else {
+                throw new System.Exception("Unexpected non accessor method in accessor statement ");
+            }
+            return NetAccessor;
+        }
+
         private Method CreateNewConstructor(IMethodSymbol method) {
             Method FamixMethod = this.CreateNewMethod(method);
             FamixMethod.isConstructor = true;
@@ -126,7 +157,6 @@ namespace RoslynMonoFamix.ModelBuilder {
         }
 
         public FAMIX.Type EnsureType(ISymbol aType) {
-
             string fullName = helper.FullTypeName(aType);
 
             if (Types.has(fullName))
@@ -153,9 +183,7 @@ namespace RoslynMonoFamix.ModelBuilder {
                 var ns = EnsureNamespace(aType.ContainingNamespace);
                 type.container = ns;
             }
-
             return type;
-
         }
 
         public FAMIX.Attribute EnsureField(IFieldSymbol symbol) {
@@ -167,8 +195,16 @@ namespace RoslynMonoFamix.ModelBuilder {
             return attribute;
         }
 
-        internal AttributeGroup CreateStructuralEntityGroup() {
+        public AttributeGroup CreateStructuralEntityGroup() {
             return new AttributeGroup();
+        }
+
+        public Property EnsureProperty(IPropertySymbol symbol) {
+            Net.Property property = this.CreateNewEntity<Net.Property>(typeof(Net.Property).FullName); ;
+            property.accessibility = helper.AccessibilityName(symbol.DeclaredAccessibility);
+            property.declaredType = this.EnsureType(symbol.Type);
+            property.name = symbol.Name;
+            return property;
         }
     }
 }

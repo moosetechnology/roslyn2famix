@@ -40,7 +40,22 @@ namespace FAMIX {
             this.SetType(type);
             return type;
         }
+
+        public static NullContext NullContext() {
+            return new NullContext();
+        }
     }
+
+    public class NullContext : TypingContext {
+        public NullContext() : base(null) { }
+        public override void SetType(Type type) {
+         
+        }
+        public override FAMIX.Type TypeUsing(VisualBasicModelBuilder importer) {
+            return null;
+        }
+    }
+
 
     public class MethodTypingContext : TypingContext {
         protected FAMIX.Method method;

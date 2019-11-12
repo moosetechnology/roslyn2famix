@@ -29,6 +29,8 @@ namespace FAMIX {
                 return this.TypingContext((IParameterSymbol)symbol);
             if (symbol is IFieldSymbol)
                 return this.TypingContext((IFieldSymbol)symbol);
+            if (symbol is IPropertySymbol)
+                return this.TypingContext((IPropertySymbol)symbol);
             if (symbol is ILocalSymbol)
                 return this.TypingContext((ILocalSymbol)symbol);
             throw new System.Exception("Not Yet implemented");
@@ -37,6 +39,9 @@ namespace FAMIX {
             return FAMIX.TypingContext.StructuralEntity(this, symbol.Type);
         }
         public FAMIX.TypingContext TypingContext(IFieldSymbol symbol) {
+            return FAMIX.TypingContext.StructuralEntity(this, symbol.Type);
+        }
+        public FAMIX.TypingContext TypingContext(IPropertySymbol symbol) {
             return FAMIX.TypingContext.StructuralEntity(this, symbol.Type);
         }
         public FAMIX.TypingContext TypingContext(ILocalSymbol symbol) {

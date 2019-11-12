@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharp;
+using Net;
 
 namespace RoslynMonoFamix.ModelBuilder {
     public class InCSharpImporter : AbstractModelBuilder  {
@@ -57,14 +57,14 @@ namespace RoslynMonoFamix.ModelBuilder {
             subClass.AddSuperInheritance(inheritance);
         }
 
-        public CSharp.CSharpPropertyAccessor EnsureAccessor (IMethodSymbol MethodSelector) {
-            return this.MethodNamedIfNone<CSharp.CSharpPropertyAccessor>(helper.FullMethodName(MethodSelector),
+        public Net.PropertyAccessor EnsureAccessor (IMethodSymbol MethodSelector) {
+            return this.MethodNamedIfNone<Net.PropertyAccessor>(helper.FullMethodName(MethodSelector),
               () => this.CreateAndRegisterAccessor(MethodSelector)
           );
 
         }
-        public CSharp.CSharpEvent EnsureEvent(IEventSymbol EventSelector) {
-            return this.MethodNamedIfNone<CSharp.CSharpEvent>(helper.FullEventName(EventSelector),
+        public Net.Event EnsureEvent(IEventSymbol EventSelector) {
+            return this.MethodNamedIfNone<Net.Event>(helper.FullEventName(EventSelector),
                () => this.CreateAndRegisterEvent(EventSelector)
            );
         }
@@ -96,11 +96,11 @@ namespace RoslynMonoFamix.ModelBuilder {
             return method;
         }
 
-        private CSharp.CSharpPropertyAccessor CreateAndRegisterAccessor(IMethodSymbol accessorSymbol) {
+        private Net.PropertyAccessor CreateAndRegisterAccessor(IMethodSymbol accessorSymbol) {
             if (accessorSymbol.MethodKind != MethodKind.PropertyGet && accessorSymbol.MethodKind != MethodKind.PropertySet) {
                 throw new System.Exception("The given method symbol do not belongs to a property accessor!");
             }
-            CSharp.CSharpPropertyAccessor Accessor = repository.New<CSharp.CSharpPropertyAccessor>(typeof(CSharp.CSharpPropertyAccessor).FullName) ;
+            Net.PropertyAccessor Accessor = repository.New<Net.PropertyAccessor>(typeof(Net.PropertyAccessor).FullName) ;
             Accessor.isStub = true;
             Accessor.name = accessorSymbol.Name;
             Accessor.signature = helper.MethodSignature(accessorSymbol);
@@ -108,8 +108,8 @@ namespace RoslynMonoFamix.ModelBuilder {
             return Accessor;
         }
 
-        private CSharp.CSharpEvent CreateAndRegisterEvent(IEventSymbol eventSymbol) {
-            CSharp.CSharpEvent Event = repository.New<CSharp.CSharpEvent>(typeof(CSharp.CSharpEvent).FullName);
+        private Net.Event CreateAndRegisterEvent(IEventSymbol eventSymbol) {
+            Net.Event Event = repository.New<Net.Event>(typeof(Net.Event).FullName);
             Event.isStub = true;
             Event.name = eventSymbol.Name;
             Event.signature = helper.EventSignature(eventSymbol);
@@ -175,7 +175,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             if (attribute is StructuralEntity)
                 Attributes.Add(attributeFullName, attribute as StructuralEntity);
             else
-                Methods.Add(attributeFullName, attribute as CSharpEvent);
+                Methods.Add(attributeFullName, attribute as Event);
             return attribute;
         }
 
@@ -187,9 +187,9 @@ namespace RoslynMonoFamix.ModelBuilder {
                     return typeof(FAMIX.AnnotationTypeAttribute).FullName;
             }
             if (field is IEventSymbol)
-                return typeof(CSharp.CSharpEvent).FullName;
+                return typeof(Net.Event).FullName;
             if (field is IPropertySymbol)
-                return typeof(CSharp.CSharpProperty).FullName;
+                return typeof(Net.Property).FullName;
             return typeof(FAMIX.Attribute).FullName;
         }
 
