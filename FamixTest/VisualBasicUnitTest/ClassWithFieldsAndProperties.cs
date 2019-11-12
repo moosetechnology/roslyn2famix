@@ -52,7 +52,7 @@ namespace FamixTest.VisualBasicUnitTest {
         public void AssertAttributeIsNamed(int AttributeNumber, string Name) {
             Assert.AreEqual(Attribute(AttributeNumber).name, Name);
         }
-
+        
 
         #endregion
 
@@ -63,12 +63,17 @@ namespace FamixTest.VisualBasicUnitTest {
         #region Attribute 5
 
         [TestMethod]
-        public void ParseStudyCase_Attribute5HasNoneModifiers() {
-            AssertAttributeHasModifiers(4, 0);
+        public void ParseStudyCase_Attribute5HasOneModifier() {
+            AssertAttributeHasModifiers(4, 1);
+        }
+        [TestMethod]
+        public void ParseStudyCase_Attribute5HasModifierPublic() {
+            AssertAttributeIsNamed(4, "Public");
         }
         [TestMethod]
         public void ParseStudyCase_Attribute5HasSetterAndGetter() {
-            Assert.Fail();
+            Assert.AreEqual(((Net.Property)Attribute(4)).getter.kind, "PropertyGet");
+            Assert.AreEqual(((Net.Property)Attribute(4)).setter.kind, "PropertySet");
         }
         [TestMethod]
         public void ParseStudyCase_Attribute5SetterAndGetterReliesOnAttribute1() {
@@ -81,7 +86,7 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         [TestMethod]
         public void ParseStudyCase_Attribute5IsNamed() {
-            AssertAttributeHasTypeNamed(4, "AnNonEmptySetGetProperty");
+            AssertAttributeIsNamed(4, "AnNonEmptySetGetProperty");
         }
         #endregion
 
@@ -103,7 +108,7 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         [TestMethod]
         public void ParseStudyCase_Attribute4IsNamed() {
-            AssertAttributeHasTypeNamed(3, "AnEmptySetGetProperty");
+            AssertAttributeIsNamed(3, "AnEmptySetGetProperty");
         }
         #endregion
 
@@ -126,7 +131,7 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         [TestMethod]
         public void ParseStudyCase_Attribute3IsNamed() {
-            AssertAttributeHasTypeNamed(2, "ADateValue");
+            AssertAttributeIsNamed(2, "ADateValue");
         }
         #endregion
 
@@ -150,7 +155,7 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         [TestMethod]
         public void ParseStudyCase_Attribute2IsNamed() {
-            AssertAttributeHasTypeNamed(1, "AnIntValue");
+            AssertAttributeIsNamed(1, "AnIntValue");
         }
         #endregion
 

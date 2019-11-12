@@ -43,13 +43,13 @@ namespace RoslynMonoFamix.ModelBuilder {
         }
 
         public Method EnsureMethod(IMethodSymbol method) {
-            string name = helper.FullTypeName(method);
+            string name = helper.FullMethodName(method);
             return Methods.EntityNamedIfNone<FAMIX.Method>(name,
                  () => { return this.CreateNewMethod(method); });
         }
 
         public Net.PropertyAccessor EnsureAccessorInto(IMethodSymbol method, Net.Property Owner) {
-            string name = helper.FullTypeName(method);
+            string name = helper.FullMethodName(method);
             return Methods.EntityNamedIfNone<Net.PropertyAccessor>(name,
                  () => { return this.CreateNewAccessor(method, Owner); });
         }
