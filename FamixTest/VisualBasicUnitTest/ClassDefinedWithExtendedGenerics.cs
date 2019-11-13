@@ -37,7 +37,7 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseGenericUsingClass_ClassIsParametrizableClass() {
             Assert.AreEqual(this.importer.AllElementsOfType<FAMIX.ParameterizableClass>().Count(), 1);
-            Assert.AreEqual(this.importer.AllElementsOfType<FAMIX.Class>().Count(), 2);
+            Assert.AreEqual(this.importer.AllElementsOfType<FAMIX.Class>().Count(), 3);
         }
 
         [TestMethod]

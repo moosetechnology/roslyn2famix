@@ -125,8 +125,13 @@ namespace RoslynMonoFamix.Visitor {
             this.PopContext();
         }
         public override void VisitTypeParameterSingleConstraintClause(TypeParameterSingleConstraintClauseSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.Inheritance inheritance = importer.CreateInheritanceFor(this.CurrentContext<FAMIX.Type>());
+            ITypeParameterSymbol symbol = (ITypeParameterSymbol)importer.model.GetDeclaredSymbol(node.Parent);
+            this.PushContext(inheritance.TypingContext(symbol.ConstraintTypes.Single()));
+            base.VisitTypeParameterSingleConstraintClause(node);
+            this.PopContext();
         }
+
         public override void VisitTypeParameterMultipleConstraintClause(TypeParameterMultipleConstraintClauseSyntax node) {
             throw new Exception("MustReview");
         }
@@ -134,7 +139,7 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitTypeConstraint(TypeConstraintSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitTypeConstraint(node);
         }
         public override void VisitEnumMemberDeclaration(EnumMemberDeclarationSyntax node) {
             throw new Exception("MustReview");

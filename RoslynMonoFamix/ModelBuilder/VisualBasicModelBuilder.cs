@@ -141,7 +141,7 @@ namespace RoslynMonoFamix.ModelBuilder {
 
        
 
-        public FAMIX.Inheritance CreateInheritanceFor(FAMIX.Class inheritingClass) {
+        public FAMIX.Inheritance CreateInheritanceFor(FAMIX.Type inheritingClass) {
             FAMIX.Inheritance inheritance = this.CreateNewEntity<FAMIX.Inheritance>(typeof(FAMIX.Inheritance).FullName);
             inheritance.subclass = inheritingClass;
             return inheritance;
