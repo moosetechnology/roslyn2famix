@@ -9,6 +9,7 @@ namespace FAMIX {
     [FamePackage("FAMIX")]
     [FameDescription("Type")]
     public class Type : FAMIX.ContainerEntity {
+
         private List<FAMIX.ParameterizedType> argumentsInParameterizedTypes = new List<FAMIX.ParameterizedType>();
 
         [FameProperty(Name = "argumentsInParameterizedTypes", Opposite = "arguments")]
@@ -19,7 +20,9 @@ namespace FAMIX {
         public void AddArgumentsInParameterizedType(FAMIX.ParameterizedType one) {
             argumentsInParameterizedTypes.Add(one);
         }
-
+        public Boolean isParametrizableType() {
+            return argumentsInParameterizedTypes.Count > 0;
+        }
         private List<FAMIX.Attribute> attributes = new List<FAMIX.Attribute>();
 
         [FameProperty(Name = "attributes", Opposite = "parentType")]

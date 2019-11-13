@@ -68,7 +68,7 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         [TestMethod]
         public void ParseStudyCase_Attribute5HasModifierPublic() {
-            AssertAttributeIsNamed(4, "Public");
+            AssertAttributeHasModifier(4, "Public");
         }
         [TestMethod]
         public void ParseStudyCase_Attribute5HasSetterAndGetter() {
@@ -98,10 +98,7 @@ namespace FamixTest.VisualBasicUnitTest {
         public void ParseStudyCase_Attribute4HasNoneModifiers() {
             AssertAttributeHasModifiers(3, 0);
         }
-        [TestMethod]
-        public void ParseStudyCase_Attribute4HasModifierProtected() {
-            AssertAttributeHasModifier(3, "Protected");
-        }
+        
         [TestMethod]
         public void ParseStudyCase_Attribute4IsTypedString() {
             AssertAttributeHasTypeNamed(3, "String");
@@ -127,7 +124,7 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         [TestMethod]
         public void ParseStudyCase_Attribute3IsTypedDate() {
-            AssertAttributeHasTypeNamed(2, "Date");
+            AssertAttributeHasTypeNamed(2, "DateTime");
         }
         [TestMethod]
         public void ParseStudyCase_Attribute3IsNamed() {
@@ -166,13 +163,12 @@ namespace FamixTest.VisualBasicUnitTest {
         #region Attribute 1
        
         [TestMethod]
-        public void ParseStudyCase_Attribute1HasTwoModifiers() {
-            AssertAttributeHasModifiers(0, 2);
+        public void ParseStudyCase_Attribute1HasOneModifiers() {
+            AssertAttributeHasModifiers(0, 1);
         }
         [TestMethod]
         public void ParseStudyCase_Attribute1HasModifiersPublicAndWriteOnly() {
             AssertAttributeHasModifier(0, "Public");
-            AssertAttributeHasModifier(0, "WriteOnly");
         }
         [TestMethod]
         public void ParseStudyCase_Attribute1IsTypedString() {
@@ -180,7 +176,7 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         [TestMethod]
         public void ParseStudyCase_Attribute1IsNamed() {
-            AssertAttributeHasTypeNamed(0, "AStringValue");
+            AssertAttributeIsNamed(0, "AStringValue");
         }
         #endregion
         [TestMethod]
