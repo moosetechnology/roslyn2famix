@@ -27,6 +27,7 @@ namespace RoslynMonoFamix.ModelBuilder {
         }
 
         public FAMIX.Class EnsureClass(INamedTypeSymbol type) {
+            
             string classname = helper.FullTypeName(type);
             return Types.EntityNamedIfNone<FAMIX.Class>(classname,
                  () => { return this.CreateNewClass(type); });
@@ -125,13 +126,21 @@ namespace RoslynMonoFamix.ModelBuilder {
         }
 
         private FAMIX.Class CreateNewClass(INamedTypeSymbol type) {
-            FAMIX.Class entity = this.CreateNewEntity<FAMIX.Class>(typeof(FAMIX.Class).FullName);
+            FAMIX.Class entity;
+            if (type.TypeParameters.Count() == 0) {
+                entity = this.CreateNewEntity<FAMIX.Class>(typeof(FAMIX.Class).FullName);
+            } else {
+                entity = this.CreateNewEntity<FAMIX.ParameterizableClass>(typeof(FAMIX.ParameterizableClass).FullName);
+            }
             entity.name = helper.FullTypeName(type);
             entity.isAbstract = type.IsAbstract;
             entity.isFinal = type.IsSealed;
             entity.accessibility = helper.AccessibilityName(type.DeclaredAccessibility);
             return entity;
         }
+
+       
+
         public FAMIX.Inheritance CreateInheritanceFor(FAMIX.Class inheritingClass) {
             FAMIX.Inheritance inheritance = this.CreateNewEntity<FAMIX.Inheritance>(typeof(FAMIX.Inheritance).FullName);
             inheritance.subclass = inheritingClass;
@@ -206,5 +215,17 @@ namespace RoslynMonoFamix.ModelBuilder {
             property.name = symbol.Name;
             return property;
         }
+
+        public ParameterType EnsureParametrizedTypeInto(ParameterizableClass famixClass, ITypeParameterSymbol typeParameterSymbol) {
+            FAMIX.ParameterType parameter = (FAMIX.ParameterType) this.EnsureType(typeParameterSymbol);
+            parameter.name = typeParameterSymbol.Name;
+            if (typeParameterSymbol.TypeParameterKind != TypeParameterKind.Type) throw new System.Exception(" Unexpectd kind of type parameter! ");
+            
+            famixClass.AddParameter(parameter);
+            
+
+            return parameter;
+        }
+
     }
 }

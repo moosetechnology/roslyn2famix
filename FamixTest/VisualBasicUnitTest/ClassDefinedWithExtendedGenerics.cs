@@ -4,15 +4,17 @@ using System.Linq;
 
 namespace FamixTest.VisualBasicUnitTest {
     [TestClass]
-    public class ClassDefinedWithGenerics : VisualBasicUnitTest {
+    public class ClassDefinedWithExtendedGenerics : VisualBasicUnitTest {
 
 
         #region SettingUp
        
         [TestInitialize]
-        public void ParseGenericUsingClass() {
+        public void ParseGenericConfiguredUsingClass() {
             this.Import(@"
-                    Class Example(Of T)
+                    Class Something
+                    End Class
+                    Class Example(Of Out T As Something)
                         Public AGenericField As T
                         Public Property AGenericProperty As T
                         Public Overridable Sub SubAcceptsT(Parameter As T)
@@ -35,7 +37,7 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseGenericUsingClass_ClassIsParametrizableClass() {
             Assert.AreEqual(this.importer.AllElementsOfType<FAMIX.ParameterizableClass>().Count(), 1);
-            Assert.AreEqual(this.importer.AllElementsOfType<FAMIX.Class>().Count(), 1);
+            Assert.AreEqual(this.importer.AllElementsOfType<FAMIX.Class>().Count(), 2);
         }
 
         [TestMethod]
@@ -53,6 +55,11 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseGenericUsingClass_PropertyTypeIsTheInnerType() {
             Assert.AreEqual(this.Class().Attributes[1].declaredType, this.Class().Parameters.First());
+        }
+
+        [TestMethod]
+        public void ParseGenericUsingClass_InnerTypeSuperclass() {
+            Assert.AreEqual(this.Class().SuperInheritances.First().superclass, this.importer.AllElementsOfType<FAMIX.Class>().First());
         }
 
 

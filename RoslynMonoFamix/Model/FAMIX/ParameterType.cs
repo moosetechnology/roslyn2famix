@@ -7,9 +7,9 @@ using System.Collections.Generic;
 
 namespace FAMIX
 {
-  [FamePackage("FAMIX")]
-  [FameDescription("ParameterType")]
-  public class ParameterType : FAMIX.Type
-  {
-  }
+    [FamePackage("FAMIX")]
+    [FameDescription("ParameterType")]
+    public class ParameterType : FAMIX.Type {
+       
+    }
 }

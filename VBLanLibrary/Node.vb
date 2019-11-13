@@ -2,7 +2,14 @@
 
 
 
-
+Class Example(Of T As Example)
+    Public AGenericField As T
+    Public Property AGenericProperty As T
+    Public Overridable Sub SubAcceptsT(Parameter As T)
+    End Sub
+    Public Overridable Function FunctionReturnsT() As T
+    End Function
+End Class
 
 Public Class Node
 

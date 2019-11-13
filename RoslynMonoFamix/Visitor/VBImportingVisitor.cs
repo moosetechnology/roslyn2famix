@@ -115,10 +115,14 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitTypeParameterList(TypeParameterListSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitTypeParameterList(node);
         }
         public override void VisitTypeParameter(TypeParameterSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.ParameterizableClass FamixClass = this.CurrentContext<FAMIX.ParameterizableClass>();
+            FAMIX.ParameterType Type = importer.EnsureParametrizedTypeInto(FamixClass, importer.model.GetDeclaredSymbol(node));
+            this.PushContext(Type);
+            base.VisitTypeParameter(node);
+            this.PopContext();
         }
         public override void VisitTypeParameterSingleConstraintClause(TypeParameterSingleConstraintClauseSyntax node) {
             throw new Exception("MustReview");

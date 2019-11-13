@@ -23,9 +23,5 @@ namespace FAMIX {
         [FameProperty(Name = "parameterizableClass", Opposite = "parameterizedTypes")]
         public FAMIX.ParameterizableClass parameterizableClass { get; set; }
 
-        public Boolean isBounded() {
-            return arguments.Count != 0;
-        }
-
     }
 }
