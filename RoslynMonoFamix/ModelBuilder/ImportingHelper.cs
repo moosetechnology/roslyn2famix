@@ -37,7 +37,7 @@ namespace RoslynMonoFamix.ModelBuilder {
                     if ((aType as INamedTypeSymbol).IsDefinition)
                         result = typeof(FAMIX.ParameterizableClass);
                     else
-                        result = typeof(FAMIX.ParameterizedType);
+                        result = typeof(FAMIX.ArgumentType);
                 }
             }
             if (aType is IArrayTypeSymbol)

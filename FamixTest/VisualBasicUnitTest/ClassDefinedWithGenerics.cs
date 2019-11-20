@@ -40,32 +40,32 @@ namespace FamixTest.VisualBasicUnitTest {
 
         [TestMethod]
         public void ParseGenericUsingClass_FunctionReturnsTypedAsT() {
-            Assert.AreEqual(this.Class().Methods[1].returnType, this.Class().Parameters.First());
+            Assert.AreEqual(this.Class().Methods[1].returnType, this.Class().TypeParameters.First());
         }
 
         [TestMethod]
         public void ParseGenericUsingClass_SubAcceptParameterTypedAsT() {
-            Assert.AreEqual(this.Class().Methods[0].Parameters[0].declaredType, this.Class().Parameters.First());
+            Assert.AreEqual(this.Class().Methods[0].Parameters[0].declaredType, this.Class().TypeParameters.First());
         }
 
 
 
         [TestMethod]
         public void ParseGenericUsingClass_PropertyTypeIsTheInnerType() {
-            Assert.AreEqual(this.Class().Attributes[1].declaredType, this.Class().Parameters.First());
+            Assert.AreEqual(this.Class().Attributes[1].declaredType, this.Class().TypeParameters.First());
         }
 
 
         [TestMethod]
         public void ParseGenericUsingClass_FieldTypeIsTheInnerType() {
-            Assert.AreEqual(this.Class().Attributes[0].declaredType, this.Class().Parameters.First());
+            Assert.AreEqual(this.Class().Attributes[0].declaredType, this.Class().TypeParameters.First());
         }
 
 
 
         [TestMethod]
         public void ParseGenericUsingClass_DefinedClassHasOneInnerType() {
-            Assert.AreEqual(this.Class().Parameters.Count , 1);
+            Assert.AreEqual(this.Class().TypeParameters.Count , 1);
         }
 
 

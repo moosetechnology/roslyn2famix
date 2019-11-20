@@ -10,14 +10,14 @@ namespace FAMIX {
     [FameDescription("Type")]
     public class Type : FAMIX.ContainerEntity {
 
-        private List<FAMIX.ParameterizedType> argumentsInParameterizedTypes = new List<FAMIX.ParameterizedType>();
+        private List<FAMIX.ArgumentType> argumentsInParameterizedTypes = new List<FAMIX.ArgumentType>();
 
         [FameProperty(Name = "argumentsInParameterizedTypes", Opposite = "arguments")]
-        public List<FAMIX.ParameterizedType> ArgumentsInParameterizedTypes {
+        public List<FAMIX.ArgumentType> ArgumentsInParameterizedTypes {
             get { return argumentsInParameterizedTypes; }
             set { argumentsInParameterizedTypes = value; }
         }
-        public void AddArgumentsInParameterizedType(FAMIX.ParameterizedType one) {
+        public void AddArgumentsInParameterizedType(FAMIX.ArgumentType one) {
             argumentsInParameterizedTypes.Add(one);
         }
         

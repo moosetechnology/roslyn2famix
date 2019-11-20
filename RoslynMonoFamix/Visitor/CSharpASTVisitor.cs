@@ -67,7 +67,7 @@ public class CSharpASTVisitor : CSharpSyntaxWalker {
 
     private void AddParameterTypes(INamedTypeSymbol typeSymbol, FAMIX.Type type) {
         foreach (var typeParameter in typeSymbol.TypeParameters) {
-            (type as ParameterizableClass).Parameters.Add(importer.EnsureType(typeParameter) as FAMIX.ParameterType);
+            (type as ParameterizableClass).TypeParameters.Add(importer.EnsureType(typeParameter) as FAMIX.ParameterType);
         }
     }
 

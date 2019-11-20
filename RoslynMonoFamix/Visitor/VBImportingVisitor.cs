@@ -118,7 +118,7 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitTypeParameterList(node);
         }
         public override void VisitTypeParameter(TypeParameterSyntax node) {
-            FAMIX.ParameterizableClass FamixClass = this.CurrentContext<FAMIX.ParameterizableClass>();
+            FAMIX.ParameterizableEntity FamixClass = (FAMIX.ParameterizableEntity)this.CurrentContext<FAMIX.Entity>();
             FAMIX.ParameterType Type = importer.EnsureParametrizedTypeInto(FamixClass, importer.model.GetDeclaredSymbol(node));
             this.PushContext(Type);
             base.VisitTypeParameter(node);

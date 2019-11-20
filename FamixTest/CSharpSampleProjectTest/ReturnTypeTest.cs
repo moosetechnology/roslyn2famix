@@ -27,16 +27,16 @@ namespace FamixTest
         [TestMethod]
         public void GenericListMethod()
         {
-            Assert.IsInstanceOfType(importer.Methods.Named("SampleProject.Basic.ReturnType.GenericListMethod()").declaredType, typeof(FAMIX.ParameterizedType));
-            Assert.AreEqual("List<T>", (importer.Methods.Named("SampleProject.Basic.ReturnType.GenericListMethod()").declaredType as FAMIX.ParameterizedType).parameterizableClass.name);
+            Assert.IsInstanceOfType(importer.Methods.Named("SampleProject.Basic.ReturnType.GenericListMethod()").declaredType, typeof(FAMIX.ArgumentType));
+            Assert.AreEqual("List<T>", (importer.Methods.Named("SampleProject.Basic.ReturnType.GenericListMethod()").declaredType as FAMIX.ArgumentType).parameterizableClass.name);
         }
 
         [TestMethod]
         public void GenericReturnMethod()
         {
-            Assert.IsInstanceOfType(importer.Methods.Named("SampleProject.Basic.ReturnType.GenericReturnTypeMethod()").declaredType, typeof(FAMIX.ParameterizedType));
+            Assert.IsInstanceOfType(importer.Methods.Named("SampleProject.Basic.ReturnType.GenericReturnTypeMethod()").declaredType, typeof(FAMIX.ArgumentType));
             Assert.AreEqual("Generics<ReturnType>", importer.Methods.Named("SampleProject.Basic.ReturnType.GenericReturnTypeMethod()").declaredType.name);
-            Assert.AreEqual("Generics<T>", (importer.Methods.Named("SampleProject.Basic.ReturnType.GenericReturnTypeMethod()").declaredType as FAMIX.ParameterizedType).parameterizableClass.name);
+            Assert.AreEqual("Generics<T>", (importer.Methods.Named("SampleProject.Basic.ReturnType.GenericReturnTypeMethod()").declaredType as FAMIX.ArgumentType).parameterizableClass.name);
         }
 
        

@@ -32,7 +32,7 @@ namespace Model
             metaRepo.RegisterType(typeof(Net.Delegate));
             metaRepo.RegisterType(typeof(Net.Struct));
             metaRepo.RegisterType(typeof(ParameterizableClass));
-            metaRepo.RegisterType(typeof(ParameterizedType));
+            metaRepo.RegisterType(typeof(ArgumentType));
             metaRepo.RegisterType(typeof(ParameterType));
             metaRepo.RegisterType(typeof(Enum));
             metaRepo.RegisterType(typeof(SourceAnchor));
@@ -40,6 +40,7 @@ namespace Model
             metaRepo.RegisterType(typeof(AbstractFileAnchor));
             metaRepo.RegisterType(typeof(FileAnchor));
             metaRepo.RegisterType(typeof(Namespace));
+            metaRepo.RegisterType(typeof(ParameterizableMethod));
             return t.model;
         }
     }

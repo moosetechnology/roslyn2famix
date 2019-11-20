@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace RoslynMonoFamix.ModelBuilder {
-   public  class VisualBasicModelBuilder : AbstractModelBuilder {
+    public class VisualBasicModelBuilder : AbstractModelBuilder {
         FAMIX.ScopingEntity entity;
         public VisualBasicModelBuilder(Fame.Repository repository, string projectBaseFolder) : base(repository, projectBaseFolder) {
 
@@ -27,7 +27,7 @@ namespace RoslynMonoFamix.ModelBuilder {
         }
 
         public FAMIX.Class EnsureClass(INamedTypeSymbol type) {
-            
+
             string classname = helper.FullTypeName(type);
             return Types.EntityNamedIfNone<FAMIX.Class>(classname,
                  () => { return this.CreateNewClass(type); });
@@ -94,7 +94,12 @@ namespace RoslynMonoFamix.ModelBuilder {
 
 
         private Method CreateNewMethod(IMethodSymbol method) {
-            Method FamixMethod = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName);
+            Method FamixMethod;
+            if (method.TypeParameters.Count() == 0) {
+                FamixMethod = this.CreateNewEntity<FAMIX.Method>(typeof(FAMIX.Method).FullName);
+            } else {
+                FamixMethod = this.CreateNewEntity<FAMIX.ParameterizableMethod>(typeof(FAMIX.ParameterizableMethod).FullName);
+            }
             ConfigureMethodWith(FamixMethod, method);
             return FamixMethod;
         }
@@ -139,7 +144,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             return entity;
         }
 
-       
+
 
         public FAMIX.Inheritance CreateInheritanceFor(FAMIX.Type inheritingClass) {
             FAMIX.Inheritance inheritance = this.CreateNewEntity<FAMIX.Inheritance>(typeof(FAMIX.Inheritance).FullName);
@@ -178,9 +183,9 @@ namespace RoslynMonoFamix.ModelBuilder {
 
             Types.Add(fullName, type);
 
-            if (typeKind.Equals(typeof(FAMIX.ParameterizedType).FullName)) {
+            if (typeKind.Equals(typeof(FAMIX.ArgumentType).FullName)) {
                 var parameterizedClass = EnsureType(aType.OriginalDefinition);
-                (type as FAMIX.ParameterizedType).parameterizableClass = parameterizedClass as FAMIX.ParameterizableClass;
+                (type as FAMIX.ArgumentType).parameterizableClass = parameterizedClass as FAMIX.ParameterizableClass;
             }
 
             type.name = helper.TypeName(aType);
@@ -200,7 +205,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             attribute.accessibility = helper.AccessibilityName(symbol.DeclaredAccessibility);
             attribute.declaredType = this.EnsureType(symbol.Type);
             attribute.name = symbol.Name;
-            
+
             return attribute;
         }
 
@@ -216,13 +221,15 @@ namespace RoslynMonoFamix.ModelBuilder {
             return property;
         }
 
-        public ParameterType EnsureParametrizedTypeInto(ParameterizableClass famixClass, ITypeParameterSymbol typeParameterSymbol) {
-            FAMIX.ParameterType parameter = (FAMIX.ParameterType) this.EnsureType(typeParameterSymbol);
+        public ParameterType EnsureParametrizedTypeInto(FAMIX.ParameterizableEntity parametrizableEntity, ITypeParameterSymbol typeParameterSymbol) {
+            FAMIX.ParameterType parameter = (FAMIX.ParameterType)this.EnsureType(typeParameterSymbol);
             parameter.name = typeParameterSymbol.Name;
-            if (typeParameterSymbol.TypeParameterKind != TypeParameterKind.Type) throw new System.Exception(" Unexpectd kind of type parameter! ");
-            
-            famixClass.AddParameter(parameter);
-            
+            if (typeParameterSymbol.TypeParameterKind != TypeParameterKind.Type && typeParameterSymbol.TypeParameterKind != TypeParameterKind.Method) {
+                throw new System.Exception(" Unexpectd kind of type parameter! ");
+            }
+
+            parametrizableEntity.AddParameter(parameter);
+
 
             return parameter;
         }

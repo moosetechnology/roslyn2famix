@@ -107,7 +107,7 @@ namespace FAMIX {
             outgoingReferences.Add(one);
         }
 
-        private List<FAMIX.Parameter> parameters = new List<FAMIX.Parameter>();
+        protected List<FAMIX.Parameter> parameters = new List<FAMIX.Parameter>();
 
         [FameProperty(Name = "parameters", Opposite = "parentBehaviouralEntity")]
         public List<FAMIX.Parameter> Parameters {

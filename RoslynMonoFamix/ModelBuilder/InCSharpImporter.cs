@@ -142,9 +142,9 @@ namespace RoslynMonoFamix.ModelBuilder {
 
             Types.Add(fullName, type);
 
-            if (typeKind.Equals(typeof(FAMIX.ParameterizedType).FullName)) {
+            if (typeKind.Equals(typeof(FAMIX.ArgumentType).FullName)) {
                 var parameterizedClass = EnsureType(aType.OriginalDefinition);
-                (type as FAMIX.ParameterizedType).parameterizableClass = parameterizedClass as FAMIX.ParameterizableClass;
+                (type as FAMIX.ArgumentType).parameterizableClass = parameterizedClass as FAMIX.ParameterizableClass;
             }
 
             type.name = helper.TypeName(aType);
