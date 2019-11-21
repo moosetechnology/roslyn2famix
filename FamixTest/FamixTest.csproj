@@ -322,6 +322,7 @@
     <Compile Include="VisualBasicLanBasedTests\SimpleStructTest.cs" />
     <Compile Include="VisualBasicLanBasedTests\Approved\SubClassTest.cs" />
     <Compile Include="VisualBasicUnitTest\ClassDefinedWithExtendedGenerics.cs" />
+    <Compile Include="VisualBasicUnitTest\InterfaceTest.cs" />
     <Compile Include="VisualBasicUnitTest\ClassUsingGenericsInMethodsAndState.cs" />
     <Compile Include="VisualBasicUnitTest\ClassWithFieldsAndProperties.cs" />
     <Compile Include="VisualBasicUnitTest\ClassInheritance.cs" />

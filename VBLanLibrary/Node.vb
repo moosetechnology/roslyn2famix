@@ -5,6 +5,12 @@ Class Something
 End Class
 
 
+Public Interface Inte
+    Sub Hi()
+    Public Function AFunction() As Int16
+
+
+End Interface
 
 Public Class Node
 

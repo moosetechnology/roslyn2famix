@@ -66,7 +66,7 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitInterfaceBlock(InterfaceBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitInterfaceBlock(node);
         }
         public override void VisitClassBlock(ClassBlockSyntax node) {
             base.VisitClassBlock(node);
