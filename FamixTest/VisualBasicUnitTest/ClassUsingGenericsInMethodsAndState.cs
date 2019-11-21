@@ -58,7 +58,7 @@ namespace FamixTest.VisualBasicUnitTest {
 
         [TestMethod]
         public void ParseTypeParametrizedMethods_ExampleFunctionExtendsReturnsParametrizedExtendedType() {
-            Assert.AreEqual(Method("ExampleFunctionExtends").TypeParameters.First(), Method("ExampleFunctionExtends").Parameters.First().declaredType);
+            Assert.AreEqual(Method("ExampleFunctionExtends").TypeParameters.First(), Method("ExampleFunctionExtends").returnType);
         }
 
 
@@ -91,7 +91,7 @@ namespace FamixTest.VisualBasicUnitTest {
 
         [TestMethod]
         public void ParseTypeParametrizedMethods_ExampleSubExampleSubExtendsHasOneParameterNamed() {
-            Assert.AreEqual(Method("ExampleSubExtends").TypeParameters.First().name, "GenericVariable");
+            Assert.AreEqual(Method("ExampleSubExtends").Parameters.First().name, "GenericVariable");
         }
         [TestMethod]
         public void ParseTypeParametrizedMethods_ExampleSubExampleSubExtendsHasOneParameterTyped() {
@@ -106,7 +106,8 @@ namespace FamixTest.VisualBasicUnitTest {
 
         [TestMethod]
         public void ParseTypeParametrizedMethods_ExampleSubExampleSubExtendsHasOneParameterTypedWithSuperclass() {
-            Assert.AreEqual(Method("ExampleSubExtends").TypeParameters.First().SuperInheritances.First().superclass, this.importer.AllElementsOfType<FAMIX.Class>().First());
+            Assert.AreEqual(Method("ExampleSubExtends").TypeParameters.First().boundaries.First().BoundaryType.name, this.importer.AllElementsOfType<FAMIX.Class>().First().name);
+            Assert.AreEqual(Method("ExampleSubExtends").TypeParameters.First().boundaries.First().BoundaryType, this.importer.AllElementsOfType<FAMIX.Class>().First());
         }
 
 

@@ -40,10 +40,15 @@ namespace FAMIX {
             this.SetType(type);
             return type;
         }
+        public static TypingContext TypeBoundary(TypeBoundary typeBoundary, INamedTypeSymbol symbol) {
+            return new TypeBoundaryTypingContext(typeBoundary, symbol);
+        }
 
         public static NullContext NullContext() {
             return new NullContext();
         }
+
+     
     }
 
     public class NullContext : TypingContext {
@@ -68,11 +73,22 @@ namespace FAMIX {
         }
     }
 
+    public class TypeBoundaryTypingContext : TypingContext {
+        protected FAMIX.TypeBoundary entity;
+
+        public TypeBoundaryTypingContext(FAMIX.TypeBoundary typeBoundary, INamedTypeSymbol relatedSymbol) : base(relatedSymbol) {
+            this.entity = typeBoundary;
+        }
+        public override void SetType(Type type) {
+            entity.BoundaryType = type;
+        }
+    }
+
     public class InheritanceTypingContext : TypingContext {
         protected FAMIX.Inheritance entity;
 
         public InheritanceTypingContext(FAMIX.Inheritance entity, INamedTypeSymbol relatedSymbol) : base(relatedSymbol.BaseType) {
-            this.entity = entity;
+                this.entity = entity;
         }
         public override void SetType(Type type) {
             entity.SetSuperType(type);

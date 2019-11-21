@@ -41,6 +41,8 @@ namespace Model
             metaRepo.RegisterType(typeof(FileAnchor));
             metaRepo.RegisterType(typeof(Namespace));
             metaRepo.RegisterType(typeof(ParameterizableMethod));
+            metaRepo.RegisterType(typeof(TypeBoundary));
+            
             return t.model;
         }
     }

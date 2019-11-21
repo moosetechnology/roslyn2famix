@@ -333,6 +333,7 @@
     <Compile Include="Model\Building\TypingContext.cs" />
     <Compile Include="Model\Building\ITyped.cs" />
     <Compile Include="Model\Building\IAddType.cs" />
+    <Compile Include="Model\FAMIX\TypeBoundary.cs" />
     <Compile Include="Model\FAMIX\ParameterizableEntity.cs" />
     <Compile Include="Model\FAMIX\ParameterizableMethod.cs" />
     <Compile Include="Visitor\VBImportingVisitor.cs" />

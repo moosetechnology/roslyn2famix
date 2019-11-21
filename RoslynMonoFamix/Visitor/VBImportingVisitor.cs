@@ -122,12 +122,15 @@ namespace RoslynMonoFamix.Visitor {
             FAMIX.ParameterType Type = importer.EnsureParametrizedTypeInto(FamixClass, importer.model.GetDeclaredSymbol(node));
             this.PushContext(Type);
             base.VisitTypeParameter(node);
+
+            node.TypeParameterConstraintClause?.Accept(this);
             this.PopContext();
         }
         public override void VisitTypeParameterSingleConstraintClause(TypeParameterSingleConstraintClauseSyntax node) {
-            FAMIX.Inheritance inheritance = importer.CreateInheritanceFor(this.CurrentContext<FAMIX.Type>());
+            
+            FAMIX.TypeBoundary boundary = importer.CreateTypeBoundary(this.CurrentContext<FAMIX.ParameterType>());
             ITypeParameterSymbol symbol = (ITypeParameterSymbol)importer.model.GetDeclaredSymbol(node.Parent);
-            this.PushContext(inheritance.TypingContext(symbol.ConstraintTypes.Single()));
+            this.PushContext(boundary.TypingContext(symbol.ConstraintTypes.Single()));
             base.VisitTypeParameterSingleConstraintClause(node);
             this.PopContext();
         }

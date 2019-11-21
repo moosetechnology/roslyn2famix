@@ -58,7 +58,7 @@ namespace RoslynMonoFamix.ModelBuilder {
 
         private FAMIX.Parameter CreateParameter(IParameterSymbol parameterSymbol) {
             FAMIX.Parameter parameter = this.CreateNewEntity<FAMIX.Parameter>(typeof(FAMIX.Parameter).FullName);
-
+            parameter.name = parameterSymbol.Name;
             parameter.Modifiers = (parameterSymbol.CustomModifiers.Select(p => p.Modifier.Name)
                                      .Concat(
                                             parameterSymbol.RefCustomModifiers.Select(p => p.Modifier.Name)
@@ -144,7 +144,12 @@ namespace RoslynMonoFamix.ModelBuilder {
             return entity;
         }
 
-
+        public TypeBoundary CreateTypeBoundary(FAMIX.ParameterType type) {
+            FAMIX.TypeBoundary boundary = this.CreateNewEntity<FAMIX.TypeBoundary>(typeof(FAMIX.TypeBoundary).FullName);
+            boundary.ParameterType = type;
+            type.AddBoundary(boundary);
+            return boundary;
+        }
 
         public FAMIX.Inheritance CreateInheritanceFor(FAMIX.Type inheritingClass) {
             FAMIX.Inheritance inheritance = this.CreateNewEntity<FAMIX.Inheritance>(typeof(FAMIX.Inheritance).FullName);
