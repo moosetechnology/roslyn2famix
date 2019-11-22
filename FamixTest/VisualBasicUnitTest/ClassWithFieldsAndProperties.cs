@@ -31,6 +31,7 @@ namespace FamixTest.VisualBasicUnitTest {
         }
 
         #endregion
+
         #region Assertions
 
 
@@ -55,10 +56,6 @@ namespace FamixTest.VisualBasicUnitTest {
         
 
         #endregion
-
-
-
-
 
         #region Attribute 5
 
@@ -90,8 +87,6 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         #endregion
 
-
-
         #region Attribute 4
 
         [TestMethod]
@@ -108,9 +103,6 @@ namespace FamixTest.VisualBasicUnitTest {
             AssertAttributeIsNamed(3, "AnEmptySetGetProperty");
         }
         #endregion
-
-
-
 
         #region Attribute 3
 
@@ -131,9 +123,6 @@ namespace FamixTest.VisualBasicUnitTest {
             AssertAttributeIsNamed(2, "ADateValue");
         }
         #endregion
-
-
-
 
         #region Attribute 2
 
@@ -156,10 +145,6 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         #endregion
 
-
-
-
-
         #region Attribute 1
        
         [TestMethod]
@@ -179,6 +164,7 @@ namespace FamixTest.VisualBasicUnitTest {
             AssertAttributeIsNamed(0, "AStringValue");
         }
         #endregion
+
         [TestMethod]
         public void ParseStudyCase_Contains5Attributes() {
             Assert.AreEqual(ClassElement.Attributes.Count(), 5);

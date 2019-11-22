@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Fame;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
@@ -37,7 +38,9 @@ namespace FamixTest.VisualBasicUnitTest {
             importer.Import(tree, model);
             MetaModel = importer.MetaModel;
         }
-        
 
+        public FAMIX.Method MethodNamed(String name) {
+          return  importer.AllElementsOfType<FAMIX.Method>().First(m => m.name == name);
+        }
     }
 }

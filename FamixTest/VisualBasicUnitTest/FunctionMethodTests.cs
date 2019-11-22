@@ -6,7 +6,6 @@ namespace FamixTest.VisualBasicUnitTest {
     [TestClass]
     public class FunctionMethodTests : VisualBasicUnitTest {
 
-
         #region SettingUp
         public void ParseEmptyFunctionParameterLess() {
             this.Import(@"
@@ -35,7 +34,6 @@ namespace FamixTest.VisualBasicUnitTest {
    
 
         #endregion
-
 
         #region ParseEmptyFunctionManyParameters
         [TestMethod]
@@ -80,7 +78,6 @@ namespace FamixTest.VisualBasicUnitTest {
         }
 
         #endregion
-
 
         #region ParameterLessTest
 
@@ -159,8 +156,6 @@ namespace FamixTest.VisualBasicUnitTest {
         }
 
         #endregion
-
-
 
     }
 }
