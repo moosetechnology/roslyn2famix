@@ -52,7 +52,7 @@ namespace FamixTest.VisualBasicUnitTest {
 
         #endregion
 
-
+        [TestMethod]
         public void TestExampleReturn() {
             Assert.AreEqual(MethodNamed("ExampleReturn").numberOfConditionals, 0);
             Assert.AreEqual(MethodNamed("ExampleReturn").numberOfLoops, 0);
@@ -60,6 +60,7 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(MethodNamed("ExampleReturn").OutgoingInvocations.Count(), 0);
             Assert.AreEqual(MethodNamed("ExampleReturn").IncomingInvocations.Count(), 2);
         }
+        [TestMethod]
         public void TestExampleForSecond() {
             Assert.AreEqual(MethodNamed("ExampleForSecond").numberOfConditionals, 1);
             Assert.AreEqual(MethodNamed("ExampleForSecond").numberOfLoops, 1);
@@ -67,10 +68,12 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(MethodNamed("ExampleForSecond").OutgoingInvocations.Count(), 1);
             Assert.AreEqual(MethodNamed("ExampleForSecond").IncomingInvocations.Count(), 0);
         }
+        [TestMethod]
         public void TestExampleForSecondInvocations() {
             Assert.AreEqual(MethodNamed("ExampleForSecond").OutgoingInvocations[0].receiver, MethodNamed("ExampleForSecond").OutgoingInvocations[0].sender);
             Assert.AreEqual(MethodNamed("ExampleForSecond").OutgoingInvocations[0].signature, "Dummy(Integer)");
         }
+        [TestMethod]
         public void TestExampleFor() {
             Assert.AreEqual(MethodNamed("ExampleFor").numberOfConditionals, 1);
             Assert.AreEqual(MethodNamed("ExampleFor").numberOfLoops, 1);
@@ -78,6 +81,7 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(MethodNamed("ExampleFor").OutgoingInvocations.Count(), 1);
             Assert.AreEqual(MethodNamed("ExampleFor").IncomingInvocations.Count(), 0);
         }
+        [TestMethod]
         public void TestExampleForInvocations() {
             Assert.AreEqual(MethodNamed("ExampleFor").OutgoingInvocations[0].receiver, MethodNamed("ExampleFor").OutgoingInvocations[0].sender);
             Assert.AreEqual(MethodNamed("ExampleFor").OutgoingInvocations[0].signature, "Dummy");
@@ -89,33 +93,38 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(MethodNamed("ExampleWhile").OutgoingInvocations.Count(), 1);
             Assert.AreEqual(MethodNamed("ExampleWhile").IncomingInvocations.Count(), 0);
         }
+        [TestMethod]
         public void TestExampleWhileInvocations() {
             Assert.AreEqual(MethodNamed("ExampleWhile").OutgoingInvocations[0].receiver, MethodNamed("ExampleWhile").OutgoingInvocations[0].sender);
             Assert.AreEqual(MethodNamed("ExampleWhile").OutgoingInvocations[0].signature, "Dummy");
         }
+        [TestMethod]
         public void TestDummy() {
             Assert.AreEqual(MethodNamed("Dummy").ReceivingInvocations.Count(), 5);
             foreach (FAMIX.Invocation invocation in MethodNamed("Dummy").ReceivingInvocations) {
                 Assert.AreEqual(invocation.sender, invocation.receiver);
             }
         }
+        [TestMethod]
         public void TestExampleIf () {
             Assert.AreEqual(MethodNamed("ExampleIf").numberOfConditionals, 1);
             Assert.AreEqual(MethodNamed("ExampleIf").numberOfLinesOfCode, 3);
             Assert.AreEqual(MethodNamed("ExampleIf").OutgoingInvocations.Count(), 1);
             Assert.AreEqual(MethodNamed("ExampleIf").IncomingInvocations.Count(), 0);
         }
+        [TestMethod]
         public void TestExampleIfInvocations() {
             Assert.AreEqual(MethodNamed("ExampleIf").OutgoingInvocations.First().receiver, MethodNamed("ExampleIf").OutgoingInvocations.First().sender);
             Assert.AreEqual(MethodNamed("ExampleIf").OutgoingInvocations.First().signature, "Dummy");
         }
-
+        [TestMethod]
         public void TestExampleIfElse() {
             Assert.AreEqual(MethodNamed("ExampleIfElse").numberOfConditionals, 1);
             Assert.AreEqual(MethodNamed("ExampleIfElse").numberOfLinesOfCode, 5);
             Assert.AreEqual(MethodNamed("ExampleIfElse").OutgoingInvocations.Count(), 2);
             Assert.AreEqual(MethodNamed("ExampleIfElse").IncomingInvocations.Count(), 0);
         }
+        [TestMethod]
         public void TestExampleIfElseInvocations() {
             Assert.AreEqual(MethodNamed("ExampleIfElse").OutgoingInvocations[0].receiver, MethodNamed("ExampleIfElse").OutgoingInvocations[0].sender);
             Assert.AreEqual(MethodNamed("ExampleIfElse").OutgoingInvocations[0].signature, "Dummy");
