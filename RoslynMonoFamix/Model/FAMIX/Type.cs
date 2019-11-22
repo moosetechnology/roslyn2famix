@@ -194,6 +194,34 @@ namespace FAMIX {
             structuresWithDeclaredType.Add(one);
         }
 
+
+        private List<FAMIX.Implements> implementors = new List<FAMIX.Implements>();
+
+        [FameProperty(Name = "implementors", Opposite = "implementedInterface")]
+        public List<FAMIX.Implements> Implementors {
+            get { return implementors; }
+            set { implementors = value; }
+        }
+        public void AddImplementor(FAMIX.Implements one) {
+            implements.Add(one);
+        }
+
+
+
+
+        private List<FAMIX.Implements> implements = new List<FAMIX.Implements>();
+
+        [FameProperty(Name = "implements", Opposite = "implementingClass")]
+        public List<FAMIX.Implements> Implements {
+            get { return implements; }
+            set { implements = value; }
+        }
+        public void AddImplements(FAMIX.Implements one) {
+            implements.Add(one);
+        }
+
+
+
         private List<FAMIX.Inheritance> subInheritances = new List<FAMIX.Inheritance>();
 
         [FameProperty(Name = "subInheritances", Opposite = "superclass")]

@@ -6,6 +6,7 @@ using FAMIX;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using RoslynMonoFamix.ModelBuilder;
+using System.Linq;
 
 namespace FAMIX {
 
@@ -20,7 +21,7 @@ namespace FAMIX {
             return RelatedSymbol;
         }
 
-        public abstract void SetType(FAMIX.Type type);
+        protected abstract void SetType(FAMIX.Type type);
         
         public static TypingContext Method(FAMIX.Method method, IMethodSymbol relatedSymbol) {
             return new MethodTypingContext(method, relatedSymbol);
@@ -44,6 +45,10 @@ namespace FAMIX {
             return new TypeBoundaryTypingContext(typeBoundary, symbol);
         }
 
+        internal static TypingContext Implements(Implements implements) {
+            return new ImplementsTypingContext(implements);
+        }
+
         public static NullContext NullContext() {
             return new NullContext();
         }
@@ -53,7 +58,7 @@ namespace FAMIX {
 
     public class NullContext : TypingContext {
         public NullContext() : base(null) { }
-        public override void SetType(Type type) {
+        protected override void SetType(Type type) {
          
         }
         public override FAMIX.Type TypeUsing(VisualBasicModelBuilder importer) {
@@ -68,7 +73,7 @@ namespace FAMIX {
         public MethodTypingContext(FAMIX.Method method, IMethodSymbol relatedSymbol) : base(relatedSymbol.ReturnType) {
             this.method = method;
         }
-        public override void SetType(Type type) {
+        protected override void SetType(Type type) {
             method.returnType = type;
         }
     }
@@ -79,7 +84,7 @@ namespace FAMIX {
         public TypeBoundaryTypingContext(FAMIX.TypeBoundary typeBoundary, INamedTypeSymbol relatedSymbol) : base(relatedSymbol) {
             this.entity = typeBoundary;
         }
-        public override void SetType(Type type) {
+        protected override void SetType(Type type) {
             entity.BoundaryType = type;
         }
     }
@@ -90,10 +95,36 @@ namespace FAMIX {
         public InheritanceTypingContext(FAMIX.Inheritance entity, INamedTypeSymbol relatedSymbol) : base(relatedSymbol.BaseType) {
                 this.entity = entity;
         }
-        public override void SetType(Type type) {
+        protected override void SetType(Type type) {
             entity.SetSuperType(type);
         }
     }
+
+    public class ImplementsTypingContext : TypingContext {
+        protected FAMIX.Implements entity;
+        protected List<INamedTypeSymbol> relatedSymbols = new List<INamedTypeSymbol>();
+        public ImplementsTypingContext(FAMIX.Implements entity) : base(null) {
+            this.entity = entity;
+        }
+
+        public void AddSymbols(List<INamedTypeSymbol> symbols) {
+            this.relatedSymbols.AddRange(symbols);
+        }
+
+        public override FAMIX.Type TypeUsing(VisualBasicModelBuilder importer) {
+            List<FAMIX.Type> types = this.relatedSymbols.Select(s => importer.EnsureType(s)).ToList();
+            this.SetTypes(types);
+            return null;
+        }
+        protected void SetTypes(List<FAMIX.Type> types) {
+            entity.SetImplementedInterface(types);
+        }
+        protected override void SetType(Type type) {
+            throw new System.Exception("This context is a many-types context ");
+        }
+    }
+
+    
 
     public class AttributeTypingContext : TypingContext {
         protected FAMIX.StructuralEntity entity;
@@ -101,7 +132,7 @@ namespace FAMIX {
         public AttributeTypingContext(FAMIX.StructuralEntity entity, ISymbol relatedSymbol) : base(relatedSymbol) {
             this.entity = entity;
         }
-        public override void SetType(Type type) {
+        protected override void SetType(Type type) {
             entity.declaredType = type;
         }
     }
@@ -112,7 +143,7 @@ namespace FAMIX {
         public AttributeGroupTypingContext(FAMIX.AttributeGroup entity, ISymbol relatedSymbol) : base(relatedSymbol) {
             this.entity = entity;
         }
-        public override void SetType(Type type) {
+        protected override void SetType(Type type) {
             entity.SetType(type);
         }
         public override FAMIX.Type TypeUsing(VisualBasicModelBuilder importer) {

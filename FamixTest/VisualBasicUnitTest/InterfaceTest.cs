@@ -48,18 +48,23 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(InterfaceExample().Methods.Count(), 2);
         }
         [TestMethod]
-        public void ImplementingClassExampleHasTwoInheritances() {
-            Assert.AreEqual(ImplementingClassExample().SuperInheritances.Count(), 2);
+        public void ImplementingClassExampleHasOneInheritances() {
+            Assert.AreEqual(ImplementingClassExample().SuperInheritances.Count(), 1);
+        }
+
+        [TestMethod]
+        public void ImplementingClassExampleHasOneImplementation() {
+            Assert.AreEqual(ImplementingClassExample().Implements.Count(), 1);
         }
 
         [TestMethod]
         public void ImplementingClassExampleInheritsInterface() {
-            Assert.AreEqual(ImplementingClassExample().SuperInheritances.First( a => ((FAMIX.Class)(a .superclass)).isInterface), InterfaceExample());
+            Assert.AreEqual(ImplementingClassExample().Implements.First().ImplementedInterfaces.First(), InterfaceExample());
         }
 
         [TestMethod]
         public void ImplementingClassExampleInheritsSuperclass() {
-            Assert.AreEqual(ImplementingClassExample().SuperInheritances.First(a => !((FAMIX.Class)(a.superclass)).isInterface), ClassExampleSuperclass());
+            Assert.AreEqual(ImplementingClassExample().SuperInheritances.First().superclass, ClassExampleSuperclass());
         }
 
         #endregion

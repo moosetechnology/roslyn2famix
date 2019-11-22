@@ -33,8 +33,8 @@ namespace RoslynMonoFamix.ModelBuilder {
                  () => { return this.CreateNewClass(type); });
         }
 
-        public FAMIX.Class EnsureIterface(InterfaceStatementSyntax node) {
-            string classname = helper.FullTypeName(model.GetDeclaredSymbol(node));
+        public FAMIX.Class EnsureIterface(INamedTypeSymbol node) {
+            string classname = helper.FullTypeName(node);
             return Types.EntityNamedIfNone<FAMIX.Class>(classname,
                  () => { return this.CreateNewInterface(node); });
         }
@@ -155,6 +155,12 @@ namespace RoslynMonoFamix.ModelBuilder {
             FAMIX.Inheritance inheritance = this.CreateNewEntity<FAMIX.Inheritance>(typeof(FAMIX.Inheritance).FullName);
             inheritance.subclass = inheritingClass;
             return inheritance;
+
+        }
+        public FAMIX.Implements CreateImplementsFor(FAMIX.Type implementingClass) {
+            FAMIX.Implements implements = this.CreateNewEntity<FAMIX.Implements>(typeof(FAMIX.Implements).FullName);
+            implements.ImplementingClass = implementingClass;
+            return implements;
         }
         public ScopingEntity CreateScopingEntity(CompilationUnitSyntax node) {
             if (entity != null) throw new System.Exception(" NOOOOOOO ");
@@ -168,10 +174,13 @@ namespace RoslynMonoFamix.ModelBuilder {
             return entity;
         }
 
-        private FAMIX.Class CreateNewInterface(InterfaceStatementSyntax node) {
-            FAMIX.Class entity = this.CreateNewEntity<FAMIX.Class>(helper.FullTypeName(model.GetDeclaredSymbol(node)));
+        private FAMIX.Class CreateNewInterface(INamedTypeSymbol node) {
+            FAMIX.Class entity = this.CreateNewEntity<FAMIX.Class>(typeof(FAMIX.Class).FullName);
             entity.isInterface = true;
             entity.isAbstract = true;
+            entity.name = helper.FullTypeName(node);
+            entity.isFinal = node.IsSealed;
+            entity.accessibility = helper.AccessibilityName(node.DeclaredAccessibility);            
             return entity;
         }
 

@@ -82,8 +82,13 @@ namespace RoslynMonoFamix.Visitor {
             this.PopContext();
         }
         public override void VisitImplementsStatement(ImplementsStatementSyntax node) {
-            FAMIX.Inheritance inheritance = importer.CreateInheritanceFor(this.CurrentContext<FAMIX.Class>());
-            this.PushContext(inheritance);
+            // we should check how to get the type of the interface. 
+
+            FAMIX.Implements implementation = importer.CreateImplementsFor(this.CurrentContext<FAMIX.Class>());
+            FAMIX.ImplementsTypingContext context = implementation.ImplementsTypingContext();
+            context.AddSymbols(node.Types.Select(t => (INamedTypeSymbol)importer.model.GetSymbolInfo(t).Symbol).ToList());
+
+            this.PushContext(context);
             base.VisitImplementsStatement(node);
             this.PopContext();
         }
@@ -94,7 +99,15 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitInterfaceStatement(InterfaceStatementSyntax node) {
-            FAMIX.Class FamixClass = importer.EnsureIterface(node);
+            FAMIX.Class FamixClass = importer.EnsureIterface(importer.model.GetDeclaredSymbol(node));
+            FamixClass.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
+            FamixClass.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
+            FamixClass.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword); ;
+            FamixClass.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword); ;
+            FamixClass.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
+            FAMIX.IAddType AGoodSuperContext = (FAMIX.IAddType)this.CurrentContext<FAMIX.Entity>();
+            AGoodSuperContext.AddType(FamixClass);
+
             this.PushContext(FamixClass);
             base.VisitInterfaceStatement(node);
         }
@@ -127,7 +140,7 @@ namespace RoslynMonoFamix.Visitor {
             this.PopContext();
         }
         public override void VisitTypeParameterSingleConstraintClause(TypeParameterSingleConstraintClauseSyntax node) {
-            
+
             FAMIX.TypeBoundary boundary = importer.CreateTypeBoundary(this.CurrentContext<FAMIX.ParameterType>());
             ITypeParameterSymbol symbol = (ITypeParameterSymbol)importer.model.GetDeclaredSymbol(node.Parent);
             this.PushContext(boundary.TypingContext(symbol.ConstraintTypes.Single()));
@@ -182,6 +195,22 @@ namespace RoslynMonoFamix.Visitor {
             AGoodSuperContext.AddMethod(FamixMethod);
             this.PushContext(FamixMethod);
             base.VisitMethodStatement(node);
+
+            if (node.Parent is InterfaceBlockSyntax || node.Parent is ClassBlockSyntax) {
+                this.PopContext();
+            } else {
+                if (!(node.Parent is MethodBlockSyntax)) {
+                    /*
+                     It seems that property statement can be included directly into the class body (for the fully automatic properties)
+                     And it can be included also by a property block, when we define a body for the property.
+                     If we have a body, means we have an end property statement, where we should be doing the pop of the statemet.
+                     Still, none of this affirmations are completely 
+                     */
+
+                    throw new Exception("Unexpected parent. ");
+                }
+
+            }
         }
         public override void VisitSubNewStatement(SubNewStatementSyntax node) {
             FAMIX.Method FamixClass = importer.EnsureConstructor(importer.model.GetDeclaredSymbol(node));
@@ -230,13 +259,13 @@ namespace RoslynMonoFamix.Visitor {
 
 
             // The poping of this content happens during the end statement . 
-      
+
         }
         public override void VisitAccessorStatement(AccessorStatementSyntax node) {
 
             Net.Property Owner = this.CurrentContext<Net.Property>();
             Net.PropertyAccessor NetPropertyAccessor = importer.EnsureAccessorInto(importer.model.GetDeclaredSymbol(node), Owner);
-            
+
             NetPropertyAccessor.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
             NetPropertyAccessor.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
             NetPropertyAccessor.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword);
@@ -244,8 +273,8 @@ namespace RoslynMonoFamix.Visitor {
             NetPropertyAccessor.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
 
             this.PushContext(NetPropertyAccessor);
-            
-            base.VisitAccessorStatement(node); 
+
+            base.VisitAccessorStatement(node);
 
         }
         public override void VisitImplementsClause(ImplementsClauseSyntax node) {
