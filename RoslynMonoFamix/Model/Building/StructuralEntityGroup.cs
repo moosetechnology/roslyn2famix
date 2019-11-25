@@ -8,8 +8,8 @@ using Microsoft.CodeAnalysis;
 
 namespace FAMIX {
 
-    public class AttributeGroup : FAMIX.Entity, FAMIX.ITyped {
-        List<FAMIX.Attribute> group = new List<Attribute>();
+    public class StructuralEntityGroup : FAMIX.Entity, FAMIX.ITyped {
+        List<FAMIX.StructuralEntity> group = new List<StructuralEntity>();
         public TypingContext TypingContext(ISymbol symbol) {
             return FAMIX.TypingContext.StructuralEntityGroup(this, symbol);
         }
@@ -18,10 +18,17 @@ namespace FAMIX {
                 e.declaredType = type;
             }
         }
-        public void AddAllInto(FAMIX.Class FamixClass) {
+        public void AddAllAttributesInto(FAMIX.Class FamixClass) {
             foreach (var entity in group) {
-                FamixClass.AddAttribute(entity);
-                entity.parentType = FamixClass;
+                FamixClass.AddAttribute((Attribute)entity);
+                ((Attribute)entity).parentType = FamixClass;
+            }
+        }
+
+        public void AddAllLocalVariablesInto(FAMIX.BehaviouralEntity FamixEntity) {
+            foreach (var entity in group) {
+                FamixEntity.AddLocalVariable((LocalVariable)entity);
+                ((LocalVariable)entity).parentBehaviouralEntity = FamixEntity;
             }
         }
         public void AddModifiers(List<string> list) {
@@ -36,5 +43,10 @@ namespace FAMIX {
         public void AddAttribute(Attribute attribute) {
             group.Add(attribute);
         }
+
+        public void AddLocalVariable(LocalVariable variable) {
+            group.Add(variable);
+        }
+
     }
 }

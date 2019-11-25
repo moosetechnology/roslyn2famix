@@ -11,15 +11,23 @@ namespace FamixTest.VisualBasicUnitTest {
         public void ParseMultipleMethods() {
             this.Import(@"
         Public Class Example
-            Public Sub Dummy()
-            End Sub
-            Public Sub Dummy(index As Integer)
-            End Sub
             Public Sub ExampleIf()
                 If (True) Then
+                    Dim a, b, c As Single, x, y As Double, i As Integer
                     Me.Dummy()
                 End If
             End Sub
+            Public Function ExampleReturn() As Integer
+                Return 1
+            End Function
+            Public Sub Dummy(index As Integer)
+                Dim a, b, c As Single, x, y As Double, i As Integer
+            End Sub
+            Public Sub Dummy()
+                Dim variable As Example
+                Dim collection(20) As Example
+            End Sub
+
             Public Sub ExampleIfElse()
                 If (False) Then
                     Me.Dummy()
@@ -33,18 +41,19 @@ namespace FamixTest.VisualBasicUnitTest {
                 End While
             End Sub
             Public Sub ExampleFor()
-                For index As Integer = 1 To 5
+                Dim index As Integer
+                For index = 1 To 5
                     Me.Dummy()
                 Next
             End Sub
+          
             Public Sub ExampleForSecond()
-                For index As Integer = 1 To Me.ExampleReturn()
+                Dim index As Integer
+                For index = 1 To 20
                     Me.Dummy(index)
                 Next
             End Sub
-            Public Function ExampleReturn() As Integer
-                Return 1
-            End Function
+
 
         End Class
             ");

@@ -23,7 +23,19 @@ namespace RoslynMonoFamix.Visitor {
             // this.CurrentContext<FAMIX.Entity>()
         }
         public override void VisitEndBlockStatement(EndBlockStatementSyntax node) {
-            this.PopContext();
+            if (   node.Kind() == SyntaxKind.EndSubStatement 
+                || node.Kind() == SyntaxKind.EndFunctionStatement 
+                || node.Kind() == SyntaxKind.EndClassStatement
+                || node.Kind() == SyntaxKind.EndInterfaceStatement
+                || node.Kind() == SyntaxKind.EndNamespaceStatement
+                || node.Kind() == SyntaxKind.EndPropertyStatement
+                || node.Kind() == SyntaxKind.EndSetStatement
+                || node.Kind() == SyntaxKind.EndGetStatement
+                ) {
+                this.PopContext();
+            } else {
+                var a = " ";
+            }
         }
         protected void Assert(Boolean val) {
             if (!val) throw new Exception("Assert failure");
@@ -182,6 +194,8 @@ namespace RoslynMonoFamix.Visitor {
         public override void VisitParameterList(ParameterListSyntax node) {
             base.VisitParameterList(node);
         }
+
+      
         public override void VisitMethodStatement(MethodStatementSyntax node) {
             FAMIX.Method FamixMethod = importer.EnsureMethod(importer.model.GetDeclaredSymbol(node));
 
@@ -190,10 +204,14 @@ namespace RoslynMonoFamix.Visitor {
             FamixMethod.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword);
             FamixMethod.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword);
             FamixMethod.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
-
+            
             FAMIX.Type AGoodSuperContext = this.CurrentContext<FAMIX.Type>();
             AGoodSuperContext.AddMethod(FamixMethod);
             this.PushContext(FamixMethod);
+
+            importer.CreateSourceAnchor(FamixMethod, node);
+
+
             base.VisitMethodStatement(node);
 
             if (node.Parent is InterfaceBlockSyntax || node.Parent is ClassBlockSyntax) {
@@ -302,13 +320,13 @@ namespace RoslynMonoFamix.Visitor {
 
         public override void VisitFieldDeclaration(FieldDeclarationSyntax node) {
             // this define that whaever-is declared inside is mean to be a field (meaning that it belongs to a class or type)  
-            FAMIX.AttributeGroup Group = this.importer.CreateStructuralEntityGroup();
+            FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
             FAMIX.Class FamixClass = this.CurrentContext<FAMIX.Class>();
             this.PushContext(Group);
             base.VisitFieldDeclaration(node);
             this.PopContext();
             Group.AddModifiers(node.Modifiers.Select(p => p.Text).ToList());
-            Group.AddAllInto(FamixClass);
+            Group.AddAllAttributesInto(FamixClass);
         }
         /*
          *   aca tendria que manejar la definicion de una variable en particular, con un  tipo en particular definido en visitVariabledeclarator. El problema es que este modified identifier ya lo use antes, o sea, hay mas de un caso
@@ -317,10 +335,17 @@ namespace RoslynMonoFamix.Visitor {
         public override void VisitModifiedIdentifier(ModifiedIdentifierSyntax node) {
             var symbol = this.importer.model.GetDeclaredSymbol(node);
             if (symbol != null && symbol is IFieldSymbol) {
-                FAMIX.AttributeGroup Group = this.CurrentContext<FAMIX.AttributeGroup>();
+                FAMIX.StructuralEntityGroup Group = this.CurrentContext<FAMIX.StructuralEntityGroup>();
                 FAMIX.Attribute Attribute = this.importer.EnsureField((IFieldSymbol)symbol);
                 Group.AddAttribute(Attribute);
             }
+            if (symbol != null && symbol is ILocalSymbol) {
+                FAMIX.StructuralEntityGroup Group = this.CurrentContext<FAMIX.StructuralEntityGroup>();
+                FAMIX.LocalVariable Variable = this.importer.EnsureLocalVariable((ILocalSymbol)symbol);
+                Group.AddLocalVariable(Variable);
+            }
+            
+
             base.VisitModifiedIdentifier(node);
         }
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node) {
@@ -377,13 +402,13 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitExpressionStatement(ExpressionStatementSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitExpressionStatement(node);
         }
         public override void VisitPrintStatement(PrintStatementSyntax node) {
             throw new Exception("MustReview");
         }
         public override void VisitWhileBlock(WhileBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitWhileBlock(node);
         }
         public override void VisitUsingBlock(UsingBlockSyntax node) {
             throw new Exception("MustReview");
@@ -395,7 +420,18 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node) {
-            throw new Exception("MustReview");
+
+
+            FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
+            FAMIX.BehaviouralEntity FamixEntity = this.CurrentContext<FAMIX.BehaviouralEntity>();
+
+            this.PushContext(Group);
+            base.VisitLocalDeclarationStatement(node);
+            this.PopContext();
+
+            Group.AddModifiers(node.Modifiers.Select(p => p.Text).ToList());
+            Group.AddAllLocalVariablesInto(FamixEntity);
+
         }
         public override void VisitLabelStatement(LabelStatementSyntax node) {
             throw new Exception("MustReview");
@@ -427,22 +463,25 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitMultiLineIfBlock(MultiLineIfBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitMultiLineIfBlock(node);
         }
         public override void VisitIfStatement(IfStatementSyntax node) {
-            throw new Exception("MustReview");
+            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            base.VisitIfStatement(node);
         }
         public override void VisitElseIfBlock(ElseIfBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitElseIfBlock(node);
         }
         public override void VisitElseIfStatement(ElseIfStatementSyntax node) {
-            throw new Exception("MustReview");
+            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            base.VisitElseIfStatement(node);
+            
         }
         public override void VisitElseBlock(ElseBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitElseBlock(node);
         }
         public override void VisitElseStatement(ElseStatementSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitElseStatement(node);
         }
         public override void VisitTryBlock(TryBlockSyntax node) {
             throw new Exception("MustReview");
@@ -505,37 +544,52 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitDoLoopBlock(DoLoopBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitDoLoopBlock(node);
         }
         public override void VisitDoStatement(DoStatementSyntax node) {
-            throw new Exception("MustReview");
+            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
+            base.VisitDoStatement(node);
         }
         public override void VisitLoopStatement(LoopStatementSyntax node) {
-            throw new Exception("MustReview");
+            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
+            base.VisitLoopStatement(node);
         }
         public override void VisitWhileOrUntilClause(WhileOrUntilClauseSyntax node) {
             throw new Exception("MustReview");
         }
         public override void VisitWhileStatement(WhileStatementSyntax node) {
-            throw new Exception("MustReview");
+            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
+            base.VisitWhileStatement(node);
         }
         public override void VisitForBlock(ForBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitForBlock(node);
         }
         public override void VisitForEachBlock(ForEachBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitForEachBlock(node);
         }
         public override void VisitForStatement(ForStatementSyntax node) {
-            throw new Exception("MustReview");
+            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
+
+            this.PushContext(FAMIX.TypingContext.NullContext());
+            base.VisitForStatement(node);
+            this.PopContext();
         }
         public override void VisitForStepClause(ForStepClauseSyntax node) {
-            throw new Exception("MustReview");
+            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
+            base.VisitForStepClause(node);
         }
         public override void VisitForEachStatement(ForEachStatementSyntax node) {
-            throw new Exception("MustReview");
+            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
+            base.VisitForEachStatement(node);
         }
         public override void VisitNextStatement(NextStatementSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitNextStatement(node);
         }
         public override void VisitUsingStatement(UsingStatementSyntax node) {
             throw new Exception("MustReview");
@@ -576,7 +630,7 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitLiteralExpression(node);
         }
         public override void VisitParenthesizedExpression(ParenthesizedExpressionSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitParenthesizedExpression(node);
         }
         public override void VisitTupleExpression(TupleExpressionSyntax node) {
             throw new Exception("MustReview");
@@ -614,8 +668,25 @@ namespace RoslynMonoFamix.Visitor {
         public override void VisitXmlMemberAccessExpression(XmlMemberAccessExpressionSyntax node) {
             throw new Exception("MustReview");
         }
+
         public override void VisitInvocationExpression(InvocationExpressionSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.Method current = this.CurrentMethod();
+            SymbolInfo info = importer.model.GetSymbolInfo(node);
+
+            if (info.Symbol != null) {
+                FAMIX.Method invoked = this.importer.EnsureMethod((IMethodSymbol)info.Symbol);
+                importer.AddMethodCall(node, current, invoked);
+            } else if (info.CandidateSymbols.Count() > 0) {
+                foreach (ISymbol s in info.CandidateSymbols) {
+                    FAMIX.Method invoked = this.importer.EnsureMethod((IMethodSymbol)s);
+                    importer.AddMethodCall(node, current, invoked);
+                }
+            } else {
+                /* In this invocation expression area, we have to link the outgoing calls. If we cannot get a direct call nor some candidates, it may mean that we are missing something */
+
+                throw new Exception("missing something maybe? ");
+            }
+
         }
         public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node) {
             throw new Exception("MustReview");
@@ -663,13 +734,13 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitArgumentList(ArgumentListSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitArgumentList(node);
         }
         public override void VisitOmittedArgument(OmittedArgumentSyntax node) {
             throw new Exception("MustReview");
         }
         public override void VisitSimpleArgument(SimpleArgumentSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitSimpleArgument(node);
         }
         public override void VisitNameColonEquals(NameColonEqualsSyntax node) {
             throw new Exception("MustReview");

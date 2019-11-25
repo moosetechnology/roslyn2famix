@@ -25,6 +25,10 @@ namespace RoslynMonoFamix.Visitor {
         public T CurrentContext<T>() where T : FAMIX.Entity {
             return this.CurrentContextIfNone<T>(() => throw new System.Exception("Empty Stack!"));
         }
+
+        public FAMIX.Method CurrentMethod() {
+            return (FAMIX.Method) stack.ToArray().First(m => m is FAMIX.Method);
+        }
         public T CurrentContextOrNull<T>() where T : FAMIX.Entity {
             return this.CurrentContextIfNone<T>(() => null);
         }
@@ -32,6 +36,9 @@ namespace RoslynMonoFamix.Visitor {
             stack.Push(context);
         }
         public FAMIX.Entity PopContext() {
+            if (stack.Count == 2) {
+                var a = "";
+            }
             return stack.Pop() as FAMIX.Entity;
         }
 

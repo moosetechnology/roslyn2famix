@@ -223,8 +223,17 @@ namespace RoslynMonoFamix.ModelBuilder {
             return attribute;
         }
 
-        public AttributeGroup CreateStructuralEntityGroup() {
-            return new AttributeGroup();
+
+        public LocalVariable EnsureLocalVariable(ILocalSymbol symbol) {
+            FAMIX.LocalVariable localvariable = this.CreateNewEntity<FAMIX.LocalVariable>(typeof(FAMIX.LocalVariable).FullName);
+            localvariable.accessibility = helper.AccessibilityName(symbol.DeclaredAccessibility);
+            localvariable.declaredType = this.EnsureType(symbol.Type);
+            localvariable.name = symbol.Name;
+
+            return localvariable;
+        }
+        public StructuralEntityGroup CreateStructuralEntityGroup() {
+            return new StructuralEntityGroup();
         }
 
         public Property EnsureProperty(IPropertySymbol symbol) {
@@ -248,5 +257,6 @@ namespace RoslynMonoFamix.ModelBuilder {
             return parameter;
         }
 
+ 
     }
 }

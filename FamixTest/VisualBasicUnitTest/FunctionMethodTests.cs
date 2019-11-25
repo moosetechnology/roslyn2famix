@@ -37,9 +37,9 @@ namespace FamixTest.VisualBasicUnitTest {
 
         #region ParseEmptyFunctionManyParameters
         [TestMethod]
-        public void ParseEmptyFunctionManyParameters_SevenEight() {
+        public void ParseEmptyFunctionManyParameters_SevenNine() {
             this.ParseEmptyFunctionManyParameters();
-            this.AssertAmountElements(8);
+            this.AssertAmountElements(9);
         }
 
         [TestMethod]

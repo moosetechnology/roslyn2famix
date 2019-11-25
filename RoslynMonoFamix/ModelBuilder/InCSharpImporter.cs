@@ -201,54 +201,11 @@ namespace RoslynMonoFamix.ModelBuilder {
             return fullClassName + "." + field.Name;
         }
 
-        public T CreateNewAssociation<T>(String typeName) => repository.New<T>(typeName);
 
         internal T New<T>() {
             return repository.New<T>(typeof(T).FullName);
         }
 
 
-        public void CreateSourceAnchor(SourcedEntity sourcedEntity, SyntaxNode node) {
-
-            var lineSpan = node.SyntaxTree.GetLineSpan(node.Span);
-            var relativePath = node.SyntaxTree.FilePath.Substring(projectBaseFolder.Length + 1);
-            FileAnchor fileAnchor = CreateNewFileAnchor(node, ref lineSpan);
-            var loc = lineSpan.EndLinePosition.Line - lineSpan.StartLinePosition.Line;
-            if (sourcedEntity is BehaviouralEntity) (sourcedEntity as BehaviouralEntity).numberOfLinesOfCode = loc;
-
-
-            sourcedEntity.sourceAnchor = fileAnchor;
-            repository.Add(fileAnchor);
-        }
-        public void CreateSourceAnchor(FAMIX.Type sourcedEntity, ClassDeclarationSyntax node) {
-            var lineSpan = node.SyntaxTree.GetLineSpan(node.Span);
-            FileAnchor fileAnchor = CreateNewFileAnchor(node, ref lineSpan);
-            var loc = lineSpan.EndLinePosition.Line - lineSpan.StartLinePosition.Line;
-
-            if (node.Modifiers.ToFullString().Contains("partial")) {
-                if (sourcedEntity.sourceAnchor == null) {
-                    sourcedEntity.sourceAnchor = new MultipleFileAnchor();
-                    repository.Add(sourcedEntity.sourceAnchor);
-                }
-                (sourcedEntity.sourceAnchor as MultipleFileAnchor).AddAllFile(fileAnchor);
-            } else
-                sourcedEntity.sourceAnchor = fileAnchor;
-            (sourcedEntity as FAMIX.Type).numberOfLinesOfCode += loc;
-
-            repository.Add(fileAnchor);
-        }
-
-        private FileAnchor CreateNewFileAnchor(SyntaxNode node, ref FileLinePositionSpan lineSpan) {
-            var relativePath = node.SyntaxTree.FilePath.Substring(projectBaseFolder.Length + 1);
-            FileAnchor fileAnchor = new FileAnchor
-            {
-                startLine = lineSpan.StartLinePosition.Line + 1,
-                startColumn = lineSpan.StartLinePosition.Character,
-                endLine = lineSpan.EndLinePosition.Line + 1,
-                endColumn = lineSpan.EndLinePosition.Character + 1,
-                fileName = relativePath
-            };
-            return fileAnchor;
-        }
     }
 }

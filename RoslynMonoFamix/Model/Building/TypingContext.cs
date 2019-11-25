@@ -12,6 +12,7 @@ namespace FAMIX {
 
     public abstract class TypingContext : FAMIX.Entity {
         
+
         public TypingContext (ISymbol relatedSymbol) {
             this.RelatedSymbol = relatedSymbol;
         }
@@ -29,7 +30,7 @@ namespace FAMIX {
         public static TypingContext StructuralEntity (FAMIX.StructuralEntity entity, ISymbol symbol) {
             return new AttributeTypingContext(entity, symbol);
         }
-        public static TypingContext StructuralEntityGroup(FAMIX.AttributeGroup entity, ISymbol symbol) {
+        public static TypingContext StructuralEntityGroup(FAMIX.StructuralEntityGroup entity, ISymbol symbol) {
             return new AttributeGroupTypingContext(entity, symbol);
         }
         public static TypingContext Inheritance(FAMIX.Inheritance entity, INamedTypeSymbol symbol) {
@@ -138,13 +139,12 @@ namespace FAMIX {
     }
 
     public class AttributeGroupTypingContext : TypingContext {
-        protected FAMIX.AttributeGroup entity;
+        protected FAMIX.StructuralEntityGroup entity;
 
-        public AttributeGroupTypingContext(FAMIX.AttributeGroup entity, ISymbol relatedSymbol) : base(relatedSymbol) {
+        public AttributeGroupTypingContext(FAMIX.StructuralEntityGroup entity, ISymbol relatedSymbol) : base(relatedSymbol) {
             this.entity = entity;
         }
         protected override void SetType(Type type) {
-            entity.SetType(type);
         }
         public override FAMIX.Type TypeUsing(VisualBasicModelBuilder importer) {
             return entity.Type();
