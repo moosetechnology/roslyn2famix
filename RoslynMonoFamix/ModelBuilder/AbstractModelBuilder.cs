@@ -47,6 +47,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             var lineSpan = node.SyntaxTree.GetLineSpan(node.Span);
 
             FAMIX.FileAnchor fileAnchor = CreateNewFileAnchor(node, ref lineSpan);
+            
             var loc = lineSpan.EndLinePosition.Line - lineSpan.StartLinePosition.Line;
             if (sourcedEntity is FAMIX.BehaviouralEntity) (sourcedEntity as FAMIX.BehaviouralEntity).numberOfLinesOfCode = loc;
 
