@@ -39,8 +39,8 @@ namespace FamixTest.VisualBasicUnitTest {
             MetaModel = importer.MetaModel;
         }
 
-        public FAMIX.Method MethodNamed(String name) {
-          return  importer.AllElementsOfType<FAMIX.Method>().First(m => m.name == name);
+        public FAMIX.Method MethodOfSignature(String signature) {
+          return  importer.AllElementsOfType<FAMIX.Method>().First(m => m.signature == signature);
         }
     }
 }

@@ -103,9 +103,9 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(MethodElement.parentType, this.GetElement<FAMIX.Class>(0));
         }
         [TestMethod]
-        public void ParseEmptyFunctionParameterLess_FourElements() {
+        public void ParseEmptyFunctionParameterLess_FiveElements() {
             this.ParseEmptyFunctionParameterLess();
-            this.AssertAmountElements(4);
+            this.AssertAmountElements(5);
         }
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_Public() {
@@ -124,9 +124,9 @@ namespace FamixTest.VisualBasicUnitTest {
 
         #region ParseEmptyFunctionOneParameter
         [TestMethod]
-        public void ParseEmptyFunctionOneParameter_SixElements() {
+        public void ParseEmptyFunctionOneParameter_SevenElements() {
             this.ParseEmptyFunctionOneParameter();
-            this.AssertAmountElements(6);
+            this.AssertAmountElements(7);
         }
 
         [TestMethod]

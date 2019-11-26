@@ -39,9 +39,9 @@ namespace FamixTest.VisualBasicUnitTest {
 
         #region ParseEmptySubManyParameters
         [TestMethod]
-        public void ParseEmptySubManyParameters_SevenEight() {
+        public void ParseEmptySubManyParameters_Eight() {
             this.ParseEmptySubManyParameters();
-            this.AssertAmountElements(7);
+            this.AssertAmountElements(8);
         }
 
         [TestMethod]
@@ -106,9 +106,9 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(MethodElement.parentType, this.GetElement<FAMIX.Class>(0));
         }
         [TestMethod]
-        public void ParseEmptySubParameterLess_TwoElements() {
+        public void ParseEmptySubParameterLess_ThreeElements() {
             this.ParseEmptySubParameterLess();
-            this.AssertAmountElements(2);
+            this.AssertAmountElements(3);
         }
         [TestMethod]
         public void ParseEmptySubParameterLess_Public() {
@@ -129,7 +129,7 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptySubOneParameter_SixElements() {
             this.ParseEmptySubOneParameter();
-            this.AssertAmountElements(5);
+            this.AssertAmountElements(6);
         }
 
         [TestMethod]
