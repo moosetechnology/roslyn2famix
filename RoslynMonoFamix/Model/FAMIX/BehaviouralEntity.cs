@@ -3,6 +3,7 @@ using System;
 using FILE;
 using Dynamix;
 using FAMIX;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace FAMIX {
@@ -95,6 +96,14 @@ namespace FAMIX {
             get { return outgoingInvocations; }
             set { outgoingInvocations = value; }
         }
+
+        public List<FAMIX.Invocation> AllOutgoingInvocations() {
+            List<FAMIX.Invocation> invocations = new List<Invocation>();
+            invocations.AddRange(this.OutgoingInvocations);
+            invocations.AddRange(this.controlFlowStructures.SelectMany(cf => cf.AllOutgoingInvocations()));
+
+            return invocations;
+        }
         public void AddOutgoingInvocation(FAMIX.Invocation one) {
             outgoingInvocations.Add(one);
         }
@@ -124,7 +133,7 @@ namespace FAMIX {
         [FameProperty(Name = "signature")]
         public String signature { get; set; }
 
-        
+
         private List<FAMIX.ControlFlowStructure> controlFlowStructures = new List<FAMIX.ControlFlowStructure>();
 
         [FameProperty(Name = "controlFlowStructures", Opposite = "context")]

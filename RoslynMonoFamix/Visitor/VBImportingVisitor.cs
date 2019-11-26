@@ -766,7 +766,7 @@ namespace RoslynMonoFamix.Visitor {
         }
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node) {
-            FAMIX.Method current = this.CurrentMethod();
+            FAMIX.BehaviouralEntity current = this.CurrentMethod();
             SymbolInfo info = importer.model.GetSymbolInfo(node);
 
             if (info.Symbol != null) {

@@ -60,43 +60,43 @@ namespace FamixTest.VisualBasicUnitTest {
         public void TestExampleReturn() {
             Assert.AreEqual(MethodOfSignature("ExampleReturn()").numberOfConditionals, 0);
             Assert.AreEqual(MethodOfSignature("ExampleReturn()").numberOfLoops, 0);
-            Assert.AreEqual(MethodOfSignature("ExampleReturn()").OutgoingInvocations.Count(), 0);
+            Assert.AreEqual(MethodOfSignature("ExampleReturn()").AllOutgoingInvocations().Count(), 0);
             Assert.AreEqual(MethodOfSignature("ExampleReturn()").IncomingInvocations.Count(), 1);
         }
         [TestMethod]
         public void TestExampleForSecond() {
             Assert.AreEqual(MethodOfSignature("ExampleForSecond()").numberOfConditionals, 1);
             Assert.AreEqual(MethodOfSignature("ExampleForSecond()").numberOfLoops, 1);
-            Assert.AreEqual(MethodOfSignature("ExampleForSecond()").OutgoingInvocations.Count(), 1);
+            Assert.AreEqual(MethodOfSignature("ExampleForSecond()").AllOutgoingInvocations().Count(), 1);
             Assert.AreEqual(MethodOfSignature("ExampleForSecond()").IncomingInvocations.Count(), 0);
         }
         [TestMethod]
         public void TestExampleForSecondInvocations() {
-            Assert.AreEqual(MethodOfSignature("ExampleForSecond()").OutgoingInvocations[0].Candidates[0], MethodOfSignature("Dummy(Int32)"));
-            Assert.AreEqual(MethodOfSignature("ExampleForSecond()").OutgoingInvocations[0].Candidates[0].signature, "Dummy(Int32)");
+            Assert.AreEqual(MethodOfSignature("ExampleForSecond()").AllOutgoingInvocations()[0].Candidates[0], MethodOfSignature("Dummy(Int32)"));
+            Assert.AreEqual(MethodOfSignature("ExampleForSecond()").AllOutgoingInvocations()[0].Candidates[0].signature, "Dummy(Int32)");
         }
         [TestMethod]
         public void TestExampleFor() {
             Assert.AreEqual(MethodOfSignature("ExampleFor()").numberOfConditionals, 1);
             Assert.AreEqual(MethodOfSignature("ExampleFor()").numberOfLoops, 1);
-            Assert.AreEqual(MethodOfSignature("ExampleFor()").OutgoingInvocations.Count(), 1);
+            Assert.AreEqual(MethodOfSignature("ExampleFor()").AllOutgoingInvocations().Count(), 1);
             Assert.AreEqual(MethodOfSignature("ExampleFor()").IncomingInvocations.Count(), 0);
         }
         [TestMethod]
         public void TestExampleForInvocations() {
-            Assert.AreEqual(MethodOfSignature("ExampleFor()").OutgoingInvocations[0].Candidates[0], MethodOfSignature("Dummy()"));
-            Assert.AreEqual(MethodOfSignature("ExampleFor()").OutgoingInvocations[0].Candidates[0].name, "Dummy");
+            Assert.AreEqual(MethodOfSignature("ExampleFor()").AllOutgoingInvocations()[0].Candidates[0], MethodOfSignature("Dummy()"));
+            Assert.AreEqual(MethodOfSignature("ExampleFor()").AllOutgoingInvocations()[0].Candidates[0].name, "Dummy");
         }
         public void TestExampleWhile() {
             Assert.AreEqual(MethodOfSignature("ExampleWhile()").numberOfConditionals, 1);
             Assert.AreEqual(MethodOfSignature("ExampleWhile()").numberOfLoops, 1);
-            Assert.AreEqual(MethodOfSignature("ExampleWhile()").OutgoingInvocations.Count(), 1);
+            Assert.AreEqual(MethodOfSignature("ExampleWhile()").AllOutgoingInvocations().Count(), 1);
             Assert.AreEqual(MethodOfSignature("ExampleWhile()").IncomingInvocations.Count(), 0);
         }
         [TestMethod]
         public void TestExampleWhileInvocations() {
-            Assert.AreEqual(MethodOfSignature("ExampleWhile()").OutgoingInvocations[0].Candidates[0], MethodOfSignature("Dummy()"));
-            Assert.AreEqual(MethodOfSignature("ExampleWhile()").OutgoingInvocations[0].Candidates[0].name, "Dummy");
+            Assert.AreEqual(MethodOfSignature("ExampleWhile()").AllOutgoingInvocations()[0].Candidates[0], MethodOfSignature("Dummy()"));
+            Assert.AreEqual(MethodOfSignature("ExampleWhile()").AllOutgoingInvocations()[0].Candidates[0].name, "Dummy");
         }
         [TestMethod]
         public void TestDummy() {
@@ -105,27 +105,27 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void TestExampleIf () {
             Assert.AreEqual(MethodOfSignature("ExampleIf()").numberOfConditionals, 1);
-            Assert.AreEqual(MethodOfSignature("ExampleIf()").OutgoingInvocations.Count(), 1);
+            Assert.AreEqual(MethodOfSignature("ExampleIf()").AllOutgoingInvocations().Count(), 1);
             Assert.AreEqual(MethodOfSignature("ExampleIf()").IncomingInvocations.Count(), 0);
         }
         [TestMethod]
         public void TestExampleIfInvocations() {
-            Assert.AreEqual(MethodOfSignature("ExampleIf()").OutgoingInvocations.First().Candidates[0].name, "Dummy");
-            Assert.AreEqual(MethodOfSignature("ExampleIf()").OutgoingInvocations.First().Candidates[0], MethodOfSignature("Dummy()"));
+            Assert.AreEqual(MethodOfSignature("ExampleIf()").AllOutgoingInvocations().First().Candidates[0].name, "Dummy");
+            Assert.AreEqual(MethodOfSignature("ExampleIf()").AllOutgoingInvocations().First().Candidates[0], MethodOfSignature("Dummy()"));
         }
         [TestMethod]
         public void TestExampleIfElse() {
             Assert.AreEqual(MethodOfSignature("ExampleIfElse()").numberOfConditionals, 2);
-            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").OutgoingInvocations.Count(), 2);
+            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").AllOutgoingInvocations().Count(), 2);
             Assert.AreEqual(MethodOfSignature("ExampleIfElse()").IncomingInvocations.Count(), 0);
         }
         [TestMethod]
         public void TestExampleIfElseInvocations() {
             
-            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").OutgoingInvocations[1].Candidates[0].name, "ExampleReturn");
-            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").OutgoingInvocations[0].Candidates[0].name, "Dummy");
-            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").OutgoingInvocations[0].Candidates[0], MethodOfSignature("Dummy()"));
-            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").OutgoingInvocations[1].Candidates[0], MethodOfSignature("ExampleReturn()"));
+            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").AllOutgoingInvocations()[1].Candidates[0].name, "ExampleReturn");
+            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").AllOutgoingInvocations()[0].Candidates[0].name, "Dummy");
+            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").AllOutgoingInvocations()[0].Candidates[0], MethodOfSignature("Dummy()"));
+            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").AllOutgoingInvocations()[1].Candidates[0], MethodOfSignature("ExampleReturn()"));
             
         }
         

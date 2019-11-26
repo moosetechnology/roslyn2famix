@@ -94,7 +94,7 @@ namespace RoslynMonoFamix.ModelBuilder {
         }
 
         public T CreateNewAssociation<T>(String typeName) => repository.New<T>(typeName);
-        public void AddMethodCall(SyntaxNode node, FAMIX.Method clientMethod, FAMIX.Method referencedEntity) {
+        public void AddMethodCall(SyntaxNode node, FAMIX.BehaviouralEntity clientMethod, FAMIX.Method referencedEntity) {
             FAMIX.Invocation invocation = this.CreateNewAssociation<FAMIX.Invocation>("FAMIX.Invocation");
             invocation.sender = clientMethod;
             invocation.AddCandidate(referencedEntity);
