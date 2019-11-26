@@ -73,6 +73,9 @@ namespace FAMIX {
         [FameProperty(Name = "numberOfComments")]
         public int numberOfComments { get; set; }
 
+        [FameProperty(Name = "numberOfLoops")]
+        public int numberOfLoops { get; set; }
+
         [FameProperty(Name = "numberOfConditionals")]
         public int numberOfConditionals { get; set; }
 
@@ -120,6 +123,18 @@ namespace FAMIX {
 
         [FameProperty(Name = "signature")]
         public String signature { get; set; }
+
+        
+        private List<FAMIX.ControlFlowStructure> controlFlowStructures = new List<FAMIX.ControlFlowStructure>();
+
+        [FameProperty(Name = "controlFlowStructures", Opposite = "context")]
+        public List<FAMIX.ControlFlowStructure> ControlFlowStructures {
+            get { return controlFlowStructures; }
+            set { controlFlowStructures = value; }
+        }
+        public void AddControlFlow(ControlFlowStructure famixEntity) {
+            this.controlFlowStructures.Add(famixEntity);
+        }
 
     }
 }

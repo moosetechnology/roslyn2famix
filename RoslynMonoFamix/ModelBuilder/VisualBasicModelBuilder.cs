@@ -257,8 +257,12 @@ namespace RoslynMonoFamix.ModelBuilder {
             return parameter;
         }
 
-        public ControlFlowStructure CreateControlStructure() {
-            return this.CreateNewEntity<FAMIX.ControlFlowStructure>(typeof(FAMIX.ControlFlowStructure).FullName);
+        public ControlFlowStructure CreateControlStructure(String kind, BehaviouralEntity context) {
+            FAMIX.ControlFlowStructure FamixEntity = this.CreateNewEntity<FAMIX.ControlFlowStructure>(typeof(FAMIX.ControlFlowStructure).FullName); 
+            FamixEntity.kind = kind;
+            context.AddControlFlow(FamixEntity);
+            FamixEntity.context = context;
+            return FamixEntity;
         }
     }
 }

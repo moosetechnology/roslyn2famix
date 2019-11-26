@@ -115,7 +115,7 @@ namespace FamixTest.VisualBasicUnitTest {
         }
         [TestMethod]
         public void TestExampleIfElse() {
-            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").numberOfConditionals, 1);
+            Assert.AreEqual(MethodOfSignature("ExampleIfElse()").numberOfConditionals, 2);
             Assert.AreEqual(MethodOfSignature("ExampleIfElse()").OutgoingInvocations.Count(), 2);
             Assert.AreEqual(MethodOfSignature("ExampleIfElse()").IncomingInvocations.Count(), 0);
         }

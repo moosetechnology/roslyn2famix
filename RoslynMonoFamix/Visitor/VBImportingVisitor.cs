@@ -23,6 +23,13 @@ namespace RoslynMonoFamix.Visitor {
             // this.CurrentContext<FAMIX.Entity>()
         }
         public override void VisitEndBlockStatement(EndBlockStatementSyntax node) {
+
+            if(node.Parent is MethodBlockSyntax && stack.Count != 3) {
+                var a = " ";
+
+            }
+
+
             if (   node.Kind() == SyntaxKind.EndSubStatement 
                 || node.Kind() == SyntaxKind.EndFunctionStatement 
                 || node.Kind() == SyntaxKind.EndClassStatement
@@ -31,6 +38,8 @@ namespace RoslynMonoFamix.Visitor {
                 || node.Kind() == SyntaxKind.EndPropertyStatement
                 || node.Kind() == SyntaxKind.EndSetStatement
                 || node.Kind() == SyntaxKind.EndGetStatement
+                || node.Kind() == SyntaxKind.EndWhileStatement
+                || node.Kind() == SyntaxKind.EndIfStatement
                 //|| node.Kind() == SyntaxKind.EndWhileStatement
                 ) {
                 this.PopContext();
@@ -464,22 +473,66 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitMultiLineIfBlock(node);
         }
         public override void VisitIfStatement(IfStatementSyntax node) {
-            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            FAMIX.BehaviouralEntity method = this.CurrentContext<FAMIX.BehaviouralEntity>();
+            method.numberOfConditionals++;
+
+            FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("IF", method);
+            FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
+
+            this.PushContext(FamixEntity);
+            this.PushContext(Group);
+
             base.VisitIfStatement(node);
+
+
+            this.PopContext();
+            Group.AddAllLocalVariablesInto(FamixEntity);
+
         }
         public override void VisitElseIfBlock(ElseIfBlockSyntax node) {
             base.VisitElseIfBlock(node);
         }
         public override void VisitElseIfStatement(ElseIfStatementSyntax node) {
-            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
+            this.PopContext();
+
+            FAMIX.BehaviouralEntity method = this.CurrentContext<FAMIX.BehaviouralEntity>();
+            method.numberOfConditionals++;
+
+            FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("ELSE-IF", method);
+            FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
+
+            this.PushContext(FamixEntity);
+            this.PushContext(Group);
+
             base.VisitElseIfStatement(node);
+
+
+            this.PopContext();
+            Group.AddAllLocalVariablesInto(FamixEntity);
+            
             
         }
         public override void VisitElseBlock(ElseBlockSyntax node) {
             base.VisitElseBlock(node);
         }
         public override void VisitElseStatement(ElseStatementSyntax node) {
+            this.PopContext();
+
+            FAMIX.BehaviouralEntity method = this.CurrentContext<FAMIX.BehaviouralEntity>();
+            method.numberOfConditionals++;
+
+            FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("ELSE", method);
+            FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
+
+            this.PushContext(FamixEntity);
+            this.PushContext(Group);
+
             base.VisitElseStatement(node);
+
+
+            this.PopContext();
+            Group.AddAllLocalVariablesInto(FamixEntity);
+           
         }
         public override void VisitTryBlock(TryBlockSyntax node) {
             throw new Exception("MustReview");
@@ -558,9 +611,20 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitWhileStatement(WhileStatementSyntax node) {
-            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
-            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
+            FAMIX.BehaviouralEntity method = this.CurrentContext<FAMIX.BehaviouralEntity>();
+            method.numberOfConditionals++;
+            method.numberOfLoops++;
+
+            FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("WHILE", method);
+            FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
+
+            this.PushContext(FamixEntity);
+            this.PushContext(Group);
+
             base.VisitWhileStatement(node);
+
+            this.PopContext();
+            Group.AddAllLocalVariablesInto(FamixEntity);
         }
         public override void VisitForBlock(ForBlockSyntax node) {
             base.VisitForBlock(node);
@@ -569,21 +633,20 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitForEachBlock(node);
         }
         public override void VisitForStatement(ForStatementSyntax node) {
+            FAMIX.BehaviouralEntity method = this.CurrentContext<FAMIX.BehaviouralEntity>();
+            method.numberOfConditionals++;
+            method.numberOfLoops++;
 
-            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
-            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
-
-            FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure();
+            FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("FOR", method);
             FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
-
+            
             this.PushContext(FamixEntity);
             this.PushContext(Group);
-            
+
             base.VisitForStatement(node);
 
             this.PopContext();
             Group.AddAllLocalVariablesInto(FamixEntity);
-
         }
         public override void VisitForStepClause(ForStepClauseSyntax node) {
             
@@ -595,6 +658,7 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitForEachStatement(node);
         }
         public override void VisitNextStatement(NextStatementSyntax node) {
+            
             base.VisitNextStatement(node);
             this.PopContext();
         }

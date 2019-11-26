@@ -14,9 +14,7 @@ namespace FAMIX {
         [FameProperty(Name = "returnType")]
         public Type returnType;
 
-        [FameProperty(Name = "numberOfLoops")]
-        public int numberOfLoops { get; set; }
-
+       
         [FameProperty(Name = "category")]
         public String category { get; set; }
 
@@ -45,5 +43,7 @@ namespace FAMIX {
         TypingContext ITyped.TypingContext(ISymbol relatedSymbol) {
             return TypingContext.Method(this, (IMethodSymbol) relatedSymbol);
         }
+
+  
     }
 }

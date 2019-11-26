@@ -9,10 +9,9 @@ namespace FAMIX {
     [FamePackage("FAMIX")]
     [FameDescription("ControlFlowStructure")]
     public class ControlFlowStructure : FAMIX.BehaviouralEntity {
-
-
         [FameProperty(Name = "kind")]
         public String kind;
-        
+        [FameProperty(Name = "context", Opposite = "controlFlowStructures")]
+        public BehaviouralEntity context;
     }
 }
