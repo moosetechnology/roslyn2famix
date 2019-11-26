@@ -31,6 +31,7 @@ namespace RoslynMonoFamix.Visitor {
                 || node.Kind() == SyntaxKind.EndPropertyStatement
                 || node.Kind() == SyntaxKind.EndSetStatement
                 || node.Kind() == SyntaxKind.EndGetStatement
+                //|| node.Kind() == SyntaxKind.EndWhileStatement
                 ) {
                 this.PopContext();
             } else {
@@ -227,7 +228,6 @@ namespace RoslynMonoFamix.Visitor {
 
                     throw new Exception("Unexpected parent. ");
                 }
-
             }
         }
         public override void VisitSubNewStatement(SubNewStatementSyntax node) {
@@ -344,8 +344,6 @@ namespace RoslynMonoFamix.Visitor {
                 FAMIX.LocalVariable Variable = this.importer.EnsureLocalVariable((ILocalSymbol)symbol);
                 Group.AddLocalVariable(Variable);
             }
-            
-
             base.VisitModifiedIdentifier(node);
         }
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node) {
@@ -571,16 +569,24 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitForEachBlock(node);
         }
         public override void VisitForStatement(ForStatementSyntax node) {
+
             this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
             this.CurrentContext<FAMIX.Method>().numberOfLoops++;
 
-            this.PushContext(FAMIX.TypingContext.NullContext());
+            FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure();
+            FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
+
+            this.PushContext(FamixEntity);
+            this.PushContext(Group);
+            
             base.VisitForStatement(node);
+
             this.PopContext();
+            Group.AddAllLocalVariablesInto(FamixEntity);
+
         }
         public override void VisitForStepClause(ForStepClauseSyntax node) {
-            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
-            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
+            
             base.VisitForStepClause(node);
         }
         public override void VisitForEachStatement(ForEachStatementSyntax node) {
@@ -590,6 +596,7 @@ namespace RoslynMonoFamix.Visitor {
         }
         public override void VisitNextStatement(NextStatementSyntax node) {
             base.VisitNextStatement(node);
+            this.PopContext();
         }
         public override void VisitUsingStatement(UsingStatementSyntax node) {
             throw new Exception("MustReview");
@@ -683,7 +690,6 @@ namespace RoslynMonoFamix.Visitor {
                 }
             } else {
                 /* In this invocation expression area, we have to link the outgoing calls. If we cannot get a direct call nor some candidates, it may mean that we are missing something */
-
                 throw new Exception("missing something maybe? ");
             }
 
@@ -877,8 +883,10 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitPredefinedType(node);
         }
         public override void VisitIdentifierName(IdentifierNameSyntax node) {
-            FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
-            typing.TypeUsing(importer);
+            if (!(node.Parent is ForStatementSyntax)) {
+                FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
+                typing.TypeUsing(importer);
+            }
             base.VisitIdentifierName(node);
         }
         public override void VisitGenericName(GenericNameSyntax node) {

@@ -257,6 +257,8 @@ namespace RoslynMonoFamix.ModelBuilder {
             return parameter;
         }
 
- 
+        public ControlFlowStructure CreateControlStructure() {
+            return this.CreateNewEntity<FAMIX.ControlFlowStructure>(typeof(FAMIX.ControlFlowStructure).FullName);
+        }
     }
 }

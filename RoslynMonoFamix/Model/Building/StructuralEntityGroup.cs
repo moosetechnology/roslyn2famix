@@ -37,7 +37,10 @@ namespace FAMIX {
             }
         }
         public Type Type() {
-            return group[0].declaredType;
+            if (group.Count > 0) {
+                return group[0].declaredType;
+            }
+            return null;
         }
 
         public void AddAttribute(Attribute attribute) {

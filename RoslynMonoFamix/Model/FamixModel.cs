@@ -43,6 +43,7 @@ namespace Model
             metaRepo.RegisterType(typeof(ParameterizableMethod));
             metaRepo.RegisterType(typeof(TypeBoundary));
             metaRepo.RegisterType(typeof(Implements));
+            metaRepo.RegisterType(typeof(ControlFlowStructure));
             
             return t.model;
         }

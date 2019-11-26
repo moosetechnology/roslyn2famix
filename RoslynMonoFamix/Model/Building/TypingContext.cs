@@ -31,7 +31,7 @@ namespace FAMIX {
             return new AttributeTypingContext(entity, symbol);
         }
         public static TypingContext StructuralEntityGroup(FAMIX.StructuralEntityGroup entity, ISymbol symbol) {
-            return new AttributeGroupTypingContext(entity, symbol);
+            return new StructuralEntityGroupTypingContext(entity, symbol);
         }
         public static TypingContext Inheritance(FAMIX.Inheritance entity, INamedTypeSymbol symbol) {
             return new InheritanceTypingContext(entity, symbol);
@@ -138,10 +138,10 @@ namespace FAMIX {
         }
     }
 
-    public class AttributeGroupTypingContext : TypingContext {
+    public class StructuralEntityGroupTypingContext : TypingContext {
         protected FAMIX.StructuralEntityGroup entity;
 
-        public AttributeGroupTypingContext(FAMIX.StructuralEntityGroup entity, ISymbol relatedSymbol) : base(relatedSymbol) {
+        public StructuralEntityGroupTypingContext(FAMIX.StructuralEntityGroup entity, ISymbol relatedSymbol) : base(relatedSymbol) {
             this.entity = entity;
         }
         protected override void SetType(Type type) {

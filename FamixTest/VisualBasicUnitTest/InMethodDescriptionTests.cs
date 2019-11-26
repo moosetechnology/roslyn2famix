@@ -46,8 +46,7 @@ namespace FamixTest.VisualBasicUnitTest {
                 Next
             End Sub
             Public Sub ExampleForSecond()
-                Dim index As Integer
-                For index = 1 To 20
+                For index As Integer = 1 To 20
                     Me.Dummy(index)
                 Next
             End Sub
