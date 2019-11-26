@@ -11,6 +11,8 @@ namespace FAMIX {
     public class ControlFlowStructure : FAMIX.BehaviouralEntity {
         [FameProperty(Name = "kind")]
         public String kind;
+        [FameProperty(Name = "condition")]
+        public String Condition;
         [FameProperty(Name = "context", Opposite = "controlFlowStructures")]
         public BehaviouralEntity context;
     }

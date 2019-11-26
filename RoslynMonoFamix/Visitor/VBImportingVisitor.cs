@@ -24,14 +24,14 @@ namespace RoslynMonoFamix.Visitor {
         }
         public override void VisitEndBlockStatement(EndBlockStatementSyntax node) {
 
-            if(node.Parent is MethodBlockSyntax && stack.Count != 3) {
+            if (node.Parent is MethodBlockSyntax && stack.Count != 3) {
                 var a = " ";
 
             }
 
 
-            if (   node.Kind() == SyntaxKind.EndSubStatement 
-                || node.Kind() == SyntaxKind.EndFunctionStatement 
+            if (node.Kind() == SyntaxKind.EndSubStatement
+                || node.Kind() == SyntaxKind.EndFunctionStatement
                 || node.Kind() == SyntaxKind.EndClassStatement
                 || node.Kind() == SyntaxKind.EndInterfaceStatement
                 || node.Kind() == SyntaxKind.EndNamespaceStatement
@@ -205,7 +205,7 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitParameterList(node);
         }
 
-      
+
         public override void VisitMethodStatement(MethodStatementSyntax node) {
             FAMIX.Method FamixMethod = importer.EnsureMethod(importer.model.GetDeclaredSymbol(node));
 
@@ -214,7 +214,7 @@ namespace RoslynMonoFamix.Visitor {
             FamixMethod.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword);
             FamixMethod.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword);
             FamixMethod.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
-            
+
             FAMIX.Type AGoodSuperContext = this.CurrentContext<FAMIX.Type>();
             AGoodSuperContext.AddMethod(FamixMethod);
             this.PushContext(FamixMethod);
@@ -478,6 +478,8 @@ namespace RoslynMonoFamix.Visitor {
 
             FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("IF", method);
             FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
+            FamixEntity.Condition = node.Condition.ToString();
+
 
             this.PushContext(FamixEntity);
             this.PushContext(Group);
@@ -499,6 +501,8 @@ namespace RoslynMonoFamix.Visitor {
             method.numberOfConditionals++;
 
             FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("ELSE-IF", method);
+            FamixEntity.Condition = node.Condition.ToString();
+
             FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
 
             this.PushContext(FamixEntity);
@@ -509,8 +513,8 @@ namespace RoslynMonoFamix.Visitor {
 
             this.PopContext();
             Group.AddAllLocalVariablesInto(FamixEntity);
-            
-            
+
+
         }
         public override void VisitElseBlock(ElseBlockSyntax node) {
             base.VisitElseBlock(node);
@@ -532,7 +536,7 @@ namespace RoslynMonoFamix.Visitor {
 
             this.PopContext();
             Group.AddAllLocalVariablesInto(FamixEntity);
-           
+
         }
         public override void VisitTryBlock(TryBlockSyntax node) {
             throw new Exception("MustReview");
@@ -617,6 +621,7 @@ namespace RoslynMonoFamix.Visitor {
 
             FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("WHILE", method);
             FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
+            FamixEntity.Condition = node.Condition.ToString();
 
             this.PushContext(FamixEntity);
             this.PushContext(Group);
@@ -638,8 +643,14 @@ namespace RoslynMonoFamix.Visitor {
             method.numberOfLoops++;
 
             FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("FOR", method);
+            FamixEntity.Condition = node.FromValue.ToString() + " To " + node.ToValue.ToString() + " Step ";
+            if (node.StepClause == null || node.StepClause.StepValue == null) {
+                FamixEntity.Condition += "1"; 
+            } else { 
+                FamixEntity.Condition += node.StepClause.StepValue.ToString(); 
+            }
             FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
-            
+
             this.PushContext(FamixEntity);
             this.PushContext(Group);
 
@@ -649,16 +660,30 @@ namespace RoslynMonoFamix.Visitor {
             Group.AddAllLocalVariablesInto(FamixEntity);
         }
         public override void VisitForStepClause(ForStepClauseSyntax node) {
-            
+
             base.VisitForStepClause(node);
         }
         public override void VisitForEachStatement(ForEachStatementSyntax node) {
-            this.CurrentContext<FAMIX.Method>().numberOfConditionals++;
-            this.CurrentContext<FAMIX.Method>().numberOfLoops++;
+            FAMIX.BehaviouralEntity method = this.CurrentContext<FAMIX.BehaviouralEntity>();
+            method.numberOfConditionals++;
+            method.numberOfLoops++;
+
+            FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("FOREACH", method);
+            FamixEntity.Condition = node.Expression.ToString();
+            FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
+
+            this.PushContext(FamixEntity);
+            this.PushContext(Group);
+
             base.VisitForEachStatement(node);
+
+            this.PopContext();
+            Group.AddAllLocalVariablesInto(FamixEntity);
+
+
         }
         public override void VisitNextStatement(NextStatementSyntax node) {
-            
+
             base.VisitNextStatement(node);
             this.PopContext();
         }
