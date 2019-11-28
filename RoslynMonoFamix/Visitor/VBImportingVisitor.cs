@@ -62,16 +62,16 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitImportsStatement(ImportsStatementSyntax node) {
-            throw new Exception("MustReview");
+            //Nothing to do;
         }
         public override void VisitSimpleImportsClause(SimpleImportsClauseSyntax node) {
-            throw new Exception("MustReview");
+            //Nothing to do;
         }
         public override void VisitImportAliasClause(ImportAliasClauseSyntax node) {
-            throw new Exception("MustReview");
+            //Nothing to do;
         }
         public override void VisitXmlNamespaceImportsClause(XmlNamespaceImportsClauseSyntax node) {
-            throw new Exception("MustReview");
+            //Nothing to do;
         }
         public override void VisitNamespaceBlock(NamespaceBlockSyntax node) {
             base.VisitNamespaceBlock(node);
@@ -186,7 +186,7 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitMethodBlock(node);
         }
         public override void VisitConstructorBlock(ConstructorBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitConstructorBlock(node);
         }
         public override void VisitOperatorBlock(OperatorBlockSyntax node) {
             throw new Exception("MustReview");
@@ -305,7 +305,8 @@ namespace RoslynMonoFamix.Visitor {
 
         }
         public override void VisitImplementsClause(ImplementsClauseSyntax node) {
-            throw new Exception("MustReview");
+            if (node.Parent is MethodStatementSyntax) return;
+            throw new Exception("Should we care about this? ");
         }
         public override void VisitHandlesClause(HandlesClauseSyntax node) {
             throw new Exception("MustReview");
@@ -337,10 +338,6 @@ namespace RoslynMonoFamix.Visitor {
             Group.AddModifiers(node.Modifiers.Select(p => p.Text).ToList());
             Group.AddAllAttributesInto(FamixClass);
         }
-        /*
-         *   aca tendria que manejar la definicion de una variable en particular, con un  tipo en particular definido en visitVariabledeclarator. El problema es que este modified identifier ya lo use antes, o sea, hay mas de un caso
-         *   en el que uno visitaria este nodo, y no solo desde la declaracion de un field. lo importante es que es importer.model.GetDeclaredSymbol solo va a darnos info interesante con este node, ni con el variable declarator ni con el field declaration 
-         */
         public override void VisitModifiedIdentifier(ModifiedIdentifierSyntax node) {
             var symbol = this.importer.model.GetDeclaredSymbol(node);
             if (symbol != null && symbol is IFieldSymbol) {
@@ -351,6 +348,7 @@ namespace RoslynMonoFamix.Visitor {
             if (symbol != null && symbol is ILocalSymbol) {
                 FAMIX.StructuralEntityGroup Group = this.CurrentContext<FAMIX.StructuralEntityGroup>();
                 FAMIX.LocalVariable Variable = this.importer.EnsureLocalVariable((ILocalSymbol)symbol);
+
                 Group.AddLocalVariable(Variable);
             }
             base.VisitModifiedIdentifier(node);
@@ -381,7 +379,14 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitEqualsValue(EqualsValueSyntax node) {
-            if (!(this.CurrentContext<FAMIX.Parameter>() is FAMIX.Parameter)) throw new Exception("Should check what's happening here. The parameters are managing the default value. What about this thing in the stack? ");
+            FAMIX.Entity context = this.CurrentContext<FAMIX.Entity>();
+
+            if ((context is FAMIX.StructuralEntity) || context is FAMIX.StructuralEntityGroup) {
+                base.VisitEqualsValue(node);
+                return;
+            }
+
+            if (!(context is FAMIX.Parameter)) throw new Exception("Should check what's happening here. The parameters are managing the default value. What about this thing in the stack? ");
             base.VisitEqualsValue(node);
         }
         public override void VisitParameter(ParameterSyntax node) {
@@ -397,10 +402,22 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitAttributeList(AttributeListSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitAttributeList(node);
         }
         public override void VisitAttribute(AttributeSyntax node) {
-            throw new Exception("MustReview");
+
+            var symbol = (IMethodSymbol) this.importer.model.GetSymbolInfo(node).Symbol;
+
+            if (symbol == null) throw new Exception("Attribute has not related symbol");
+            if (symbol.MethodKind != MethodKind.Constructor) throw new Exception("Attribute symbol is not a constructor");
+            if (symbol.ReceiverType == null ) throw new Exception("Receiver type symbol is null");
+
+            FAMIX.AnnotationInstance instance = importer.EnsureAnnotationInstance (symbol, this.CurrentContext<FAMIX.NamedEntity>());
+            this.PushContext(instance);
+
+            base.VisitAttribute(node);
+
+            this.PopContext();
         }
         public override void VisitAttributeTarget(AttributeTargetSyntax node) {
             throw new Exception("MustReview");
@@ -645,9 +662,9 @@ namespace RoslynMonoFamix.Visitor {
             FAMIX.ControlFlowStructure FamixEntity = this.importer.CreateControlStructure("FOR", method);
             FamixEntity.Condition = node.FromValue.ToString() + " To " + node.ToValue.ToString() + " Step ";
             if (node.StepClause == null || node.StepClause.StepValue == null) {
-                FamixEntity.Condition += "1"; 
-            } else { 
-                FamixEntity.Condition += node.StepClause.StepValue.ToString(); 
+                FamixEntity.Condition += "1";
+            } else {
+                FamixEntity.Condition += node.StepClause.StepValue.ToString();
             }
             FAMIX.StructuralEntityGroup Group = this.importer.CreateStructuralEntityGroup();
 
@@ -691,7 +708,11 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitThrowStatement(ThrowStatementSyntax node) {
-            throw new Exception("MustReview");
+            if (node.Expression != null) {
+                var symbolInfo = importer.model.GetTypeInfo(node.Expression).Type;
+                FAMIX.ThrownException thrownException = importer.CreateExceptionFor(symbolInfo, (FAMIX.Method)this.CurrentMethod() );
+            }
+            base.VisitThrowStatement(node);
         }
         public override void VisitAssignmentStatement(AssignmentStatementSyntax node) {
             this.PushContext(FAMIX.TypingContext.NullContext());
@@ -759,7 +780,7 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node) {
-            throw new Exception("MustReview");
+            
         }
         public override void VisitXmlMemberAccessExpression(XmlMemberAccessExpressionSyntax node) {
             throw new Exception("MustReview");
@@ -784,16 +805,16 @@ namespace RoslynMonoFamix.Visitor {
 
         }
         public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node) {
-            throw new Exception("MustReview");
+             // Nothing to do here! 
         }
         public override void VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpressionSyntax node) {
-            throw new Exception("MustReview");
+            // Nothing to do here! 
         }
         public override void VisitArrayCreationExpression(ArrayCreationExpressionSyntax node) {
-            throw new Exception("MustReview");
+            // Nothing to do here! 
         }
         public override void VisitCollectionInitializer(CollectionInitializerSyntax node) {
-            throw new Exception("MustReview");
+            // Nothing to do here! 
         }
         public override void VisitCTypeExpression(CTypeExpressionSyntax node) {
             throw new Exception("MustReview");
@@ -808,10 +829,10 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitBinaryExpression(BinaryExpressionSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitBinaryExpression(node);
         }
         public override void VisitUnaryExpression(UnaryExpressionSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitUnaryExpression(node);
         }
         public override void VisitBinaryConditionalExpression(BinaryConditionalExpressionSyntax node) {
             throw new Exception("MustReview");
@@ -832,13 +853,17 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitArgumentList(node);
         }
         public override void VisitOmittedArgument(OmittedArgumentSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitOmittedArgument(node);
         }
         public override void VisitSimpleArgument(SimpleArgumentSyntax node) {
+            if (node.NameColonEquals != null) { 
+                
+            }
+
             base.VisitSimpleArgument(node);
         }
         public override void VisitNameColonEquals(NameColonEqualsSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitNameColonEquals(node);
         }
         public override void VisitRangeArgument(RangeArgumentSyntax node) {
             throw new Exception("MustReview");
@@ -972,7 +997,7 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitPredefinedType(node);
         }
         public override void VisitIdentifierName(IdentifierNameSyntax node) {
-            if (!(node.Parent is ForStatementSyntax)) {
+            if (!(node.Parent is ForStatementSyntax || node.Parent is AttributeSyntax || node.Parent is NameColonEqualsSyntax)) {
                 FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
                 typing.TypeUsing(importer);
             }

@@ -105,6 +105,5 @@ namespace RoslynMonoFamix.ModelBuilder {
             this.CreateSourceAnchor(invocation, node);
         }
 
-
     }
 }

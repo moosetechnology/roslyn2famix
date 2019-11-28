@@ -163,7 +163,6 @@ namespace RoslynMonoFamix.ModelBuilder {
             return implements;
         }
         public ScopingEntity CreateScopingEntity(CompilationUnitSyntax node) {
-            if (entity != null) throw new System.Exception(" NOOOOOOO ");
             entity = new FAMIX.ScopingEntity();
             return entity;
         }
@@ -229,7 +228,6 @@ namespace RoslynMonoFamix.ModelBuilder {
             localvariable.accessibility = helper.AccessibilityName(symbol.DeclaredAccessibility);
             localvariable.declaredType = this.EnsureType(symbol.Type);
             localvariable.name = symbol.Name;
-
             return localvariable;
         }
         public StructuralEntityGroup CreateStructuralEntityGroup() {
@@ -263,6 +261,26 @@ namespace RoslynMonoFamix.ModelBuilder {
             context.AddControlFlow(FamixEntity);
             FamixEntity.context = context;
             return FamixEntity;
+        }
+
+        public ThrownException CreateExceptionFor(ITypeSymbol symbolInfo, FAMIX.Method method) {
+            FAMIX.ThrownException thrownException = this.CreateNewEntity<FAMIX.ThrownException>(typeof(FAMIX.ThrownException).FullName);
+            thrownException.definingMethod = method;
+            thrownException.exceptionClass = (FAMIX.Class) this.EnsureType(symbolInfo);
+            return thrownException;
+        }
+
+        public AnnotationInstance EnsureAnnotationInstance(IMethodSymbol symbol, FAMIX.NamedEntity currentContext) {
+            FAMIX.AnnotationInstance instance;
+            FAMIX.AnnotationType type;
+            
+            type = (FAMIX.AnnotationType) this.EnsureType(symbol.ReceiverType);
+            instance = this.CreateNewEntity<FAMIX.AnnotationInstance>(typeof(FAMIX.AnnotationInstance).FullName);
+            instance.annotationType = type;
+            instance.annotatedEntity = currentContext;
+
+
+            return instance; 
         }
     }
 }

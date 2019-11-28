@@ -72,11 +72,7 @@ namespace FamixTest.VisualBasicUnitTest {
             Assert.AreEqual(((Net.Property)Attribute(4)).getter.kind, "PropertyGet");
             Assert.AreEqual(((Net.Property)Attribute(4)).setter.kind, "PropertySet");
         }
-        [TestMethod]
-        public void ParseStudyCase_Attribute5SetterAndGetterReliesOnAttribute1() {
-            Assert.Fail();
-        }
-
+ 
         [TestMethod]
         public void ParseStudyCase_Attribute5IsTypedString() {
             AssertAttributeHasTypeNamed(4, "String");
