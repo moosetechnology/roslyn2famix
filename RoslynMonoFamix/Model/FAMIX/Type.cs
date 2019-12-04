@@ -28,7 +28,7 @@ namespace FAMIX {
             get { return attributes; }
             set { attributes = value; }
         }
-        public void AddAttribute(FAMIX.Attribute one) {
+        public virtual void AddAttribute(FAMIX.Attribute one) {
             attributes.Add(one);
         }
 

@@ -12,7 +12,7 @@ namespace FAMIX
   public class AnnotationInstanceAttribute : FAMIX.SourcedEntity
   {
     [FameProperty(Name = "annotationTypeAttribute",  Opposite = "annotationAttributeInstances")]    
-    public FAMIX.AnnotationTypeAttribute annotationTypeAttribute { get; set; }
+    public FAMIX.Attribute annotationTypeAttribute { get; set; }
     
     [FameProperty(Name = "parentAnnotationInstance",  Opposite = "attributes")]    
     public FAMIX.AnnotationInstance parentAnnotationInstance { get; set; }

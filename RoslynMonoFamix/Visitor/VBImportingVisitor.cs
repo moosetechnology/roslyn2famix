@@ -33,6 +33,7 @@ namespace RoslynMonoFamix.Visitor {
             if (node.Kind() == SyntaxKind.EndSubStatement
                 || node.Kind() == SyntaxKind.EndFunctionStatement
                 || node.Kind() == SyntaxKind.EndClassStatement
+                || node.Kind() == SyntaxKind.EndModuleStatement
                 || node.Kind() == SyntaxKind.EndInterfaceStatement
                 || node.Kind() == SyntaxKind.EndNamespaceStatement
                 || node.Kind() == SyntaxKind.EndPropertyStatement
@@ -40,7 +41,7 @@ namespace RoslynMonoFamix.Visitor {
                 || node.Kind() == SyntaxKind.EndGetStatement
                 || node.Kind() == SyntaxKind.EndWhileStatement
                 || node.Kind() == SyntaxKind.EndIfStatement
-                //|| node.Kind() == SyntaxKind.EndWhileStatement
+                || node.Kind() == SyntaxKind.EndEnumStatement
                 ) {
                 this.PopContext();
             } else {
@@ -59,7 +60,7 @@ namespace RoslynMonoFamix.Visitor {
             this.Assert(stack.Count == 0);
         }
         public override void VisitOptionStatement(OptionStatementSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitOptionStatement(node);
         }
         public override void VisitImportsStatement(ImportsStatementSyntax node) {
             //Nothing to do;
@@ -82,7 +83,7 @@ namespace RoslynMonoFamix.Visitor {
             this.PushContext(nspace);
         }
         public override void VisitModuleBlock(ModuleBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitModuleBlock(node);
         }
         public override void VisitStructureBlock(StructureBlockSyntax node) {
             throw new Exception("MustReview");
@@ -94,7 +95,7 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitClassBlock(node);
         }
         public override void VisitEnumBlock(EnumBlockSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitEnumBlock(node);
         }
         public override void VisitInheritsStatement(InheritsStatementSyntax node) {
             FAMIX.Inheritance inheritance = importer.CreateInheritanceFor(this.CurrentContext<FAMIX.Class>());
@@ -115,7 +116,17 @@ namespace RoslynMonoFamix.Visitor {
             this.PopContext();
         }
         public override void VisitModuleStatement(ModuleStatementSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.Class FamixClass = importer.EnsureClass(importer.model.GetDeclaredSymbol(node));
+            FamixClass.isModule = true;
+            FamixClass.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
+            FamixClass.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
+            FamixClass.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword); ;
+            FamixClass.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword); ;
+            FamixClass.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
+            FAMIX.IAddType AGoodSuperContext = (FAMIX.IAddType)this.CurrentContext<FAMIX.Entity>();
+            AGoodSuperContext.AddType(FamixClass);
+            this.PushContext(FamixClass);
+            base.VisitModuleStatement(node);
         }
         public override void VisitStructureStatement(StructureStatementSyntax node) {
             throw new Exception("MustReview");
@@ -147,7 +158,17 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitClassStatement(node);
         }
         public override void VisitEnumStatement(EnumStatementSyntax node) {
-            throw new Exception("MustReview");
+            FAMIX.Type FamixType = importer.EnsureType(importer.model.GetDeclaredSymbol(node));
+
+            FamixType.isShadow = node.Modifiers.Any(SyntaxKind.ShadowsKeyword);
+            FamixType.isPrivate = node.Modifiers.Any(SyntaxKind.PrivateKeyword);
+            FamixType.isPublic = node.Modifiers.Any(SyntaxKind.PublicKeyword); ;
+            FamixType.isProtected = node.Modifiers.Any(SyntaxKind.ProtectedKeyword); ;
+            FamixType.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
+            FAMIX.IAddType AGoodSuperContext = (FAMIX.IAddType)this.CurrentContext<FAMIX.Entity>();
+            AGoodSuperContext.AddType(FamixType);
+            this.PushContext(FamixType);
+            base.VisitEnumStatement(node);
         }
         public override void VisitTypeParameterList(TypeParameterListSyntax node) {
             base.VisitTypeParameterList(node);
@@ -180,7 +201,14 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitTypeConstraint(node);
         }
         public override void VisitEnumMemberDeclaration(EnumMemberDeclarationSyntax node) {
-            throw new Exception("MustReview");
+
+            var Enumeration = this.CurrentContext<FAMIX.Enum>();
+            var EnumVal = importer.EnsureEnumField(importer.model.GetDeclaredSymbol(node));
+            Enumeration.AddValue(EnumVal);
+            EnumVal.parentEnum = Enumeration;
+            this.PushContext(EnumVal);
+            base.VisitEnumMemberDeclaration(node);
+            this.PopContext();
         }
         public override void VisitMethodBlock(MethodBlockSyntax node) {
             base.VisitMethodBlock(node);
@@ -405,25 +433,33 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitAttributeList(node);
         }
         public override void VisitAttribute(AttributeSyntax node) {
+            FAMIX.AnnotationInstance instance;
+            ISymbol symbolicRef = this.importer.model.GetDeclaredSymbol(node.Parent.Parent);
 
-            var symbol = (IMethodSymbol) this.importer.model.GetSymbolInfo(node).Symbol;
 
-            if (symbol == null) throw new Exception("Attribute has not related symbol");
-            if (symbol.MethodKind != MethodKind.Constructor) throw new Exception("Attribute symbol is not a constructor");
-            if (symbol.ReceiverType == null ) throw new Exception("Receiver type symbol is null");
-
-            FAMIX.AnnotationInstance instance = importer.EnsureAnnotationInstance (symbol, this.CurrentContext<FAMIX.NamedEntity>());
-            this.PushContext(instance);
-
-            base.VisitAttribute(node);
-
-            this.PopContext();
+            if (symbolicRef != null) {
+                String name = node.Name.ToString();
+                List<AttributeData> symbols;
+                symbols = symbolicRef.GetAttributes().ToList().FindAll(f => f.AttributeClass.Name == name);
+                if (symbols.Count() == 0) {
+                    if (node.Name is QualifiedNameSyntax) {
+                        name = ((QualifiedNameSyntax)node.Name).Right.ToString();
+                    }
+                    symbols = symbolicRef.GetAttributes().ToList().FindAll(f => f.AttributeClass.Name == name);
+                }
+                if (symbols.Count() > 0) {
+                    instance = importer.EnsureAnnotationInstance(symbols.First(), this.CurrentContext<FAMIX.NamedEntity>());
+                    this.PushContext(instance);
+                    base.VisitAttribute(node);
+                    this.PopContext();
+                }
+            }
         }
         public override void VisitAttributeTarget(AttributeTargetSyntax node) {
             throw new Exception("MustReview");
         }
         public override void VisitAttributesStatement(AttributesStatementSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitAttributesStatement(node);
         }
         public override void VisitExpressionStatement(ExpressionStatementSyntax node) {
             base.VisitExpressionStatement(node);
@@ -710,7 +746,7 @@ namespace RoslynMonoFamix.Visitor {
         public override void VisitThrowStatement(ThrowStatementSyntax node) {
             if (node.Expression != null) {
                 var symbolInfo = importer.model.GetTypeInfo(node.Expression).Type;
-                FAMIX.ThrownException thrownException = importer.CreateExceptionFor(symbolInfo, (FAMIX.Method)this.CurrentMethod() );
+                FAMIX.ThrownException thrownException = importer.CreateExceptionFor(symbolInfo, (FAMIX.Method)this.CurrentMethod());
             }
             base.VisitThrowStatement(node);
         }
@@ -762,13 +798,13 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitMeExpression(MeExpressionSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitMeExpression(node);
         }
         public override void VisitMyBaseExpression(MyBaseExpressionSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitMyBaseExpression(node);
         }
         public override void VisitMyClassExpression(MyClassExpressionSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitMyClassExpression(node);
         }
         public override void VisitGetTypeExpression(GetTypeExpressionSyntax node) {
             throw new Exception("MustReview");
@@ -780,7 +816,7 @@ namespace RoslynMonoFamix.Visitor {
             throw new Exception("MustReview");
         }
         public override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node) {
-            
+
         }
         public override void VisitXmlMemberAccessExpression(XmlMemberAccessExpressionSyntax node) {
             throw new Exception("MustReview");
@@ -805,7 +841,7 @@ namespace RoslynMonoFamix.Visitor {
 
         }
         public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node) {
-             // Nothing to do here! 
+            // Nothing to do here! 
         }
         public override void VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpressionSyntax node) {
             // Nothing to do here! 
@@ -817,13 +853,13 @@ namespace RoslynMonoFamix.Visitor {
             // Nothing to do here! 
         }
         public override void VisitCTypeExpression(CTypeExpressionSyntax node) {
-            throw new Exception("MustReview");
+            // Nothing to do here.. by the moment base.VisitCTypeExpression(node);
         }
         public override void VisitDirectCastExpression(DirectCastExpressionSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitDirectCastExpression(node);
         }
         public override void VisitTryCastExpression(TryCastExpressionSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitTryCastExpression(node);
         }
         public override void VisitPredefinedCastExpression(PredefinedCastExpressionSyntax node) {
             throw new Exception("MustReview");
@@ -856,10 +892,9 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitOmittedArgument(node);
         }
         public override void VisitSimpleArgument(SimpleArgumentSyntax node) {
-            if (node.NameColonEquals != null) { 
-                
+            if (node.NameColonEquals != null) {
+                this.importer.EnsureAnnotationAttributeInto(this.CurrentContext<FAMIX.AnnotationInstance>(), node.NameColonEquals.Name.ToString(), node.Expression.ToString());
             }
-
             base.VisitSimpleArgument(node);
         }
         public override void VisitNameColonEquals(NameColonEqualsSyntax node) {
@@ -997,23 +1032,32 @@ namespace RoslynMonoFamix.Visitor {
             base.VisitPredefinedType(node);
         }
         public override void VisitIdentifierName(IdentifierNameSyntax node) {
-            if (!(node.Parent is ForStatementSyntax || node.Parent is AttributeSyntax || node.Parent is NameColonEqualsSyntax)) {
+            if (!(node.Parent is ForStatementSyntax || node.Parent is AttributeSyntax || node.Parent is NameColonEqualsSyntax || node.Parent is BinaryExpressionSyntax || node.Parent is QualifiedNameSyntax)) {
                 FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
                 typing.TypeUsing(importer);
             }
             base.VisitIdentifierName(node);
         }
         public override void VisitGenericName(GenericNameSyntax node) {
-            throw new Exception("MustReview");
+            if (!(node.Parent is ForStatementSyntax || node.Parent is AttributeSyntax || node.Parent is NameColonEqualsSyntax || node.Parent is BinaryExpressionSyntax)) {
+                FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
+                typing.TypeUsing(importer);
+            }
+            base.VisitGenericName(node);
+
         }
         public override void VisitQualifiedName(QualifiedNameSyntax node) {
-            throw new Exception("MustReview");
+            if (!(node.Parent is ForStatementSyntax || node.Parent is AttributeSyntax || node.Parent is NameColonEqualsSyntax || node is QualifiedNameSyntax)) {
+                FAMIX.TypingContext typing = this.CurrentContext<FAMIX.TypingContext>();
+                typing.TypeUsing(importer);
+            }
+            base.VisitQualifiedName(node);
         }
         public override void VisitGlobalName(GlobalNameSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitGlobalName(node);
         }
         public override void VisitTypeArgumentList(TypeArgumentListSyntax node) {
-            throw new Exception("MustReview");
+            base.VisitTypeArgumentList(node);
         }
         public override void VisitCrefReference(CrefReferenceSyntax node) {
             throw new Exception("MustReview");

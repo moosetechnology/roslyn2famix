@@ -22,6 +22,7 @@ namespace Model
             metaRepo.RegisterType(typeof(Type));
             metaRepo.RegisterType(typeof(Net.Property));
             metaRepo.RegisterType(typeof(Net.PropertyAccessor));
+            metaRepo.RegisterType(typeof(Net.Delegate));
             metaRepo.RegisterType(typeof(AnnotationType));
             metaRepo.RegisterType(typeof(AnnotationTypeAttribute));
             metaRepo.RegisterType(typeof(AnnotationInstance));
@@ -44,6 +45,7 @@ namespace Model
             metaRepo.RegisterType(typeof(TypeBoundary));
             metaRepo.RegisterType(typeof(Implements));
             metaRepo.RegisterType(typeof(ControlFlowStructure));
+            metaRepo.RegisterType(typeof(ScopingEntity));
             
             return t.model;
         }

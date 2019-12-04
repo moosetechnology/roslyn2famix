@@ -24,7 +24,10 @@ namespace RoslynMonoFamix.ModelBuilder {
             
             System.Type result = typeof(FAMIX.Class);
 
+           
             if (aType is ITypeSymbol) typeNameMap.TryGetValue(((ITypeSymbol)aType).TypeKind.ToString(), out result);
+
+            
             if (aType is INamedTypeSymbol) {
                 var superType = (aType as INamedTypeSymbol).BaseType;
                 while (superType != null) {

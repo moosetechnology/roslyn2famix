@@ -31,7 +31,9 @@ namespace RoslynMonoFamix.ModelBuilder {
         public T CreateNewEntity<T>(String typeName) {
             return repository.New<T>(typeName);
         }
-        private void LinkWithInheritance(FAMIX.Class subClass, FAMIX.Class superClass) {
+
+
+        public void LinkWithInheritance(FAMIX.Type subClass, FAMIX.Type superClass) {
             FAMIX.Inheritance inheritance = CreateNewEntity<FAMIX.Inheritance>(typeof(FAMIX.Inheritance).FullName);
             inheritance.subclass = subClass;
             inheritance.superclass = superClass;

@@ -22,5 +22,9 @@ namespace FAMIX {
         [FameProperty(Name = "isInterface")]
         public Boolean isInterface { get; set; }
 
+
+        [FameProperty(Name = "isModule")]
+        public Boolean isModule { get; set; }
+
     }
 }

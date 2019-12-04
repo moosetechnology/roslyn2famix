@@ -9,7 +9,7 @@ namespace FAMIX
 {
   [FamePackage("FAMIX")]
   [FameDescription("AnnotationType")]
-  public class AnnotationType : FAMIX.Type
+  public class AnnotationType : FAMIX.Class
   {
     [FameProperty(Name = "container",  Opposite = "definedAnnotationTypes")]    
     public FAMIX.ContainerEntity container { get; set; }
@@ -21,7 +21,8 @@ namespace FAMIX
     {
       get { return instances; }
       set { instances = value; }
-    }
+    } 
+
     public void AddInstance(FAMIX.AnnotationInstance one)
     {
       instances.Add(one);

@@ -3,8 +3,10 @@
 Public Class SingleDestinationAddress
     Inherits AbstractDestinationAddress
 
+
+
     <Custom(SomeArbitraryValue:="ToastForIt")>
-    <Required(ErrorMessage:="Invalid ID number")>
+    <RequiredAttribute(ErrorMessage:="Invalid ID number")>
     Public Property Id As String
 
     Public Overrides Function IsDestinationFor(anId As String) As Boolean

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Net
 {
-  [FamePackage("CSharp")]
+  [FamePackage("Net")]
   [FameDescription("Delegate")]
   public class Delegate : FAMIX.Type
   {

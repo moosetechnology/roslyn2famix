@@ -43,6 +43,46 @@ namespace RoslynMonoFamix.ModelBuilder {
                  () => { return this.CreateNamespace(ns); });
         }
 
+        internal FAMIX.Type EnsureBinaryType(INamedTypeSymbol superType) {
+
+            string fullName = helper.FullTypeName(superType.OriginalDefinition);
+
+            if (Types.has(fullName))
+                return Types.Named(fullName);
+
+            FAMIX.Type binaryType = RealEnsureType(superType.OriginalDefinition);
+            var members = superType.GetMembers();
+            foreach (var member in members) {
+
+                if ( member is IPropertySymbol) {
+                    var attr = EnsureProperty((IPropertySymbol)member) as FAMIX.Attribute;
+                    binaryType.AddAttribute(attr);
+                    attr.parentType = binaryType;
+                }
+
+                if (member is IFieldSymbol) {
+                    var attr = EnsureField((IFieldSymbol)member) as FAMIX.Attribute;
+                    binaryType.AddAttribute(attr);
+                    attr.parentType = binaryType;
+                }
+                if (member is IMethodSymbol) {
+                    var methd = EnsureMethod(member as IMethodSymbol) as FAMIX.Method;
+                    binaryType.AddMethod(methd);
+                    methd.parentType = binaryType;
+                }
+            }
+
+            if (superType.BaseType != null) {
+                var superDuper = EnsureType(superType.BaseType.OriginalDefinition);
+                LinkWithInheritance(binaryType, superDuper);
+            }
+
+            foreach (var inter in superType.AllInterfaces) {
+                var superDuper = EnsureType(inter.OriginalDefinition);
+                LinkWithInheritance(binaryType, superDuper);
+            }
+            return binaryType;
+        }
         public Method EnsureMethod(IMethodSymbol method) {
             string name = helper.FullMethodName(method);
             return Methods.EntityNamedIfNone<FAMIX.Method>(name,
@@ -132,11 +172,14 @@ namespace RoslynMonoFamix.ModelBuilder {
 
         private FAMIX.Class CreateNewClass(INamedTypeSymbol type) {
             FAMIX.Class entity;
-            if (type.TypeParameters.Count() == 0) {
-                entity = this.CreateNewEntity<FAMIX.Class>(typeof(FAMIX.Class).FullName);
-            } else {
-                entity = this.CreateNewEntity<FAMIX.ParameterizableClass>(typeof(FAMIX.ParameterizableClass).FullName);
+
+            if (type.DeclaringSyntaxReferences.Length == 0) {
+                return (FAMIX.Class)EnsureBinaryType(type);
             }
+
+            string typeKind = helper.ResolveFAMIXTypeName(type).FullName;
+
+            entity = this.CreateNewEntity<FAMIX.Class>(typeKind);
             entity.name = helper.FullTypeName(type);
             entity.isAbstract = type.IsAbstract;
             entity.isFinal = type.IsSealed;
@@ -163,7 +206,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             return implements;
         }
         public ScopingEntity CreateScopingEntity(CompilationUnitSyntax node) {
-            entity = new FAMIX.ScopingEntity();
+            entity = this.CreateNewEntity<FAMIX.ScopingEntity>(typeof(FAMIX.ScopingEntity).FullName);
             return entity;
         }
 
@@ -179,17 +222,25 @@ namespace RoslynMonoFamix.ModelBuilder {
             entity.isAbstract = true;
             entity.name = helper.FullTypeName(node);
             entity.isFinal = node.IsSealed;
-            entity.accessibility = helper.AccessibilityName(node.DeclaredAccessibility);            
+            entity.accessibility = helper.AccessibilityName(node.DeclaredAccessibility);
             return entity;
         }
-
         public FAMIX.Type EnsureType(ISymbol aType) {
+            if (aType.DeclaringSyntaxReferences.Length == 0 && aType is INamedTypeSymbol)
+                return EnsureBinaryType((INamedTypeSymbol)aType);
+            return RealEnsureType(aType);
+        }
+
+        public FAMIX.Type RealEnsureType(ISymbol aType) {
+            string typeKind = helper.ResolveFAMIXTypeName(aType).FullName;
+            return this.EnsureType(aType, typeKind);
+        }
+
+            public FAMIX.Type EnsureType(ISymbol aType, String typeKind) {
             string fullName = helper.FullTypeName(aType);
 
             if (Types.has(fullName))
                 return Types.Named(fullName);
-
-            string typeKind = helper.ResolveFAMIXTypeName(aType).FullName;
 
             FAMIX.Type type = repository.New<FAMIX.Type>(typeKind);
             type.isStub = true;
@@ -222,6 +273,14 @@ namespace RoslynMonoFamix.ModelBuilder {
             return attribute;
         }
 
+        public FAMIX.EnumValue EnsureEnumField(IFieldSymbol symbol) {
+            FAMIX.EnumValue value = this.CreateNewEntity<FAMIX.EnumValue>(typeof(FAMIX.EnumValue).FullName);
+            value.accessibility = helper.AccessibilityName(symbol.DeclaredAccessibility);
+            value.declaredType = this.EnsureType(symbol.Type);
+            value.name = symbol.Name;
+
+            return value;
+        }
 
         public LocalVariable EnsureLocalVariable(ILocalSymbol symbol) {
             FAMIX.LocalVariable localvariable = this.CreateNewEntity<FAMIX.LocalVariable>(typeof(FAMIX.LocalVariable).FullName);
@@ -256,7 +315,7 @@ namespace RoslynMonoFamix.ModelBuilder {
         }
 
         public ControlFlowStructure CreateControlStructure(String kind, BehaviouralEntity context) {
-            FAMIX.ControlFlowStructure FamixEntity = this.CreateNewEntity<FAMIX.ControlFlowStructure>(typeof(FAMIX.ControlFlowStructure).FullName); 
+            FAMIX.ControlFlowStructure FamixEntity = this.CreateNewEntity<FAMIX.ControlFlowStructure>(typeof(FAMIX.ControlFlowStructure).FullName);
             FamixEntity.kind = kind;
             context.AddControlFlow(FamixEntity);
             FamixEntity.context = context;
@@ -266,21 +325,46 @@ namespace RoslynMonoFamix.ModelBuilder {
         public ThrownException CreateExceptionFor(ITypeSymbol symbolInfo, FAMIX.Method method) {
             FAMIX.ThrownException thrownException = this.CreateNewEntity<FAMIX.ThrownException>(typeof(FAMIX.ThrownException).FullName);
             thrownException.definingMethod = method;
-            thrownException.exceptionClass = (FAMIX.Class) this.EnsureType(symbolInfo);
+            thrownException.exceptionClass = (FAMIX.Class)this.EnsureType(symbolInfo);
             return thrownException;
         }
 
-        public AnnotationInstance EnsureAnnotationInstance(IMethodSymbol symbol, FAMIX.NamedEntity currentContext) {
+        public AnnotationInstance EnsureAnnotationInstance(AttributeData symbol, FAMIX.NamedEntity currentContext) {
             FAMIX.AnnotationInstance instance;
             FAMIX.AnnotationType type;
             
-            type = (FAMIX.AnnotationType) this.EnsureType(symbol.ReceiverType);
+            type = (FAMIX.AnnotationType)this.EnsureType(symbol.AttributeClass, typeof(FAMIX.AnnotationType).FullName);
+
             instance = this.CreateNewEntity<FAMIX.AnnotationInstance>(typeof(FAMIX.AnnotationInstance).FullName);
+
+            type.AddInstance(instance);
+
             instance.annotationType = type;
+
             instance.annotatedEntity = currentContext;
 
+            return instance;
+        }
 
-            return instance; 
+
+       public FAMIX.Attribute EnsureAnnotationTypeAttribute(FAMIX.AnnotationType annotationType, String attributeName) {
+            var attributes = annotationType.Attributes.FindAll(a => a.name == attributeName);
+
+            if (attributes.Count() > 0) return attributes[0];
+
+            FAMIX.Attribute attr = this.CreateNewEntity<FAMIX.Attribute>(typeof(FAMIX.Attribute).FullName);
+            attr.name = attributeName;
+            annotationType.AddAttribute(attr);
+            return attr;
+
+       }
+        public AnnotationInstanceAttribute EnsureAnnotationAttributeInto(AnnotationInstance annotationInstance, string attributeName, string attributeValue) {
+            AnnotationInstanceAttribute attr;
+            attr = this.CreateNewEntity<FAMIX.AnnotationInstanceAttribute>(typeof(FAMIX.AnnotationInstanceAttribute).FullName);
+            
+            attr.annotationTypeAttribute = this.EnsureAnnotationTypeAttribute(annotationInstance.annotationType, attributeName);
+            attr.value = attributeValue;
+            return attr;
         }
     }
 }
