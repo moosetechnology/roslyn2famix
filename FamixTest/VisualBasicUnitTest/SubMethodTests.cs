@@ -39,9 +39,9 @@ namespace FamixTest.VisualBasicUnitTest {
 
         #region ParseEmptySubManyParameters
         [TestMethod]
-        public void ParseEmptySubManyParameters_Eight() {
+        public void ParseEmptySubManyParameters_Nine() {
             this.ParseEmptySubManyParameters();
-            this.AssertAmountElements(8);
+            this.AssertAmountElements(9);
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptySubManyParameters_IsInternal() {
             this.ParseEmptySubManyParameters();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.IsFalse(MethodElement.isPublic);
             Assert.IsFalse(MethodElement.isProtected);
             Assert.IsFalse(MethodElement.isPrivate);
@@ -75,7 +75,7 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptySubManyParameters_HasTwoParameters() {
             this.ParseEmptySubManyParameters();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.Parameters.Count, 2);
         }
 
@@ -88,13 +88,13 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptySubParameterLess_IsNamedExample() {
             this.ParseEmptySubParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.name, "ExampleSub");
         }
         [TestMethod]
         public void ParseEmptySubParameterLess_ReturnsNothing() {
             this.ParseEmptySubParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.returnType, null);
         }
 
@@ -102,24 +102,24 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptySubParameterLess_IsContainedInExampleClass() {
             this.ParseEmptySubParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
-            Assert.AreEqual(MethodElement.parentType, this.GetElement<FAMIX.Class>(0));
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
+            Assert.AreEqual(MethodElement.parentType, this.GetElement<FAMIX.Class>(1));
         }
         [TestMethod]
-        public void ParseEmptySubParameterLess_ThreeElements() {
+        public void ParseEmptySubParameterLess_FourElements() {
             this.ParseEmptySubParameterLess();
-            this.AssertAmountElements(3);
+            this.AssertAmountElements(4);
         }
         [TestMethod]
         public void ParseEmptySubParameterLess_Public() {
             this.ParseEmptySubParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.IsTrue(MethodElement.isPublic);
         }
         [TestMethod]
         public void ParseEmptySubParameterLess_HasNoParameter() {
             this.ParseEmptySubParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.Parameters.Count, 0);
         }
 
@@ -127,9 +127,9 @@ namespace FamixTest.VisualBasicUnitTest {
 
         #region ParseEmptySubOneParameter
         [TestMethod]
-        public void ParseEmptySubOneParameter_SixElements() {
+        public void ParseEmptySubOneParameter_SevenElements() {
             this.ParseEmptySubOneParameter();
-            this.AssertAmountElements(6);
+            this.AssertAmountElements(7);
         }
 
         [TestMethod]
@@ -148,13 +148,13 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptySubOneParameters_Protected() {
             this.ParseEmptySubOneParameter();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.IsTrue(MethodElement.isPublic);
         }
         [TestMethod]
         public void ParseEmptySubOneParameter_HasOneParameter() {
             this.ParseEmptySubOneParameter();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.Parameters.Count, 1);
         }
 

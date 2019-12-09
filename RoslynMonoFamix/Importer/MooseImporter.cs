@@ -13,6 +13,7 @@ using Model;
 using Fame;
 using RoslynMonoFamix.ModelBuilder;
 using RoslynMonoFamix.Visitor;
+using Microsoft.Build.Framework;
 
 namespace RoslynMonoFamix {
 
@@ -24,7 +25,7 @@ namespace RoslynMonoFamix {
             importer = new ModelBuilder.VisualBasicModelBuilder(_repository, ignoreFolder);
         }
         public override void Visit(SyntaxNode node) {
-            var visitor = new VBImportingVisitor (importer as VisualBasicModelBuilder) ;
+            var visitor = new VBImportingVisitor(importer as VisualBasicModelBuilder);
             visitor.Visit(node);
         }
     }
@@ -47,22 +48,19 @@ namespace RoslynMonoFamix {
         creating a AST and visiting for loading all the information of this project into a Famix Metamodel   
      */
     public abstract class MooseImporter {
-
-
-
+        
         internal ModelBuilder.AbstractModelBuilder importer;
         internal Repository _repository;
         internal string ignoreFolder;
         public Repository MetaModel { get { return _repository; } }
-
+        
         public NamedEntityAccumulator<Method> Methods { get { return importer.Methods; } }
         public NamedEntityAccumulator<FAMIX.StructuralEntity> Attributes { get { return importer.Attributes; } }
         public NamedEntityAccumulator<FAMIX.Type> Types { get { return importer.Types; } }
         public IEnumerable<T> AllElementsOfType<T>() {
             return importer.AllElementsOfType<T>();
         }
-
-
+        
         public MooseImporter() {
             _repository = FamixModel.Metamodel();
             ignoreFolder = "";
@@ -90,35 +88,45 @@ namespace RoslynMonoFamix {
          */
         public Repository ImportProject(string solutionPath) {
             //The code that causes the error goes here.
-            
-            var msWorkspace = MSBuildWorkspace.Create();
+
+            var msWorkspace = MSBuildWorkspace.Create(new Dictionary<string, string>() { { "Configuration", "Debug" }, { "Platform", "AnyCPU" }, { "CheckForSystemRuntimeDependency", "true" } });
 
             var solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
             ignoreFolder = this.PrivateDirectoryNameFor(solutionPath);
 
             this.InitializeForImport();
+            MetadataReference mscoreLibReference =
+           AssemblyMetadata
+               .CreateFromFile(typeof(string).Assembly.Location)
+               .GetReference();
 
 
             var documents = new List<Document>();
             for (int i = 0; i < solution.Projects.Count<Project>(); i++) {
                 var project = solution.Projects.ElementAt<Project>(i);
+
+                var compilationAsync = project.GetCompilationAsync().Result;
+                compilationAsync.AddReferences(
+                                      MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
+                        ).AddReferences(
+                                      MetadataReference.CreateFromFile(typeof(RequiredAttribute).Assembly.Location));
+                var diagnostics = compilationAsync.GetDiagnostics();
+
                 for (int j = 0; j < project.Documents.Count<Document>(); j++) {
                     var document = project.Documents.ElementAt<Document>(j);
                     if (document.SupportsSyntaxTree) {
                         this.log("(project " + (i + 1) + " / " + solution.Projects.Count<Project>() + ")");
                         this.logln("(document " + (j + 1) + " / " + project.Documents.Count<Document>() + " " + document.FilePath + ")");
                         var tree = document.GetSyntaxTreeAsync().Result;
-                        var compilationAsync = project.GetCompilationAsync().Result;
                         var semanticModel = compilationAsync.GetSemanticModel(tree);
+                        var model = semanticModel.GetDiagnostics();
                         this.Import(tree, semanticModel);
-
-                        
                     }
                 }
             }
             return _repository;
         }
-        public void Import (SyntaxTree tree, SemanticModel model) {
+        public void Import(SyntaxTree tree, SemanticModel model) {
             importer.model = model;
             this.Visit(tree.GetRoot());
         }
@@ -147,5 +155,5 @@ namespace RoslynMonoFamix {
             return Path.GetDirectoryName(uri.AbsolutePath);
         }
     }
-   
+
 }

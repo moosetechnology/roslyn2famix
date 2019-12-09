@@ -44,9 +44,9 @@ namespace FamixTest.VisualBasicUnitTest {
 
 
         [TestMethod]
-        public void ParseSimpleInheritance_HasThreeElements() {
+        public void ParseSimpleInheritance_HasFourElements() {
             this.ParseSimpleInheritance();
-            this.AssertAmountElements(3);
+            this.AssertAmountElements(4);
         }
 
         [TestMethod]
@@ -79,15 +79,15 @@ namespace FamixTest.VisualBasicUnitTest {
         }
 
         [TestMethod]
-        public void ParseMustInheritNotInheritableSimpleInheritance_HasFourElements() {
+        public void ParseMustInheritNotInheritableSimpleInheritance_HasFiveElements() {
             this.ParseMustInheritNotInheritableSimpleInheritance();
-            this.AssertAmountElements(4);
+            this.AssertAmountElements(5);
         }
 
         [TestMethod]
-        public void ParseNotInheritableMustInheritSimpleInheritance_HasFiveElements() {
+        public void ParseNotInheritableMustInheritSimpleInheritance_HasSixElements() {
             this.ParseNotInheritableMustInheritSimpleInheritance();
-            this.AssertAmountElements(5);
+            this.AssertAmountElements(6);
         }
 
         [TestMethod]

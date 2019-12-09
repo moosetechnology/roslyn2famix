@@ -87,7 +87,10 @@ namespace RoslynMonoFamix.ModelBuilder {
         public String FullMethodName(IMethodSymbol method) {
             return FullTypeName(method.ContainingType) + "." + MethodSignature(method);
         }
-
+        public String FullPropertyName(IPropertySymbol property) {
+            return FullTypeName(property.ContainingType) + "." + property.Name ;
+        }
+        
         public String MethodSignature(IMethodSymbol method) {
             var parameters = "";
             parameters += "(";

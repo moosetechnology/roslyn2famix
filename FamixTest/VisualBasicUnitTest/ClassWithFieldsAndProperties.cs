@@ -27,7 +27,7 @@ namespace FamixTest.VisualBasicUnitTest {
                         End Property
                     End Class
             ");
-            ClassElement = this.GetElement<FAMIX.Class>(0);
+            ClassElement = this.GetElement<FAMIX.Class>(1);
         }
 
         #endregion

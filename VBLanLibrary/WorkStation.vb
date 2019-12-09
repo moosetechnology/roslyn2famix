@@ -4,7 +4,6 @@ Public Class WorkStation
     Private _type As String
     Private _conf As LinkedList(Of Int64)
     Public confTwo As IList(Of AbstractDestinationAddress)
-
     Public Sub New()
         Me._conf = New LinkedList(Of Int64)()
         Me.confTwo = New ArrayList()

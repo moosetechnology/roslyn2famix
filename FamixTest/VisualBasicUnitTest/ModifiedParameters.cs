@@ -29,9 +29,9 @@ namespace FamixTest.VisualBasicUnitTest {
         }
 
         [TestMethod]
-        public void ParsingExample_HasElevenElements() {
+        public void ParsingExample_HasTwelveElements() {
             this.ParsingExample();
-            this.AssertAmountElements(11);
+            this.AssertAmountElements(12);
         }
 
         private FAMIX.Parameter GetParameter(int i) {

@@ -8,12 +8,14 @@ namespace FamixTest.VisualBasic {
         [TestMethod]
         public void IngestedAnnotationTypes() {
             var allAnnotationTypes = (importer.AllElementsOfType<FAMIX.AnnotationType>()).ToList();
-            Assert.AreEqual(allAnnotationTypes.Count(), 2);
+            Assert.AreEqual(allAnnotationTypes.Count(), 9);
         }
 
         [TestMethod]
         public void BuiltInAnnotationIsDigested() {
-            var annotation = importer.Types.Named("System.ComponentModel.DataAnnotations.Require");
+            //TODO: System.ComponentModel.DataAnnotations.RequiredAttribute 
+
+            var annotation = importer.Types.Named("RequiredAttribute");
             Assert.IsNotNull(annotation);
             Assert.IsTrue(annotation is FAMIX.AnnotationType);
             Assert.IsTrue(annotation.isStub);

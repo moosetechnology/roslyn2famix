@@ -125,7 +125,7 @@ namespace RoslynMonoFamix.ModelBuilder {
 
         private void ConfigureMethodWith(FAMIX.Method FamixMethod, IMethodSymbol method) {
             FamixMethod.isStub = true;
-            FamixMethod.name = method.Name;
+            FamixMethod.name = helper.FullMethodName(method);
             FamixMethod.Modifiers = method.RefCustomModifiers.Select(p => p.Modifier.Name).ToList();
             FamixMethod.signature = helper.MethodSignature(method);
             FamixMethod.accessibility = helper.AccessibilityName(method.DeclaredAccessibility);
@@ -297,7 +297,7 @@ namespace RoslynMonoFamix.ModelBuilder {
             Net.Property property = this.CreateNewEntity<Net.Property>(typeof(Net.Property).FullName); ;
             property.accessibility = helper.AccessibilityName(symbol.DeclaredAccessibility);
             property.declaredType = this.EnsureType(symbol.Type);
-            property.name = symbol.Name;
+            property.name = helper.FullPropertyName(symbol);
             return property;
         }
 

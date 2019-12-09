@@ -292,6 +292,8 @@ namespace RoslynMonoFamix.Visitor {
             Net.Property property = this.importer.EnsureProperty(symbol);
             property.Modifiers.AddRange(node.Modifiers.Select(p => p.Text).ToList());
             FamixClass.AddAttribute(property);
+            property.parentType = FamixClass;
+
             this.PushContext(property);
             base.VisitPropertyStatement(node);
 

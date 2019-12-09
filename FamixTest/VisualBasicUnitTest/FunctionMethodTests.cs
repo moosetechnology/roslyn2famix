@@ -37,9 +37,9 @@ namespace FamixTest.VisualBasicUnitTest {
 
         #region ParseEmptyFunctionManyParameters
         [TestMethod]
-        public void ParseEmptyFunctionManyParameters_SevenNine() {
+        public void ParseEmptyFunctionManyParameters_SevenTen() {
             this.ParseEmptyFunctionManyParameters();
-            this.AssertAmountElements(9);
+            this.AssertAmountElements(10);
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptyFunctionManyParameters_IsInternal() {
             this.ParseEmptyFunctionManyParameters();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.IsFalse(MethodElement.isPublic);
             Assert.IsFalse(MethodElement.isProtected);
             Assert.IsFalse(MethodElement.isPrivate);
@@ -73,7 +73,7 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptyFunctionManyParameters_HasTwoParameters() {
             this.ParseEmptyFunctionManyParameters();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.Parameters.Count, 2);
         }
 
@@ -85,13 +85,13 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_IsNamedExample() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.name, "ExampleFunction");
         }
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_ReturnsBoolean() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.returnType.name, "Boolean");
         }
 
@@ -99,24 +99,24 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_IsContainedInExampleClass() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
-            Assert.AreEqual(MethodElement.parentType, this.GetElement<FAMIX.Class>(0));
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
+            Assert.AreEqual(MethodElement.parentType, this.GetElement<FAMIX.Class>(1));
         }
         [TestMethod]
-        public void ParseEmptyFunctionParameterLess_FiveElements() {
+        public void ParseEmptyFunctionParameterLess_SixElements() {
             this.ParseEmptyFunctionParameterLess();
-            this.AssertAmountElements(5);
+            this.AssertAmountElements(6);
         }
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_Public() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.IsTrue(MethodElement.isPublic);
         }
         [TestMethod]
         public void ParseEmptyFunctionParameterLess_HasNoParameter() {
             this.ParseEmptyFunctionParameterLess();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.Parameters.Count, 0);
         }
 
@@ -124,9 +124,9 @@ namespace FamixTest.VisualBasicUnitTest {
 
         #region ParseEmptyFunctionOneParameter
         [TestMethod]
-        public void ParseEmptyFunctionOneParameter_SevenElements() {
+        public void ParseEmptyFunctionOneParameter_EightElements() {
             this.ParseEmptyFunctionOneParameter();
-            this.AssertAmountElements(7);
+            this.AssertAmountElements(8);
         }
 
         [TestMethod]
@@ -145,13 +145,13 @@ namespace FamixTest.VisualBasicUnitTest {
         [TestMethod]
         public void ParseEmptyFunctionOneParameters_Protected() {
             this.ParseEmptyFunctionOneParameter();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.IsTrue(MethodElement.isProtected);
         }
         [TestMethod]
         public void ParseEmptyFunctionOneParameter_HasOneParameter() {
             this.ParseEmptyFunctionOneParameter();
-            var MethodElement = this.GetElement<FAMIX.Method>(1);
+            var MethodElement = this.GetElement<FAMIX.Method>(2);
             Assert.AreEqual(MethodElement.Parameters.Count, 1);
         }
 
