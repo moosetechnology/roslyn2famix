@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Fame</RootNamespace>
     <AssemblyName>Fame</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -61,31 +62,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClassNotMetadescribedException.cs" />
+    <Compile Include="Exceptions\ClassNotMetadescribedException.cs" />
     <Compile Include="Common\Warnings.cs" />
-    <Compile Include="ElementInPropertyNotMetadescribed.cs" />
-    <Compile Include="FameDescriptionAttribute.cs" />
-    <Compile Include="FamePackageAttribute.cs" />
-    <Compile Include="FamePropertyAttribute.cs" />
-    <Compile Include="FamePropertyWithDerivedAttribute.cs" />
+    <Compile Include="Exceptions\ElementInPropertyNotMetadescribed.cs" />
+    <Compile Include="Fm3Internals\MetaDescriptionFactory.cs" />
+    <Compile Include="Metamodel\FameDescriptionAttribute.cs" />
+    <Compile Include="Metamodel\FamePackageAttribute.cs" />
+    <Compile Include="Metamodel\FamePropertyAttribute.cs" />
+    <Compile Include="Metamodel\FamePropertyWithDerivedAttribute.cs" />
     <Compile Include="Fm3\Element.cs" />
     <Compile Include="Fm3\MetaDescription.cs" />
     <Compile Include="Fm3\PackageDescription.cs" />
     <Compile Include="Fm3\PropertyDescription.cs" />
-    <Compile Include="INamed.cs" />
-    <Compile Include="INested.cs" />
-    <Compile Include="Internal\Access.cs" />
-    <Compile Include="Internal\MetaDescriptionFactory.cs" />
-    <Compile Include="Internal\Number.cs" />
-    <Compile Include="Internal\PropertyFactory.cs" />
-    <Compile Include="Internal\RepositoryVisitor.cs" />
-    <Compile Include="Internal\UnknownElementError.cs" />
-    <Compile Include="MetaRepository.cs" />
-    <Compile Include="Parser\IParseClient.cs" />
-    <Compile Include="Parser\MSEPrinter.cs" />
+    <Compile Include="Fm3Internals\Access.cs" />
+    <Compile Include="Fm3Internals\Number.cs" />
+    <Compile Include="Fm3Internals\PropertyFactory.cs" />
+    <Compile Include="Fm3Internals\RepositoryVisitor.cs" />
+    <Compile Include="Fm3Internals\UnknownElementError.cs" />
+    <Compile Include="Metamodel\MetaRepository.cs" />
+    <Compile Include="Printer\MSEPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repository.cs" />
-    <Compile Include="Tower.cs" />
+    <Compile Include="Metamodel\Repository.cs" />
+    <Compile Include="Metamodel\Tower.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -7,9 +7,11 @@ using System.Collections.Generic;
 
 namespace FAMIX
 {
-  [FamePackage("FAMIX")]
-  [FameDescription("Entity")]
-  public class Entity
+    [FamePackage("FAMIX")]
+    [FameDescription("Entity")]
+   
+  public class Entity 
   {
   }
+
 }

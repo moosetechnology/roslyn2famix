@@ -9,25 +9,24 @@ namespace FAMIX
 {
   [FamePackage("FAMIX")]
   [FameDescription("ParameterizableClass")]
-  public class ParameterizableClass : FAMIX.Class
-  {
-    private List<FAMIX.ParameterizedType> parameterizedTypes = new List<FAMIX.ParameterizedType>();
+  public class ParameterizableClass : FAMIX.Class, FAMIX.ParameterizableEntity {
+    private List<FAMIX.ArgumentType> argumentedTypes = new List<FAMIX.ArgumentType>();
     
     [FameProperty(Name = "parameterizedTypes",  Opposite = "parameterizableClass")]    
-    public List <FAMIX.ParameterizedType> ParameterizedTypes
+    public List <FAMIX.ArgumentType> ArgumentedTypes
     {
-      get { return parameterizedTypes; }
-      set { parameterizedTypes = value; }
+      get { return argumentedTypes; }
+      set { argumentedTypes = value; }
     }
-    public void AddParameterizedType(FAMIX.ParameterizedType one)
+    public void AddArgumentType(FAMIX.ArgumentType one)
     {
-      parameterizedTypes.Add(one);
+      argumentedTypes.Add(one);
     }
     
     private List<FAMIX.ParameterType> parameters = new List<FAMIX.ParameterType>();
     
     [FameProperty(Name = "parameters")]    
-    public List <FAMIX.ParameterType> Parameters
+    public List <FAMIX.ParameterType> TypeParameters
     {
       get { return parameters; }
       set { parameters = value; }
